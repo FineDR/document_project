@@ -1,7 +1,7 @@
 // src/pages/CVPage.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../api/authService";
+import { logoutUser } from "../features/auth/authSlice";
 import EducationSection from "../components/sections/EducationSection";
 import PersonalInfoSection from "../components/sections/PersonalInfoSection";
 import ReferencesSection from "../components/sections/ReferencesSection";
@@ -26,11 +26,12 @@ const CVPage = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [signInIsOpen, setSignInIsOpen] = useState(!user);
 
+  // ✅ Updated: remove user?.id
   const { data: cvData, loading, error } = useCurrentUserCV();
 
   const closeSignIn = () => setSignInIsOpen(false);
 
-  // If token is invalid -> open SignIn modal
+  // Handle token errors -> reopen sign-in modal
   useEffect(() => {
     if (error && typeof error === "object" && "detail" in error) {
       if (
@@ -45,10 +46,9 @@ const CVPage = () => {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      await authService.logout(dispatch);
+      await dispatch(logoutUser()).unwrap();
       setSignInIsOpen(true);
       navigate("/");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Logout failed:", err.message);
     } finally {
@@ -56,12 +56,12 @@ const CVPage = () => {
     }
   };
 
-  // Show SignIn modal if not authenticated or token expired
+  // Show SignIn modal if no user
   if (!user || signInIsOpen) {
     return <SignIn onClose={closeSignIn} />;
   }
 
-  // Loader while fetching CV
+  // Show loader while fetching CV
   if (loading) {
     return (
       <main className="p-6 container mx-auto min-h-screen flex items-center justify-center">
@@ -70,22 +70,14 @@ const CVPage = () => {
     );
   }
 
-  // Show error ONLY if not a token error
-  if (error && user && !loading) {
+  // Show error message if fetch fails
+  if (error && !loading) {
     const errorMessage =
       typeof error === "string"
         ? error
         : "detail" in error
         ? error.detail
         : "Failed to load CV";
-
-    // Skip showing UI if it's a token error (SignIn handles it)
-    if (
-      errorMessage === "Invalid token." ||
-      errorMessage === "Given token not valid for any token type"
-    ) {
-      return null;
-    }
 
     return (
       <main className="p-6 container mx-auto min-h-screen flex flex-col items-center justify-center">
@@ -100,7 +92,7 @@ const CVPage = () => {
     );
   }
 
-  // No CV data
+  // Show fallback if no CV data
   if (!cvData && !loading) {
     return (
       <main className="p-6 container mx-auto min-h-screen flex items-center justify-center">
@@ -109,9 +101,9 @@ const CVPage = () => {
     );
   }
 
+  // ✅ Main CV Page
   return (
     <main className="p-6 container mx-auto bg-gray-50 min-h-screen mt-10 space-y-8">
-      {/* Profile Header */}
       <section className="bg-white shadow-md rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center text-2xl font-bold">
@@ -146,12 +138,10 @@ const CVPage = () => {
         </Button>
       </section>
 
-      {/* Page Title */}
-      <h1 className="text-3xl font-semibold text-center text-primary">
+      <h1 className="text-3xl font-semibold text-center text-red-600">
         Profile Summary
       </h1>
 
-      {/* Grid Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <PersonalInfoSection cv={cvData!} />
         <ProjectsSection cv={cvData!} />

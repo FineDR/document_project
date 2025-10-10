@@ -21,7 +21,7 @@ const Button: React.FC<ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElemen
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`btn bg-red-600 ${className}`}
+      className={`bg-red-600 text-white hover:bg-red-700 ${className}`}
       aria-disabled={disabled}
       style={{
         padding: "0.5rem 1rem",

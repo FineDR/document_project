@@ -110,6 +110,7 @@ async signUp(dispatch: AppDispatch, data: SignUp) {
       throw new Error(err.message || "Something went wrong during login");
     }
   },
+  
 
   async logout(dispatch: AppDispatch) {
     try {
@@ -144,4 +145,47 @@ async signUp(dispatch: AppDispatch, data: SignUp) {
       throw new Error(err.message || "Something went wrong during logout");
     }
   },
+  async signUpWithGoogle(dispatch: AppDispatch, tokenId: string) {
+    try {
+      console.log("➡️ Google Signup tokenId:", tokenId);
+
+      const response = await fetch(`${API_BASE_URL}/auth/google-signup/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: tokenId }),
+      });
+
+      console.log("⬅️ Raw response:", response);
+
+      let responseData: any = {};
+      try {
+        responseData = await response.json();
+      } catch {
+        console.warn("⚠️ No JSON returned from backend");
+      }
+      console.log("⬅️ Response JSON:", responseData);
+
+      if (!response.ok) {
+        throw { response: { data: responseData, status: response.status } };
+      }
+
+      dispatch(
+        loginSuccess({
+          access: responseData.access,
+          refresh: responseData.refresh,
+          user: responseData.user,
+        })
+      );
+
+      localStorage.setItem("access", responseData.access);
+      localStorage.setItem("refresh", responseData.refresh);
+      localStorage.setItem("user", JSON.stringify(responseData.user));
+
+      return { status: response.status, data: responseData };
+    } catch (err: any) {
+      console.error("❌ Google Signup error:", err);
+      throw err;
+    }
+  }
 };
+

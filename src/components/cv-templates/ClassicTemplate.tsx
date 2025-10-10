@@ -16,7 +16,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ data }) => {
       {/* Header */}
       <header className="text-center pb-6 mb-8 p-8 print:p-6">
         <h1 className="text-3xl font-bold text-blue-800 mb-2 print:text-3xl uppercase">
-          {data.profiles.full_name}
+          {data.profile.full_name}
         </h1>
         <div className="border-b-4 border-gray-800 mx-auto w-3/4 mb-6"></div>
         
@@ -24,7 +24,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ data }) => {
         <div className="flex flex-wrap justify-center gap-6 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaEnvelope className="text-blue-600" />
-            <span>{data.profiles.email}</span>
+            <span>{data.profile.email}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <FaPhone className="text-blue-600" />
@@ -197,13 +197,13 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ data }) => {
         )}
 
         {/* Certificates */}
-        {data.profiles.certificates.length > 0 && (
+        {data.profile.certificates.length > 0 && (
           <section className="mb-6">
             <h2 className="text-lg font-bold text-blue-800 uppercase mb-2">
               Certifications
             </h2>
             <div className="space-y-3">
-              {data.profiles.certificates.map((cert) => (
+              {data.profile.certificates.map((cert) => (
                 <div key={cert.id} className="flex justify-between items-start border-l-2 border-blue-200 pl-4">
                   <div>
                     <span className="font-medium text-gray-800">{cert.name}</span>

@@ -1,29 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
+import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { FaX } from "react-icons/fa6";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+
 import InputField from "../formElements/InputField";
 import Button from "../formElements/Button";
-import { achievementsSchema } from "../forms/cvValidationSchema";
-import { FaX } from "react-icons/fa6";
-import { z } from "zod";
-import { submitAchievements, updateAchievement } from "../../api/achievements";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
-import type { Achievement } from "../../types/cv/cv";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
 import Loader from "../common/Loader";
+
+import { achievementsSchema } from "../forms/cvValidationSchema";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
+import type { Achievement } from "../../types/cv/cv";
+
+import {
+  addAchievement,
+  editAchievement,
+} from "../../features/achievements/achievementsSlice";
 
 type FormFields = z.infer<typeof achievementsSchema>;
 
 interface Props {
-  editingAchievement?: Achievement; // For editing
-  onDone?: (updatedAchievement?: Achievement) => void; // Called after successful submission
+  editingAchievement?: Achievement;
+  onDone?: (updatedAchievement?: Achievement) => void;
 }
 
 const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
 
   const {
     register,
@@ -45,7 +51,7 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
     name: "achievement",
   });
 
-  const { loading, withLoader } = useTimedLoader(3000); // Minimum loader duration 3s
+  const { loading, withLoader } = useTimedLoader(3000);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -63,6 +69,13 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
       });
     }
   }, [editingAchievement, reset]);
+
+  useEffect(() => {
+    if (successMsg) {
+      const timer = setTimeout(() => setSuccessMsg(""), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMsg]);
 
   if (!user) return <p className="text-red-500">Not logged in</p>;
 
@@ -86,19 +99,31 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
       };
 
       try {
-        let updatedAchievement;
+        let message = "";
+        let updatedAchievement: Achievement | undefined;
+
         if (editingAchievement?.id) {
-          updatedAchievement = await updateAchievement(
-            editingAchievement.id,
-            payload
+          const resultAction = await dispatch(
+            editAchievement({ id: editingAchievement.id, data: payload })
           );
-          setSuccessMsg("Achievement updated successfully ✅");
+          if (editAchievement.fulfilled.match(resultAction)) {
+            updatedAchievement = resultAction.payload;
+            message = "Achievement updated successfully ✅";
+          } else {
+            throw new Error("Update failed");
+          }
         } else {
-          updatedAchievement = await submitAchievements(payload);
-          setSuccessMsg("Achievement saved successfully ✅");
+          const resultAction = await dispatch(addAchievement(payload));
+          if (addAchievement.fulfilled.match(resultAction)) {
+            updatedAchievement = resultAction.payload;
+            message = "Achievement saved successfully ✅";
+          } else {
+            throw new Error("Save failed");
+          }
         }
 
-        reset();
+        reset({ achievement: [{ value: "" }] });
+        setSuccessMsg(message);
         onDone?.(updatedAchievement);
       } catch (error) {
         console.error("Error saving achievement:", error);
@@ -111,11 +136,18 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
 
   return (
     <div className="p-4 border rounded-lg relative m-4">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
+      <h2 className="text-xl font-semibold text-gray-700 mb-2 text-center">
         {editingAchievement ? "Edit Achievement" : "Add New Achievement"}
       </h2>
 
+      {/* Guidance message at top */}
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Add your personal or professional achievements — for example, awards,
+        recognitions, completed certifications, or big projects.
+      </p>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Dynamic Achievement Fields */}
         <div className="space-y-4">
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-start w-full">
@@ -128,6 +160,8 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
                   register={register(`achievement.${index}.value`)}
                   error={errors.achievement?.[index]?.value?.message}
                   disabled={loading}
+                  autoFocus={index === fields.length - 1}
+                  helperText="Tip: Include awards, certifications, completed projects, or any personal milestones."
                 />
               </div>
               {fields.length > 1 && (
@@ -145,6 +179,7 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
           ))}
         </div>
 
+        {/* Buttons */}
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -162,7 +197,7 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
           />
         </div>
 
-        {/* Reusable loader with elapsed time */}
+        {/* Loader */}
         <Loader
           loading={loading}
           message={
@@ -172,6 +207,7 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
           }
         />
 
+        {/* Messages */}
         {successMsg && (
           <div className="mt-4 text-green-600 text-center font-medium">
             {successMsg}

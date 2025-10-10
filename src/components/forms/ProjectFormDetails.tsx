@@ -18,19 +18,20 @@ import {
 } from "../../api/submitProjectDetails";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-import Loader from "../common/Loader"; // reusable loader component
-import { useTimedLoader } from "../../hooks/useTimedLoader"; // ensures minimum display time
+import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 type FormFields = z.infer<typeof projectSchema>;
 
 interface Props {
   existingProjects?: FormFields["projects"];
-  onDone?: (updatedProject?: any) => void; // optional project callback
+  onDone?: (updatedProject?: any) => void;
 }
 
 const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const { loading, withLoader } = useTimedLoader(1000); // minimum loader display
+  const { loading, withLoader } = useTimedLoader(1000);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(projectSchema),
@@ -46,34 +47,53 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
     fields: projectFields,
     append: appendProject,
     remove: removeProject,
-  } = useFieldArray({
-    control,
-    name: "projects",
-  });
+  } = useFieldArray({ control, name: "projects" });
+
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
   const handleOnclick = () => setActive(!active);
+
   useEffect(() => {
     if (existingProjects) reset({ projects: existingProjects });
   }, [existingProjects, reset]);
 
-  if (!user) return <p>Not logged in</p>;
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  if (!user) return <p className="text-red-500">Not logged in</p>;
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     await withLoader(async () => {
       const payload = { ...data, email: user.email };
+
       try {
+        let message = "";
+
         if (existingProjects && existingProjects.length > 0) {
           const updatedProjects = await Promise.all(
             data.projects.map((proj, idx) =>
               updateProject((existingProjects as any)[idx].id, proj)
             )
           );
+          message = "✅ Projects updated successfully.";
           updatedProjects.forEach((proj) => onDone?.(proj));
+          reset({ projects: updatedProjects });
         } else {
-          await submitProjectDetails(payload);
+          const response = await submitProjectDetails(payload);
+          message = "✅ Projects submitted successfully.";
+          reset({
+            projects: response.projects || [
+              { title: "", description: "", link: "", technologies: [{ value: "" }] },
+            ],
+          });
           onDone?.();
         }
+
+        setSuccessMessage(message);
       } catch (error) {
         console.error("Error submitting projects:", error);
       }
@@ -99,11 +119,10 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   return (
     <FormProvider {...methods}>
       <div className="relative border p-4 rounded-lg bg-white m-4">
-        <h2 className="text-center text-primary text-2xl font-semibold mb-6">
-          {existingProjects
-            ? "Edit Projects"
-            : "Fill the Projects Details Clearly"}
-        </h2>
+        {/* Guidance message at top */}
+        <p className="text-gray-600 text-sm mb-4 text-center">
+          Add your projects clearly — include title, description, technologies used, and links if any.
+        </p>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -112,9 +131,14 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
           {projectFields.map((project, index) => (
             <div
               key={(project as any).id ?? index}
-              className="p-4 mb-6 relative"
+              className="p-4 mb-6 relative "
             >
-              <ProjectInput projectIndex={index} disabled={loading} />
+              {/* Pass showHelperText to display helper tips */}
+              <ProjectInput
+                projectIndex={index}
+                disabled={loading}
+                showHelperText
+              />
 
               {projectFields.length > 1 && !existingProjects && (
                 <button
@@ -169,11 +193,15 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
 
           <Loader
             loading={loading}
-            message={
-              existingProjects ? "Updating project..." : "Saving project..."
-            }
+            message={existingProjects ? "Updating project..." : "Saving project..."}
           />
         </form>
+
+        {successMessage && (
+          <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+            {successMessage}
+          </div>
+        )}
       </div>
     </FormProvider>
   );

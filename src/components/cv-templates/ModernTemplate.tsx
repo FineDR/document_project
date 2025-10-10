@@ -20,7 +20,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data }) => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-4xl font-bold mb-2 print:text-3xl uppercase">
-              {data.profiles.full_name}
+              {data.profile.full_name}
             </h1>
             {/* <div className="text-blue-100 text-lg">
               {data.career_objectives[0]?.career_objective}
@@ -29,7 +29,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data }) => {
           <div className="flex flex-col space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <FaEnvelope size={16} />
-              <span>{data.profiles.email}</span>
+              <span>{data.profile.email}</span>
             </div>
             <div className="flex items-center gap-2">
               <FaPhone size={16} />
@@ -199,13 +199,13 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data }) => {
           )}
           
           {/* Certificates */}
-          {data.profiles.certificates.length > 0 && (
+          {data.profile.certificates.length > 0 && (
             <section className="mb-8">
               <h2 className="text-base font-bold text-blue-800 uppercase mb-4">
                 Certificates
               </h2>
               <div className="space-y-3">
-                {data.profiles.certificates.map((cert) => (
+                {data.profile.certificates.map((cert) => (
                   <div key={cert.id}>
                     <p className="text-gray-800 text-sm">
                       {cert.name} - {cert.issuer} ({formatDate(cert.date)})

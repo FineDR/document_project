@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +12,8 @@ import {
 } from "../../api/personalDetails";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-import Loader from "../common/Loader"; // Reusable loader component
-import { useTimedLoader } from "../../hooks/useTimedLoader"; // Handles minimum loader time
+import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 type FormFields = z.infer<typeof personalInformationSchema>;
 
@@ -23,6 +23,8 @@ interface Props {
 }
 
 const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
+  const [successMessage, setSuccessMessage] = useState("");
+
   const user = useSelector((state: RootState) => state.auth.user);
   const {
     register,
@@ -43,11 +45,18 @@ const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
     },
   });
 
-  const { loading, withLoader } = useTimedLoader(1500); // Minimum 1.5s loader
+  const { loading, withLoader } = useTimedLoader(1500);
 
   useEffect(() => {
     if (existingDetails) reset(existingDetails);
   }, [existingDetails, reset]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   if (!user) return <p>Not logged in</p>;
 
@@ -59,11 +68,25 @@ const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
     await withLoader(async () => {
       const payload = { ...data, full_name, email: user.email };
       try {
+        let message = "";
         if (existingDetails) {
           await updatePersonalDetails(payload);
+          message = "✅ Your personal details have been updated successfully.";
         } else {
           await submitPersonalDetails(payload);
+          message = "✅ Your personal details have been saved successfully.";
         }
+        reset({
+          phone: "",
+          address: "",
+          linkedin: "",
+          github: "",
+          website: "",
+          date_of_birth: "",
+          nationality: "",
+          profile_summary: "",
+        });
+        setSuccessMessage(message);
         onDone?.();
       } catch (error) {
         console.error("Submission failed:", error);
@@ -87,6 +110,12 @@ const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
       <h2 className="text-center text-primary text-2xl font-semibold">
         {existingDetails ? "Edit Personal Details" : "Fill Personal Details"}
       </h2>
+
+      {/* User guidance */}
+      <p className="text-gray-600 text-sm text-center mt-2">
+        Please fill in your personal information accurately. This information
+        will be used in your CV/profile.
+      </p>
 
       <div className="relative mt-6">
         <form
@@ -165,6 +194,11 @@ const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
               error={errors.profile_summary?.message}
               disabled={loading}
             />
+            {/* Inline tip for profile summary */}
+            <p className="text-gray-500 text-xs col-span-full">
+              Tip: Keep your profile summary concise (2-3 sentences) and highlight
+              your main skills and career goal.
+            </p>
           </div>
 
           <div className="flex gap-4 flex-wrap mx-4">
@@ -194,6 +228,11 @@ const PersonDetailForm = ({ existingDetails, onDone }: Props) => {
           />
         </form>
       </div>
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

@@ -10,7 +10,9 @@ interface Props {
 }
 
 const CertificationsSection = ({ cv }: Props) => {
-  const certificates = cv.profiles?.certificates || [];
+  // Get certificates safely from cv.profile.certificates
+  const certificates = cv.profile?.certificates || [];
+
   const [certData, setCertData] = useState<Certificate[]>(certificates);
   const [showForm, setShowForm] = useState(false);
   const [editingCert, setEditingCert] = useState<Certificate | null>(null);
@@ -80,7 +82,7 @@ const CertificationsSection = ({ cv }: Props) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-2 top-9 absolute">
+          <div className="text-center py-2">
             <p className="text-gray-500 italic">No certifications added yet</p>
           </div>
         )}

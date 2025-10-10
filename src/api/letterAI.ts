@@ -25,7 +25,7 @@ export type LetterResponse = {
   closing: string;   // e.g., "Sincerely,"
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 // Get auth headers from Redux store
 const getAuthHeaders = (): Record<string, string> => {

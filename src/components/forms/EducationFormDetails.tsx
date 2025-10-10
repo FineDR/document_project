@@ -24,6 +24,7 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
   const handleOnClick = () => setActive(!active);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const {
     register,
@@ -52,7 +53,7 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
     name: "education",
   });
 
-  const { loading, withLoader } = useTimedLoader(3000); // Minimum loader duration 3s
+  const { loading, withLoader } = useTimedLoader(3000);
   const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
@@ -83,47 +84,63 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 100);
 
-      setTimeout(async () => {
-        try {
-          let updatedEdu: Education | undefined;
+      try {
+        let message = "";
+        let updatedEdu: Education | undefined;
 
-          const payload = data.education[0];
-          if (!payload.degree || !payload.institution || !payload.start_date) {
-            console.error("Please fill all required fields!");
-            return;
-          }
-
-          if (editingEducation?.id) {
-            updatedEdu = await updateEducation(editingEducation.id, payload);
-          } else {
-            const response = await submitEducation({
-              education: data.education,
-            });
-            updatedEdu = response.data?.[0]; // Adjust according to your backend
-          }
-
-          reset();
-          onDone?.(updatedEdu);
-        } catch (error) {
-          console.error("Error submitting education:", error);
-        } finally {
-          clearInterval(interval);
+        const payload = data.education[0];
+        if (!payload.degree || !payload.institution || !payload.start_date) {
+          console.error("Please fill all required fields!");
+          return;
         }
-      }, 0);
+
+        if (editingEducation?.id) {
+          updatedEdu = await updateEducation(editingEducation.id, payload);
+          message = "✅ Education updated successfully.";
+        } else {
+          const response = await submitEducation({ education: data.education });
+          updatedEdu = response.data?.[0];
+          message = "✅ Education submitted successfully.";
+        }
+
+        reset({
+          education: [
+            {
+              degree: "",
+              institution: "",
+              location: "",
+              start_date: "",
+              end_date: "",
+              grade: "",
+            },
+          ],
+        });
+
+        setSuccessMessage(message);
+        onDone?.(updatedEdu);
+      } catch (error) {
+        console.error("Error submitting education:", error);
+      } finally {
+        clearInterval(interval);
+      }
     });
   };
 
   return (
     <section className="relative mx-auto mt-10 p-6 border bg-white rounded-lg">
       <h2 className="text-center text-primary text-2xl font-semibold mb-6">
-        {editingEducation
-          ? "Edit Education"
-          : "Fill the Education Details Clearly"}
+        {editingEducation ? "Edit Education" : "Education Details"}
       </h2>
+      {/* Guidance message for user */}
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Fill in your education details carefully. Required fields are marked with *.
+      </p>
+
+      
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4 mb-4 space-y-4">
+          <div key={field.id} className="p-4 mb-4 space-y-2">
             <InputField
               type="text"
               label="Degree or Certification *"
@@ -133,6 +150,9 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
               error={errors.education?.[index]?.degree?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              Enter the full name of your degree, diploma, or certification.
+            </p>
 
             <InputField
               type="text"
@@ -143,6 +163,9 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
               error={errors.education?.[index]?.institution?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              Full name of the school, college, or university attended.
+            </p>
 
             <InputField
               type="text"
@@ -153,15 +176,19 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
               error={errors.education?.[index]?.location?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              City and country where the institution is located.
+            </p>
 
             <InputField
               type="date"
-              label="Start Date"
+              label="Start Date *"
               name={`education.${index}.start_date`}
               register={register(`education.${index}.start_date`)}
               error={errors.education?.[index]?.start_date?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">The date you started this program.</p>
 
             <InputField
               type="date"
@@ -171,6 +198,9 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
               error={errors.education?.[index]?.end_date?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              The date you completed this program (leave blank if ongoing).
+            </p>
 
             <InputField
               type="text"
@@ -181,6 +211,9 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
               error={errors.education?.[index]?.grade?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              Enter your GPA, final grade, or any honors/awards received.
+            </p>
 
             {!editingEducation && fields.length > 1 && (
               <button
@@ -224,7 +257,6 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
           />
         </div>
 
-        {/* Reusable Loader with elapsed time */}
         <Loader
           loading={loading}
           message={
@@ -234,6 +266,12 @@ const EducationFormDetails = ({ editingEducation, onDone }: Props) => {
           }
         />
       </form>
+
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </section>
   );
 };

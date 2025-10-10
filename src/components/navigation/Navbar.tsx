@@ -13,8 +13,12 @@ export const NavBar = () => {
   const isAdmin = user?.is_staff || user?.is_superuser;
   
   return (
-    <nav className="hidden md:flex bg-red-50 shadow-md px-6 py-3 justify-between items-center p-8 border-b-2 border-red-200">
-      <div className="text-2xl text-red-700">
+    // <div className="container bg-gray-50 mx-auto">
+     
+    // </div>
+
+     <nav className="hidden md:flex container mx-auto  px-6 py-3 justify-between items-center p-8 ">
+      <div className="text-2xl text-gray-700">
         <Logo />
       </div>
       <ul className="flex gap-8 items-center">
@@ -41,8 +45,8 @@ export const NavBar = () => {
                     to={link.path}
                     className={({ isActive }) =>
                       isActive
-                        ? "text-red-600 font-bold text-lg transition"
-                        : "text-red-700 hover:text-red-500 font-medium transition"
+                        ? "text-gray-700 text-lg transition"
+                        : "text-red-700 hover:text-red-500 text-lg transition"
                     }
                   >
                     {link.name}
@@ -78,7 +82,7 @@ export const MobileNavBar = () => {
   const closeMenu = () => setIsOpen(false);
   
   return (
-    <nav className="md:hidden bg-red-50 shadow-md px-4 py-3 border-b-2 border-red-200">
+    <nav className="md:hidden bg-red-50 shadow-md bg-white/30 backdrop-blur-md px-4 py-3 border-b-2 border-red-200">
       <div className="flex justify-between items-center">
         <div className="text-xl font-bold text-red-700">
           <Logo />

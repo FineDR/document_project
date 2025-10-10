@@ -14,6 +14,21 @@ import { FaEnvelopeOpenText } from "react-icons/fa";
 import { FaCheckCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Button from "../formElements/Button";
+import { useAppDispatch } from "../../hooks/reduxHooks";
+import { loginUser, googleAuthUser } from "../../features/auth/authSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+
+
+
+interface GoogleUser {
+  sub: string;
+  email: string;
+  given_name: string;
+  family_name: string;
+}
+
 const loginSchema = z.object({
   email: z
     .string()
@@ -63,35 +78,70 @@ const TopNav = () => {
   };
 
   return (
-    <div className="w-screen h-6 bg-red-100 border-b border-red-900 flex items-center gap-4 px-4 relative">
-      <div
-        className="text-red-700 text-sm hover:text-red-500 flex flex-row mx-4 cursor-pointer"
-        onClick={toggleSignIn}
-      >
-        SIGN IN{" "}
-        <span className="hover:text-2xl hover:text-red-600">
-          <RiArrowDropDownLine />
-        </span>
+    <div className="w-full bg-red-50">
+      <div className="container mx-auto">
+        <div className="w-screen h-10 bg-red-50 flex items-center gap-4 px-4 relative">
+          <div
+            className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex flex-row mx-4 cursor-pointer"
+            onClick={toggleSignIn}
+          >
+            SIGN IN{" "}
+            <span className="hover:text-2xl hover:text-red-600">
+              <RiArrowDropDownLine />
+            </span>
+          </div>
+          <div
+            className="text-red-700 lowercase text-base flex font-bold hover:text-red-500 lowercase flex-row cursor-pointer"
+            onClick={toggleSignUp}
+          >
+            SIGN UP{" "}
+            <span className="hover:text-2xl hover:text-red-600">
+              <RiArrowDropDownLine />
+            </span>
+          </div>
+        </div>
       </div>
-      <div
-        className="text-red-700 text-sm flex hover:text-red-500 flex-row cursor-pointer"
-        onClick={toggleSignUp}
-      >
-        SIGN UP{" "}
-        <span className="hover:text-2xl hover:text-red-600">
-          <RiArrowDropDownLine />
-        </span>
-      </div>
-      {signInIsOpen && <SignIn onClose={closeModals} />}
-      {signUpIsOpen && <SignUp onClose={closeModals} />}
+
+      {/* Centered modal overlays */}
+      {signInIsOpen && (
+        <div
+          className="bg-white p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[400px] mt-28 sm:mt-20"
+          onClick={closeModals}
+        >
+          <div
+            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mt-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SignIn onClose={closeModals} />
+          </div>
+        </div>
+      )}
+
+      {signUpIsOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 mt-50"
+          onClick={closeModals}
+        >
+          <div
+            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SignUp onClose={closeModals} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default TopNav;
 
+
+
 // ✅ SignIn with icon close
 export const SignIn = ({ onClose }: { onClose: () => void }) => {
+  const dispatch = useAppDispatch();
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   type FormFields = z.infer<typeof loginSchema>;
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -111,25 +161,71 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
     defaultValues: { email: "", password: "" },
 
   });
-  const dispatch = useDispatch<AppDispatch>();
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const token = credentialResponse.credential;
+    if (!token) return;
+
+    try {
+      const user = jwtDecode<GoogleUser>(token);
+      const payload = {
+        email: user.email,
+        first_name: user.given_name,
+        last_name: user.family_name,
+        googleId: user.sub,
+      };
+
+      console.log("Google SignUp Payload:", payload);
+      const resultAction = await dispatch(
+        googleAuthUser({ token })
+      );
+
+      if (googleAuthUser.fulfilled.match(resultAction)) {
+        toast.success("Signed up successfully with Google!");
+        onClose();
+      } else {
+        throw new Error((resultAction.payload as string) || "Google signup failed");
+      }
+    } catch (err: any) {
+      console.error("Google signup error:", err);
+      toast.error(err.message || "Google signup failed. Try again.");
+    }
+  };
+
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     setLoading(true);
     setErrorMsg("");
+    setFieldErrors({});
     try {
-      const result = await authService.login(dispatch, data);
+      const resultAction = await dispatch(loginUser(data));
+      const result = unwrapResult(resultAction);
+      console.log("Login success:", result);
 
-      if (result.status === 200) {
-        console.log("Login success:", result.data);
-        // Show success notification / message
-        setShowSuccess(true);
-        // Optionally store token or update auth context here
-      }
+      setShowSuccess(true);
+      setTimeout(() => {
+        window.location.href = "/profile";
+      }, 2000);
+      // Optionally store token or update auth context here
     } catch (error: any) {
-      const backendMessage = error.message || "Login failed";
-      console.error("Login error:", backendMessage);
-      setErrorMsg(backendMessage);
-      toast.error(backendMessage);
-    } finally {
+      if (error && typeof error === "object") {
+        const newFieldErrors: Record<string, string> = {};
+
+        Object.keys(error).forEach((key) => {
+          if (Array.isArray(error[key]) && error[key].length > 0) {
+            newFieldErrors[key] = error[key][0];
+          }
+        });
+
+        setFieldErrors(newFieldErrors);
+
+        if (newFieldErrors.non_field_errors) {
+          setErrorMsg(newFieldErrors.non_field_errors);
+        }
+      } else {
+        setErrorMsg(error || "Login failed");
+      }
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -144,7 +240,7 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <RiCloseLine
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-500 cursor-pointer text-xl"
+          className="absolute top-2 right-2 text-blue-500 hover:text-red-500 cursor-pointer text-xl"
           onClick={onClose}
         />
 
@@ -181,21 +277,21 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
                 name="email"
                 type="email"
                 register={register("email")}
-                error={errors.email?.message}
+                error={fieldErrors.email || errors.email?.message}
               />
               <InputField
                 placeholder="password"
                 name="password"
                 type="password"
                 register={register("password")}
-                error={errors.password?.message}
+                error={fieldErrors.password || errors.password?.message}
               />
 
               <Button
                 type="submit"
                 name="submit"
                 label="submit"
-                className={`${active ? hoverStyle : ""}`}
+                className={`w-full ${active ? hoverStyle : ""}`}
                 onClick={handleClickedSignIn}
               />
 
@@ -205,6 +301,10 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )}
             </form>
+            <div className="flex flex-col items-center mt-4">
+              <p className="text-gray-500 mb-2">Or sign up with Google</p>
+              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google signup failed. Try again.")} />
+            </div>
           </>
         )}
       </div>
@@ -213,7 +313,6 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
 };
 
 // ✅ SignUp with icon close
-
 
 
 
@@ -248,6 +347,36 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const token = credentialResponse.credential;
+    if (!token) return;
+
+    try {
+      const user = jwtDecode<GoogleUser>(token);
+      const payload = {
+        email: user.email,
+        first_name: user.given_name,
+        last_name: user.family_name,
+        googleId: user.sub,
+      };
+
+      console.log("Google SignUp Payload:", payload);
+      const resultAction = await dispatch(
+        googleAuthUser({ token })
+      );
+
+      if (googleAuthUser.fulfilled.match(resultAction)) {
+        toast.success("Signed up successfully with Google!");
+        onClose();
+      } else {
+        throw new Error((resultAction.payload as string) || "Google signup failed");
+      }
+    } catch (err: any) {
+      console.error("Google signup error:", err);
+      toast.error(err.message || "Google signup failed. Try again.");
+    }
+  };
+
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     setLoading(true);
     setBackendError(null);
@@ -262,10 +391,8 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
     } catch (error: any) {
       let messages = "Signup failed. Please try again.";
 
-      // If backend sent structured error
       if (error?.response?.data) {
         const data = error.response.data;
-        // If it's a dict (like DRF ValidationError)
         if (typeof data === "object") {
           messages = Object.entries(data)
             .map(([field, val]) =>
@@ -325,7 +452,6 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
               Sig<span className="text-primary">n Up</span>
             </h1>
 
-            {/* Backend error at the top */}
             {backendError && (
               <div className="bg-red-100 text-red-700 p-2 rounded mb-3 text-center break-words">
                 {backendError}
@@ -336,49 +462,14 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
               onSubmit={handleSubmit(onSubmit)}
               className="w-full h-full mt-4 p-4 relative"
             >
-              <InputField
-                placeholder="Email"
-                name="email"
-                type="email"
-                register={register("email")}
-              />
-              <InputField
-                placeholder="First Name"
-                name="first_name"
-                type="text"
-                register={register("first_name")}
-              />
-              <InputField
-                placeholder="Middle Name"
-                name="middle_name"
-                type="text"
-                register={register("middle_name")}
-              />
-              <InputField
-                placeholder="Last Name"
-                name="last_name"
-                type="text"
-                register={register("last_name")}
-              />
-              <InputField
-                placeholder="Password"
-                name="password"
-                type="password"
-                register={register("password")}
-              />
-              <InputField
-                placeholder="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                register={register("confirmPassword")}
-              />
+              <InputField placeholder="Email" name="email" type="email" register={register("email")} />
+              <InputField placeholder="First Name" name="first_name" type="text" register={register("first_name")} />
+              <InputField placeholder="Middle Name" name="middle_name" type="text" register={register("middle_name")} />
+              <InputField placeholder="Last Name" name="last_name" type="text" register={register("last_name")} />
+              <InputField placeholder="Password" name="password" type="password" register={register("password")} />
+              <InputField placeholder="Confirm Password" name="confirmPassword" type="password" register={register("confirmPassword")} />
 
-              <Button
-                type="submit"
-                label="Submit"
-                className={`${active ? hoverStyle : ""}`}
-                onClick={handleClickedSignUp}
-              />
+              <Button type="submit" label="Submit" className={`w-full ${active ? hoverStyle : ""}`} onClick={handleClickedSignUp} />
 
               {loading && (
                 <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center rounded-2xl">
@@ -386,9 +477,15 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )}
             </form>
+
+            <div className="flex flex-col items-center mt-4">
+              <p className="text-gray-500 mb-2">Or sign up with Google</p>
+              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google signup failed. Try again.")} />
+            </div>
           </>
         )}
       </div>
     </div>
   );
 };
+

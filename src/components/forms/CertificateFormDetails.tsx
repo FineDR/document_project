@@ -4,155 +4,141 @@ import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { certificationsSchema } from "../forms/cvValidationSchema";
 import type { z } from "zod";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
 import InputField from "../formElements/InputField";
 import Button from "../formElements/Button";
-import {
-  submitCertificates,
-  updateCertificate,
-} from "../../api/submitCertificates";
-import type { Certificate } from "../../types/cv/cv";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
 import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
+import { useAppDispatch as useDispatch } from "../../hooks/reduxHooks";
+import { addCertificate, updateCertificat } from "../../features/certificates/certificatesSlice";
 
-// Form fields come from Zod schema
 type FormFields = z.infer<typeof certificationsSchema>;
 
 interface CertificateFormDetailsProps {
-  editingCert?: Certificate | null;
-  onClose: () => void;
-  onUpdate: (cert: Certificate) => void;
+  editingCert?: any | null;
+  onClose?: () => void;
 }
 
-const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({
-  editingCert,
-  onClose,
-  onUpdate,
-}) => {
-  const {
-    register,
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormFields>({
+const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editingCert }) => {
+  const dispatch = useDispatch();
+
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<FormFields>({
+    defaultValues: { certificates: [{ name: "", issuer: "", date: "" }] },
     resolver: zodResolver(certificationsSchema),
-    defaultValues: {
-      certificates: [{ name: "", issuer: "", date: "" }],
-    },
   });
+
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "certificates",
   });
 
-  const user = useSelector((state: RootState) => state.auth.user);
-  const { loading, withLoader } = useTimedLoader(3000); // Minimum loader duration 3s
+  const { withLoader } = useTimedLoader(3000);
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-blue-600/60";
 
   const handleOnClick = () => setActive(!active);
 
+  // Prefill form if editing
   useEffect(() => {
     if (editingCert) {
-      replace([
-        {
-          name: editingCert.name,
-          issuer: editingCert.issuer,
-          date: editingCert.date,
-        },
-      ]);
+      replace([{ ...editingCert }]);
+    } else {
+      reset({ certificates: [{ name: "", issuer: "", date: "" }] });
     }
-  }, [editingCert, replace]);
-
-  if (!user) return <p>Not logged in</p>;
-
-  const full_name =
-    user.profiles?.full_name ||
-    [user.first_name, user.middle_name, user.last_name]
-      .filter(Boolean)
-      .join(" ");
+  }, [editingCert, replace, reset]);
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    if (!user) return;
+    const payload = {
+      full_name: user?.first_name + " " + user?.last_name,
+      email: user?.email,
+      certificates: data.certificates.map(cert => ({
+        name: cert.name,
+        issuer: cert.issuer,
+        date: cert.date,
+        profile: user?.profile?.id,
+      }))
+    };
+
+    console.log("Submitted Data:", payload);
 
     await withLoader(async () => {
+      setLoading(true);
       const startTime = Date.now();
-      setElapsedTime(0);
-
-      const interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 100);
+      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
       try {
-        let updatedCert: Certificate;
+        let resultAction;
+        let message = "";
 
         if (editingCert) {
-          const payload = {
-            name: data.certificates[0].name,
-            issuer: data.certificates[0].issuer,
-            date: data.certificates[0].date,
-          };
-
-          updatedCert = await updateCertificate(editingCert.id, payload);
+          resultAction = await dispatch(updateCertificat({ id: editingCert.id, data: payload }));
+          message = "✅ Certificate updated successfully!";
         } else {
-          const payload = {
-            certificates: [
-              {
-                name: data.certificates[0].name,
-                issuer: data.certificates[0].issuer,
-                date: data.certificates[0].date,
-              },
-            ],
-            full_name,
-            email: user.email,
-          };
-
-          updatedCert = await submitCertificates(payload);
+          resultAction = await dispatch(addCertificate(payload));
+          message = "✅ Certificate added successfully!";
         }
 
-        onUpdate(updatedCert);
-        reset();
-        onClose();
-      } catch (error) {
-        console.error("❌ Error submitting certificate:", error);
+        if (resultAction.meta.requestStatus === "fulfilled") {
+          setSuccessMessage(message);
+          reset({ certificates: [{ name: "", issuer: "", date: "" }] });
+        } else {
+          console.error("Failed to save certificate:", resultAction.payload);
+        }
+      } catch (err) {
+        console.error(err);
       } finally {
         clearInterval(interval);
+        setLoading(false);
       }
     });
   };
 
   return (
-    <section className="relative mx-auto p-6 bg-white border rounded-lg m-8">
+    <section className="mx-auto p-6 bg-white border rounded-lg m-8">
       <h2 className="text-center text-primary text-2xl font-semibold mb-6">
         {editingCert ? "Edit Certificate" : "Add Certificate"}
       </h2>
+      {/* Guidance message */}
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Fill in your certificate details. Required fields are marked with *.
+      </p>
+
+      
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4 space-y-4 relative">
+          <div key={field.id} className="p-4 space-y-4 relative ">
             <InputField
               type="text"
               label="Certificate Name *"
-              placeholder="e.g., AWS Certified Cloud Practitioner, Microsoft Azure Fundamentals"
+              placeholder="e.g., AWS Certified Cloud Practitioner"
               name={`certificates.${index}.name`}
               register={register(`certificates.${index}.name`)}
               error={errors.certificates?.[index]?.name?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              Enter the full name of the certificate or course you completed.
+            </p>
 
             <InputField
               type="text"
               label="Issuer *"
-              placeholder="e.g., Amazon Web Services, Microsoft, Coursera"
+              placeholder="e.g., Amazon Web Services"
               name={`certificates.${index}.issuer`}
               register={register(`certificates.${index}.issuer`)}
               error={errors.certificates?.[index]?.issuer?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              The organization or company that issued the certificate.
+            </p>
 
             <InputField
               type="date"
@@ -162,6 +148,9 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({
               error={errors.certificates?.[index]?.date?.message}
               disabled={loading}
             />
+            <p className="text-gray-500 text-xs">
+              The date you were awarded the certificate.
+            </p>
 
             {fields.length > 1 && (
               <button
@@ -170,7 +159,7 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({
                 disabled={loading}
                 className="text-red-500 underline text-sm"
               >
-                Remove Certificate
+                Remove
               </button>
             )}
           </div>
@@ -193,16 +182,17 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({
           />
         </div>
 
-        {/* Reusable loader with elapsed time */}
         <Loader
           loading={loading}
-          message={
-            loading
-              ? `Saving your certificates... (${elapsedTime}s elapsed)`
-              : ""
-          }
+          message={loading ? `Saving... (${elapsedTime}s)` : ""}
         />
       </form>
+
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </section>
   );
 };

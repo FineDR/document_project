@@ -127,8 +127,8 @@ export async function generateModernDoc(user: User, type: string) {
   };
 
   // --- Header ---
-  if (user.profiles && user.profiles.full_name) {
-    drawText(user.profiles.full_name.toUpperCase(), margin, yLeft, timesRomanBold, 16, headingColor, leftPage);
+  if (user.profile && user.profile.full_name) {
+    drawText(user.profile.full_name.toUpperCase(), margin, yLeft, timesRomanBold, 16, headingColor, leftPage);
     yLeft -= lineHeight * 1.5;
 
     // Career objectives if available
@@ -137,8 +137,8 @@ export async function generateModernDoc(user: User, type: string) {
     }
 
     // Contact information - only include non-empty fields
-    if (user.profiles.email) {
-      addParagraphLeft(`Email: ${user.profiles.email}`);
+    if (user.profile.email) {
+      addParagraphLeft(`Email: ${user.profile.email}`);
     }
     if (user.personal_details && user.personal_details.phone) {
       addParagraphLeft(`Phone: ${user.personal_details.phone}`);
@@ -258,11 +258,11 @@ export async function generateModernDoc(user: User, type: string) {
     }
   }
 
-  if (user.profiles && user.profiles.certificates && user.profiles.certificates.length > 0) {
+  if (user.profile && user.profile.certificates && user.profile.certificates.length > 0) {
     addSectionRight("Certificates");
     yRight -= lineHeight * 1.0;
 
-    user.profiles.certificates.forEach(c => {
+    user.profile.certificates.forEach(c => {
       if (c.name && c.issuer && c.date) {
         addParagraphRight(`${c.name} - ${c.issuer} (${c.date})`);
       }
@@ -289,6 +289,6 @@ export async function generateModernDoc(user: User, type: string) {
   // --- Save PDF ---
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-  saveAs(blob, `${user.profiles?.full_name || "CV"}_ModernCV.pdf`);
+  saveAs(blob, `${user.profile?.full_name || "CV"}_ModernCV.pdf`);
 
 }

@@ -29,13 +29,14 @@ import SkillsForm from "../components/forms/SkillsForm";
 
 // Sidebar sections
 const categories = [
+  { key: "certification", label: "Certification", icon: <FaCertificate /> },
   { key: "personal_information", label: "Personal Information", icon: <FaUser /> },
   { key: "work_experience", label: "Work Experience", icon: <FaBriefcase /> },
   { key: "career_objective", label: "Career Objective", icon: <FaBullseye /> },
   { key: "skills", label: "Skills", icon: <FaStar /> },
   { key: "education", label: "Education", icon: <FaGraduationCap /> },
   { key: "language", label: "Language", icon: <FaLanguage /> },
-  { key: "certification", label: "Certification", icon: <FaCertificate /> },
+  
   { key: "projects", label: "Projects", icon: <FaProjectDiagram /> },
   { key: "achievements", label: "Achievements", icon: <FaTrophy /> },
   { key: "references", label: "References", icon: <FaAddressBook /> },
@@ -65,8 +66,8 @@ const CvDocument = () => {
   const SelectedComponent = selectedCategory ? categoryComponents[selectedCategory] : null;
 
   return (
-    <div className="h-screen bg-gray-100 sm:p-8 mt-8">
-      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+    <div className="h-screen bg-gray-100 sm:p-8 mt-8 border-t">
+      <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 mt-10">
         Fill Your CV Details Below
       </h2>
 

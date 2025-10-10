@@ -48,10 +48,10 @@ const Services = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-10 sm:mb-16">
-          <h1 className="text-2xl sm:text-4xl font-bold text-red-900 mb-3 sm:mb-4">
+          <h1 className="text-2xl sm:text-4xl font-bold text-red-600 mb-3 sm:mb-4">
             Our Services
           </h1>
-          <p className="text-sm sm:text-lg text-red-700 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-lg text-gray-700 max-w-2xl mx-auto">
             Professional document creation services to help you present yourself effectively.
           </p>
         </div>
@@ -75,25 +75,25 @@ const Services = () => {
 
               {/* Service Body */}
               <div className="p-4 sm:p-6">
-                <p className="text-red-800 mb-4 sm:mb-6 text-sm sm:text-base">
+                <p className="text-gray-800 mb-4 sm:mb-6 text-sm sm:text-base">
                   {service.description}
                 </p>
 
                 {/* Features List */}
-                <h3 className="text-base sm:text-lg font-semibold text-red-900 mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
                   Key Features:
                 </h3>
                 <ul className="mb-4 sm:mb-6 space-y-2">
                   {service.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <FaCheck className="text-red-600 mt-1 mr-2 flex-shrink-0 text-sm sm:text-base" />
-                      <span className="text-red-800 text-sm sm:text-base">{feature}</span>
+                      <FaCheck className="text-gray-600 mt-1 mr-2 flex-shrink-0 text-sm sm:text-base" />
+                      <span className="text-gray-800 text-sm sm:text-base">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 {/* Process Steps */}
-                <h3 className="text-base sm:text-lg font-semibold text-red-900 mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
                   How It Works:
                 </h3>
                 <div className="mb-4 sm:mb-6 space-y-3">
@@ -104,8 +104,8 @@ const Services = () => {
                           {i + 1}
                         </div>
                         <div>
-                          <h4 className="font-medium text-red-900 text-sm sm:text-base">{step}</h4>
-                          <p className="text-red-700 text-xs sm:text-sm">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base">{step}</h4>
+                          <p className="text-gray-700 text-xs sm:text-sm">
                             {i === 0
                               ? 'Select from professional templates'
                               : i === 1
@@ -133,7 +133,7 @@ const Services = () => {
 
         {/* Benefits Section */}
         <div className="mt-12 sm:mt-16 bg-white rounded-xl shadow-md p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-red-900 mb-6 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-6 text-center">
             Why Choose Our Services?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
@@ -141,10 +141,10 @@ const Services = () => {
               <div className="bg-red-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <FaFileAlt className="text-lg sm:text-2xl text-red-700" />
               </div>
-              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-red-900">
+              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-gray-900">
                 Professional Quality
               </h3>
-              <p className="text-red-700 text-xs sm:text-sm">
+              <p className="text-gray-700 text-xs sm:text-sm">
                 Templates designed by experts for professional, polished documents.
               </p>
             </div>
@@ -152,10 +152,10 @@ const Services = () => {
               <div className="bg-red-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <FaEnvelope className="text-lg sm:text-2xl text-red-700" />
               </div>
-              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-red-900">
+              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-gray-900">
                 Time-Saving
               </h3>
-              <p className="text-red-700 text-xs sm:text-sm">
+              <p className="text-gray-700 text-xs sm:text-sm">
                 Create professional documents in minutes, not hours.
               </p>
             </div>
@@ -163,10 +163,10 @@ const Services = () => {
               <div className="bg-red-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <FaCheck className="text-lg sm:text-2xl text-red-700" />
               </div>
-              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-red-900">
+              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2 text-gray-900">
                 Easy to Use
               </h3>
-              <p className="text-red-700 text-xs sm:text-sm">
+              <p className="text-gray-700 text-xs sm:text-sm">
                 Step-by-step guidance makes document creation simple.
               </p>
             </div>

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -37,6 +37,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
   const dispatch = useDispatch();
 
   const user = useSelector((state: RootState) => state.auth.user);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const technicalDefault = useMemo(
     () =>
@@ -73,6 +74,13 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
       softSkills: softDefault,
     });
   }, [reset, technicalDefault, softDefault]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   if (!user) return <p>Not logged in</p>;
 
@@ -122,73 +130,90 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
     }
   };
 
-const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
-  if (!user) return;
+  const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
+    if (!user) return;
 
-  try {
-    await withLoader(async () => {
-      const full_name = [user.first_name, user.middle_name, user.last_name]
-        .filter(Boolean)
-        .join(" ");
+    try {
+      // Decide message based on new or existing skills
+      const message = skillSet
+        ? "✅ Skills updated successfully."
+        : "✅ Skills saved successfully.";
 
-      const payload: SkillsPayload = {
-        technicalSkills: data.technicalSkills.map((s, i) => ({
-          value: s.value,
-          id: skillSet?.technical_skills?.[i]?.id,
-        })),
-        softSkills: data.softSkills.map((s, i) => ({
-          value: s.value,
-          id: skillSet?.soft_skills?.[i]?.id,
-        })),
-        email: user.email,
-        full_name,
-      };
+      await withLoader(async () => {
+        const full_name = [user.first_name, user.middle_name, user.last_name]
+          .filter(Boolean)
+          .join(" ");
 
-      // API call
-      const savedData = skillSet?.id
-        ? await updateSkill(skillSet.id, payload)
-        : await submitSkills(payload);
+        const payload: SkillsPayload = {
+          technicalSkills: data.technicalSkills.map((s, i) => ({
+            value: s.value,
+            id: skillSet?.technical_skills?.[i]?.id,
+          })),
+          softSkills: data.softSkills.map((s, i) => ({
+            value: s.value,
+            id: skillSet?.soft_skills?.[i]?.id,
+          })),
+          email: user.email,
+          full_name,
+        };
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+        // Call API to save or update skills
+        const savedData = skillSet?.id
+          ? await updateSkill(skillSet.id, payload)
+          : await submitSkills(payload);
 
-      // ✅ Merge new with old instead of overwriting
-      const updatedSkillSet: SkillSet = {
-        id: skillSet?.id ?? savedData.id,
-        technical_skills:
-          savedData.technicalSkills ?? skillSet?.technical_skills ?? [],
-        soft_skills:
-          savedData.softSkills ?? skillSet?.soft_skills ?? [],
-        full_name,
-        email: user.email,
-        user: user.id,
-      };
+        // Simulate minimum loader display
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      reset({
-        technicalSkills: updatedSkillSet.technical_skills.map((s) => ({
-          value: s.value,
-        })),
-        softSkills: updatedSkillSet.soft_skills.map((s) => ({
-          value: s.value,
-        })),
+        // Merge old and new data
+        const updatedSkillSet: SkillSet = {
+          id: skillSet?.id ?? savedData.id,
+          technical_skills:
+            savedData.technicalSkills ?? skillSet?.technical_skills ?? [],
+          soft_skills:
+            savedData.softSkills ?? skillSet?.soft_skills ?? [],
+          full_name,
+          email: user.email,
+          user: user.id,
+        };
+
+        // Reset form with latest values
+        reset({
+          technicalSkills: updatedSkillSet.technical_skills.map((s) => ({
+            value: s.value,
+          })),
+          softSkills: updatedSkillSet.soft_skills.map((s) => ({
+            value: s.value,
+          })),
+        });
+
+        // Update parent and global state
+        onUpdate?.(updatedSkillSet);
+        dispatch(updateSkillsInStore({ skillSet: updatedSkillSet }));
+
+        // Show success notification card
+        setSuccessMessage(message);
+
+        // Close form/modal if needed
+        onClose();
       });
-
-      onUpdate?.(updatedSkillSet);
-      dispatch(updateSkillsInStore({ skillSet: updatedSkillSet }));
-      onClose();
-    });
-  } catch (error: any) {
-    console.error("Error submitting skills:", error);
-  }
-};
+    } catch (error: any) {
+      console.error("Error submitting skills:", error);
+    }
+  };
 
 
   return (
     <div className="p-4 border rounded-lg bg-white relative">
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Enter your skills clearly. Separate technical skills (tools, frameworks) and soft skills (communication, teamwork, leadership). Required fields are marked with *.
+      </p>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <h3 className="font-semibold mb-2">Technical Skills</h3>
           {technicalFieldsArray.fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mb-2">
+            <div key={field.id} className="flex flex-col gap-2 mb-2">
               <input
                 {...register(`technicalSkills.${index}.value`)}
                 placeholder="e.g., React, Node.js"
@@ -196,15 +221,22 @@ const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
                 disabled={loading}
               />
               {technicalFieldsArray.fields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleDeleteSkill("technical", index)}
-                  className="text-red-500"
-                  disabled={loading}
-                >
-                  <FaX className="mb-8 text-sm" />
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSkill("technical", index)}
+                    className="text-red-500"
+                    disabled={loading}
+                  >
+                    <FaX className="mb-8 text-sm" />
+                  </button>
+
+                </div>
+
               )}
+              <p className="text-gray-500 text-xs mb-1">
+                Enter a technical skill or technology you are proficient in.
+              </p>
             </div>
           ))}
           <Button
@@ -218,7 +250,7 @@ const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
         <div>
           <h3 className="font-semibold mb-2">Soft Skills</h3>
           {softFieldsArray.fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 mb-2">
+            <div key={field.id} className="flex flex-col gap-2 mb-2">
               <input
                 {...register(`softSkills.${index}.value`)}
                 placeholder="e.g., Communication"
@@ -226,15 +258,22 @@ const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
                 disabled={loading}
               />
               {softFieldsArray.fields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleDeleteSkill("soft", index)}
-                  className="text-red-500"
-                  disabled={loading}
-                >
-                  <FaX className="mb-8 text-sm" />
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSkill("soft", index)}
+                    className="text-red-500"
+                    disabled={loading}
+                  >
+                    <FaX className="mb-8 text-sm" />
+                  </button>
+
+                </div>
+
               )}
+              <p className="text-gray-500 text-xs mb-1">
+                Enter a soft skill like teamwork, communication, or leadership.
+              </p>
             </div>
           ))}
           <Button
@@ -247,19 +286,24 @@ const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
 
         <Button
           type="submit"
-          onClick={()=>{}}
+          onClick={() => { }}
           label={
             loading
               ? "Submitting..."
               : skillSet
-              ? "Update Skills"
-              : "Save Skills"
+                ? "Update Skills"
+                : "Save Skills"
           }
           disabled={loading}
         />
 
         <Loader loading={loading} message="Saving your skills..." />
       </form>
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

@@ -14,7 +14,7 @@ const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
       {/* Header */}
       <header className="mb-8 p-6 text-center">
         <h1 className="text-3xl font-bold text-blue-800 mb-4">
-          {data.profiles.full_name.toUpperCase()}
+          {data.profile.full_name.toUpperCase()}
         </h1>
         
         {/* Contact Information in Two Columns */}
@@ -22,8 +22,8 @@ const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
           {/* Contact Column */}
           <div className="text-left">
             <h2 className="text-xs font-bold text-gray-500 uppercase mb-2">Contact</h2>
-            {data.profiles.email && (
-              <p className="text-sm"><span className="font-bold">Email:</span> {data.profiles.email}</p>
+            {data.profile.email && (
+              <p className="text-sm"><span className="font-bold">Email:</span> {data.profile.email}</p>
             )}
             {data.personal_details.phone && (
               <p className="text-sm"><span className="font-bold">Phone:</span> {data.personal_details.phone}</p>
@@ -182,11 +182,11 @@ const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
         )}
 
         {/* Certifications */}
-        {data.profiles.certificates.length > 0 && (
+        {data.profile.certificates.length > 0 && (
           <section className="mb-6">
             <h2 className="text-base font-bold text-blue-800 uppercase mb-3">Certifications</h2>
             <div className="space-y-2">
-              {data.profiles.certificates.map((cert) => (
+              {data.profile.certificates.map((cert) => (
                 <p key={cert.id} className="text-sm">{cert.name}, {cert.issuer} ({formatDate(cert.date)})</p>
               ))}
             </div>

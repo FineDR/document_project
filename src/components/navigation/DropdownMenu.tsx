@@ -41,16 +41,16 @@ export const DropdownMenu = ({ title, items, onItemClick }: DropdownMenuProps) =
       onMouseLeave={handleMouseLeave}
     >
       <button
-        className="text-red-700 hover:text-red-500 font-medium transition flex items-center gap-1"
+        className="text-red-700 hover:text-red-500 text-lg transition flex items-center gap-1"
         onClick={toggleDropdown}
       >
         {title}
-        <span className="text-xl text-red-600">
+        <span className="text-sm text-gray-600">
           <RiArrowDropDownLine />
         </span>
       </button>
       <div
-        className={`absolute left-0 mt-1 bg-white shadow-lg rounded-lg z-[9999] w-48 transition-all duration-200 border border-red-200 ${
+        className={`absolute left-0 mt-1 bg-white shadow-lg rounded-lg z-[9999] w-48 transition-all duration-200 border border-gray-200 ${
           open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-2"
         }`}
       >
@@ -62,8 +62,8 @@ export const DropdownMenu = ({ title, items, onItemClick }: DropdownMenuProps) =
             className={({ isActive }) =>
               `block px-4 py-2 text-sm transition-colors ${
                 isActive 
-                  ? "bg-red-600 text-white font-medium" 
-                  : "text-red-700 hover:bg-red-50 hover:text-red-600"
+                  ? "bg-gray-600 text-white text-lg text" 
+                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-600"
               }`
             }
           >

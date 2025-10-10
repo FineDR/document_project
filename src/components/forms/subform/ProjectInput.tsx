@@ -6,12 +6,14 @@ import { FaX } from "react-icons/fa6";
 
 type ProjectInputProps = {
   projectIndex: number;
-  disabled?: boolean; // New prop to control disabled state
+  disabled?: boolean; // controls input disabled state
+  showHelperText?: boolean; // new prop to show helper text
 };
 
 const ProjectInput: React.FC<ProjectInputProps> = ({
   projectIndex,
   disabled = false,
+  showHelperText = false,
 }) => {
   const {
     register,
@@ -29,11 +31,10 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
   });
 
   const projectErrors =
-    errors.projects as // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { [key: number]: any } | undefined;
+    errors.projects as { [key: number]: any } | undefined;
 
   return (
-    <div className="p-4 mb-6 relative">
+    <div className="p-4 mb-6 relative ">
       <InputField
         type="text"
         label="Project Title *"
@@ -42,6 +43,7 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
         register={register(`projects.${projectIndex}.title`)}
         error={projectErrors?.[projectIndex]?.title?.message}
         disabled={disabled}
+        helperText={showHelperText ? "Give a clear, short title of your project." : undefined}
       />
 
       <InputField
@@ -52,6 +54,7 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
         register={register(`projects.${projectIndex}.description`)}
         error={projectErrors?.[projectIndex]?.description?.message}
         disabled={disabled}
+        helperText={showHelperText ? "Explain what the project does and your role in it." : undefined}
       />
 
       <InputField
@@ -62,6 +65,7 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
         register={register(`projects.${projectIndex}.link`)}
         error={projectErrors?.[projectIndex]?.link?.message}
         disabled={disabled}
+        helperText={showHelperText ? "Optional: Add a live link or repository URL." : undefined}
       />
 
       <div className="mt-4">
@@ -105,6 +109,11 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
         {projectErrors?.[projectIndex]?.technologies && (
           <p className="text-red-500 text-sm mt-1">
             {(projectErrors?.[projectIndex]?.technologies as any)?.message}
+          </p>
+        )}
+        {showHelperText && (
+          <p className="text-gray-500 text-sm mt-1">
+            Add the key technologies used in this project.
           </p>
         )}
       </div>

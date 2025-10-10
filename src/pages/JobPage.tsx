@@ -10,7 +10,6 @@ import {
   FaBuilding, 
   FaMapMarkerAlt, 
   FaCalendarAlt, 
-  FaBriefcase, 
   FaSearch,
   FaFilter,
   FaTimes,
@@ -245,13 +244,11 @@ const JobPage: React.FC = () => {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 mt-10 sm:px-6 border-t">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-4">
-            <FaBriefcase className="text-red-600 text-xl" />
-          </div>
+          
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Latest Job Opportunities</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover your next career move from our curated list of job openings across Tanzania

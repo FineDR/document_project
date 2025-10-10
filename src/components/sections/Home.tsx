@@ -10,7 +10,7 @@ const Home = () => {
   const activeBtnClass =
     "bg-red-600 text-white border border-red-600 shadow-lg";
   const inactiveBtnClass =
-    "border border-red-600 text-red-600 hover:bg-red-600 hover:text-white";
+    "border border-red-600 text-white bg-red-600 hover:bg-red-600 hover:text-white";
 
   const documentTypes = [
     { name: "CV", icon: <FaFileAlt className="text-lg sm:text-xl" />, description: "Professional curriculum vitae" },
@@ -47,7 +47,7 @@ const Home = () => {
       <section className="relative z-30 flex flex-col justify-center items-center min-h-[80vh] sm:min-h-screen text-center px-4 sm:px-6 md:px-8 py-6 sm:py-10">
         <div className="w-full max-w-3xl mx-auto">
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white drop-shadow mb-3 sm:mb-6">
-            Welcome to <span className="text-red-300">GenDocs</span>
+            Welcome to <span className="text-red-300">SmartDocs</span>
           </h1>
           <p className="text-white text-xs sm:text-base md:text-lg lg:text-xl font-light mb-6 sm:mb-10">
             One professional platform for generating CVs and Official Letters — effortlessly.

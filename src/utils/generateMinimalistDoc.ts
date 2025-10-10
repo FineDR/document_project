@@ -107,10 +107,10 @@ export async function generateMinimalistDoc(user: User, type: string) {
 
   // --- HEADER ---
   // Only draw header if full_name exists
-  if (user.profiles && user.profiles.full_name) {
+  if (user.profile && user.profile.full_name) {
     // Name in uppercase, centered with blue color
-    const nameWidth = timesRomanBold.widthOfTextAtSize(user.profiles.full_name.toUpperCase(), 24);
-    page.drawText(user.profiles.full_name.toUpperCase(), {
+    const nameWidth = timesRomanBold.widthOfTextAtSize(user.profile.full_name.toUpperCase(), 24);
+    page.drawText(user.profile.full_name.toUpperCase(), {
       x: (pageWidth - nameWidth) / 2,
       y,
       font: timesRomanBold,
@@ -122,7 +122,7 @@ export async function generateMinimalistDoc(user: User, type: string) {
     // --- CONTACT INFORMATION ---
     // Only draw contact info if there are any contact items
     const contactItems = [];
-    if (user.profiles.email) contactItems.push({ label: "Email", value: user.profiles.email });
+    if (user.profile.email) contactItems.push({ label: "Email", value: user.profile.email });
     if (user.personal_details && user.personal_details.phone) contactItems.push({ label: "Phone", value: user.personal_details.phone });
     if (user.personal_details && user.personal_details.address) contactItems.push({ label: "Address", value: user.personal_details.address });
 
@@ -342,10 +342,10 @@ export async function generateMinimalistDoc(user: User, type: string) {
   }
 
   // --- CERTIFICATIONS ---
-  if (user.profiles && user.profiles.certificates && user.profiles.certificates.length > 0) {
+  if (user.profile && user.profile.certificates && user.profile.certificates.length > 0) {
     drawHeading("Certifications");
 
-    user.profiles.certificates.forEach((cert) => {
+    user.profile.certificates.forEach((cert) => {
       if (cert.name) {
         drawParagraph(cert.name, pageWidth - margin * 2, timesRomanBold, 11); // Changed from 12 to 11
       }
@@ -379,6 +379,6 @@ export async function generateMinimalistDoc(user: User, type: string) {
   // Save the PDF
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-  saveAs(blob, `${user.profiles?.full_name || "CV"}_MinimalistCV.pdf`);
+  saveAs(blob, `${user.profile?.full_name || "CV"}_MinimalistCV.pdf`);
 
 }

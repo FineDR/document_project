@@ -72,4 +72,16 @@ export interface PersonalInformation {
     achievements: string[];
     references: Reference[];
   }
-  
+  export interface Letter {
+  id: any;
+  recipient: string;
+  recipientTitle: string;
+  recipientAddress: string;
+  sender: string;
+  senderTitle: string;
+  senderAddress: string;
+  date: string; // ISO date string
+  subject: string;
+  content: string;
+  closing: string;
+}

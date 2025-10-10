@@ -7,7 +7,7 @@ import { store } from "../store/store";
 export type ReferencesData = z.infer<typeof referencesSchema>;
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_APP_API_BASE_URL;
 
 // ✅ Helper to get auth headers
 const getAuthHeaders = () => {

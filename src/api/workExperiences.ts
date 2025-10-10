@@ -4,7 +4,7 @@ import type { RootState } from "../store/store";
 import { store } from "../store/store";
 import type { WorkExperience } from "../types/cv/cv";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 // ✅ Get auth headers
 const getAuthHeaders = () => {

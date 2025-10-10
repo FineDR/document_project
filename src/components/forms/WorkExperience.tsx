@@ -22,6 +22,7 @@ interface Props {
 
 const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const [successMessage, setSuccessMessage] = useState("");
   const { loading, withLoader } = useTimedLoader(1200); // minimum loader time
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
@@ -64,34 +65,67 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
     }
   }, [editingExperience, setValue]);
 
+  useEffect(() => {
+  if (successMessage) {
+    const timer = setTimeout(() => setSuccessMessage(""), 5000);
+    return () => clearTimeout(timer);
+  }
+}, [successMessage]);
+
   if (!user) return null;
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    await withLoader(async () => {
-      try {
-        const exp = data.experiences[0]; // Only one experience for editing
-        const payload = {
-          job_title: exp.job_title,
-          company: exp.company,
-          location: exp.location || "",
-          start_date: exp.start_date || "",
-          end_date: exp.end_date || "",
-          responsibilities: exp.responsibilities.map(r => ({ value: r.value })),
-        };
+ const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  await withLoader(async () => {
+    try {
+      // Prepare message for the user
+      const message = editingExperience
+        ? "✅ Work experience updated successfully."
+        : "✅ Work experience saved successfully.";
 
-        const apiCall = editingExperience
-          ? updateWorkExperience(editingExperience.id, payload as WorkExperience)
-          : submitWorkExperience(payload as WorkExperience);
+      // Take the first experience (editing one)
+      const exp = data.experiences[0];
 
-        const response = await apiCall;
+      // Build payload
+      const payload = {
+        job_title: exp.job_title,
+        company: exp.company,
+        location: exp.location || "",
+        start_date: exp.start_date || "",
+        end_date: exp.end_date || "",
+        responsibilities: exp.responsibilities.map((r) => ({ value: r.value })),
+      };
 
-        if (onDone) onDone(response);
-        reset();
-      } catch (error) {
-        console.error("Error submitting work experience:", error);
-      }
-    });
-  };
+      // Call appropriate API
+      const apiCall = editingExperience
+        ? updateWorkExperience(editingExperience.id, payload as WorkExperience)
+        : submitWorkExperience(payload as WorkExperience);
+
+      const response = await apiCall;
+
+      // Reset form to default/empty values
+      reset({
+        experiences: [
+          {
+            job_title: "",
+            company: "",
+            location: "",
+            start_date: "",
+            end_date: "",
+            responsibilities: [{ value: "" }],
+          },
+        ],
+      });
+
+      // Show success notification card to the user
+      setSuccessMessage(message);
+
+      // Pass updated experience to parent or callback
+      onDone?.(response);
+    } catch (error) {
+      console.error("Error submitting work experience:", error);
+    }
+  });
+};
 
   return (
     <div className="p-4 border rounded-lg bg-white">
@@ -135,7 +169,7 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
             type="submit"
             label={editingExperience ? "Update" : "Submit"}
             onClick={handleOnclick}
-            className={`${active ? hoverStyle : ""}`}
+            className={`mx-4 ${active ? hoverStyle : ""}`}
             disabled={loading}
           />
 
@@ -143,6 +177,12 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
           <Loader loading={loading} message={editingExperience ? "Updating experience..." : "Saving experience..."} />
         </form>
       </div>
+        {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
+
     </div>
   );
 };

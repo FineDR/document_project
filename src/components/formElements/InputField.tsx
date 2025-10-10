@@ -1,3 +1,4 @@
+import React from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 export interface InputFieldProps {
@@ -9,7 +10,9 @@ export interface InputFieldProps {
   error?: string;
   label?: string;
   disabled?: boolean;
-  visible?: boolean; // new prop to optionally hide/show the field
+  visible?: boolean;
+  autoFocus?: boolean;
+  helperText?: string; // ✅ new prop
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -21,29 +24,47 @@ const InputField: React.FC<InputFieldProps> = ({
   error,
   label,
   disabled = false,
-  visible = true, // default visible
+  visible = true,
+  autoFocus = false,
+  helperText,
 }) => {
-  if (!visible) return null; // hide if not visible
+  if (!visible) return null;
 
   return (
-    <div className="input-group" style={{ marginBottom: "1rem" }}>
-      {label && <label className="inline-block mb-1">{label}</label>}
+    <div className="relative mb-6 w-full">
+      {/* Input field */}
       <input
         id={name}
         type={type}
-        placeholder={placeholder}
+        placeholder=" "
         required={required}
         disabled={disabled}
+        autoFocus={autoFocus}
         {...register}
-        style={{
-          padding: "0.5rem",
-          width: "100%",
-          border: error ? "1px solid red" : "1px solid #ccc",
-          borderRadius: "4px",
-          backgroundColor: disabled ? "#f3f3f3" : "white",
-        }}
+        className={`peer block w-full appearance-none rounded-md border border-gray-300 px-3 pt-5 pb-2 text-base text-gray-900 placeholder-transparent focus:outline-none focus:ring-2 ${
+          error ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
+        } ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}`}
       />
-      {error && <p style={{ color: "red", fontSize: "0.8rem" }}>{error}</p>}
+
+      {/* Floating label */}
+      <label
+        htmlFor={name}
+        className={`absolute left-3 top-0 -translate-y-1/2 bg-white px-1 text-sm text-gray-500 transition-all duration-200
+          peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+          peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-sm peer-focus:text-blue-600
+          pointer-events-none`}
+      >
+        {label || placeholder}
+        {required && <span className="text-red-500">*</span>}
+      </label>
+
+      {/* Error message */}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+
+      {/* Helper text */}
+      {!error && helperText && (
+        <p className="mt-1 text-sm text-center text-gray-500">{helperText}</p>
+      )}
     </div>
   );
 };

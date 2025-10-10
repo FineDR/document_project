@@ -1,9 +1,25 @@
 // src/store/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./authSlice";
-import cvReducer from "./cvSlice";
+// import cvReducer from "./cvSlice";
 import adminUsersReducer from "./adminUsersSlice";
-import jobsReducer from "./jobSlice"; // <-- add this
+import projectReducer from "./report/reportSlice";
+import achievementReducer from "../features/achievements/achievementsSlice";
+import certificatesReducer from "../features/certificates/certificatesSlice";
+import experienceReducer from "../features/experiences/workExperiencesSlice";
+import skillsReducer from "../features/skills/skillsSlice";
+import languagesReducer from "../features/languages/languagesSlice";
+import authentReducer from "../features/auth/authSlice";
+import jobReducer from "../features/jobs/jobsSlice";
+import languageReducer from "../features/languages/languagesSlice";
+import letterReducer from "../features/letters/lettersSlice";
+import personalReducer from "../features/personalDetails/personalDetailsSlice";
+import projectsReducer from "../features/projects/projectsSlice";
+import carerObjectiveReducer from "../features/carerobjectives/carerObjectivesSlice";
+import educationReducer from "../features/educations/educationsSlice";
+import civReducer from "../features/cv/cvSlice";
+import paymentReducer from "../features/payments/paymentsSlice";
+// import profileReducer from "../features/certificates/profileSlice";
+
 
 import {
   persistStore,
@@ -24,14 +40,30 @@ const authPersistConfig = {
   whitelist: ["access", "refresh", "user"],
 };
 
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+const persistedAuthReducer = persistReducer(authPersistConfig, authentReducer);
 
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
-    cv: cvReducer,
+    // cv: cvReducer,
     adminUsers: adminUsersReducer,
-    jobs: jobsReducer, // <-- added jobs slice here
+    jobs: jobReducer, // <-- added jobs slice here
+    project: projectReducer,
+    achievements: achievementReducer,
+    certificates: certificatesReducer,
+    experiences: experienceReducer,
+    skills: skillsReducer,
+    languages: languageReducer,
+    auths: authentReducer,
+    letters: letterReducer,
+    personalDetails: personalReducer,
+    projects: projectsReducer,
+    carerObjectives: carerObjectiveReducer,
+    educations: educationReducer, 
+    language: languagesReducer,
+    cv: civReducer,
+    payments: paymentReducer,
+    // profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -107,8 +107,8 @@ export async function generateClassicDoc(user: User, type: string) {
 
   // --- Header with thick border ---
   // Name in uppercase, centered, and blue
-  if (user.profiles.full_name) {
-    drawCenteredText(user.profiles.full_name.toUpperCase(), timesRomanBold, 18, 0, nameColor);
+  if (user.profile.full_name) {
+    drawCenteredText(user.profile.full_name.toUpperCase(), timesRomanBold, 18, 0, nameColor);
     y -= lineHeight * 1.5;
 
     // Draw thick border below name
@@ -123,7 +123,7 @@ export async function generateClassicDoc(user: User, type: string) {
 
     // Contact information - only include non-empty fields
     const contactItems = [];
-    if (user.profiles.email) contactItems.push(`Email: ${user.profiles.email}`);
+    if (user.profile.email) contactItems.push(`Email: ${user.profile.email}`);
     if (user.personal_details.phone) contactItems.push(`Phone: ${user.personal_details.phone}`);
     if (user.personal_details.address) contactItems.push(`Address: ${user.personal_details.address}`);
     if (user.personal_details.linkedin) contactItems.push(`LinkedIn: ${user.personal_details.linkedin}`);
@@ -259,10 +259,10 @@ export async function generateClassicDoc(user: User, type: string) {
   }
 
   // --- Certificates ---
-  if (user.profiles && user.profiles.certificates && user.profiles.certificates.length > 0) {
+  if (user.profile && user.profile.certificates && user.profile.certificates.length > 0) {
     drawHeading("Certifications");
 
-    for (const cert of user.profiles.certificates) {
+    for (const cert of user.profile.certificates) {
       // Certificate name, issuer, and date all inline
       const certText = `* ${cert.name} - ${cert.issuer} (${formatDate(cert.date)})`;
       drawParagraph(certText, pageWidth - margin * 2, timesRoman);
@@ -289,7 +289,7 @@ export async function generateClassicDoc(user: User, type: string) {
   // --- Save PDF ---
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-  saveAs(blob, `${user.profiles.full_name || "CV"}_ClassicCV.pdf`);
+  saveAs(blob, `${user.profile.full_name || "CV"}_ClassicCV.pdf`);
 
 }
 

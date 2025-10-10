@@ -61,6 +61,9 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
           error={experienceErrors?.job_title?.message}
           disabled={disabled}
         />
+        <small className="text-gray-500 text-sm">
+          Enter your role, e.g., Frontend Developer or Project Manager
+        </small>
         <InputField
           type="text"
           label="Company *"
@@ -70,6 +73,9 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
           error={experienceErrors?.company?.message}
           disabled={disabled}
         />
+        <small className="text-gray-500 text-sm">
+          The name of the organization you worked for
+        </small>
         <InputField
           type="text"
           label="Location *"
@@ -79,6 +85,9 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
           error={experienceErrors?.location?.message}
           disabled={disabled}
         />
+        <small className="text-gray-500 text-sm">
+          City, state, or indicate "Remote"
+        </small>
         <InputField
           type="date"
           label="Start Date *"
@@ -88,6 +97,9 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
           error={experienceErrors?.start_date?.message}
           disabled={disabled}
         />
+        <small className="text-gray-500 text-sm">
+          Select the month and year you started
+        </small>
         <InputField
           type="date"
           label="End Date *"
@@ -97,10 +109,16 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
           error={experienceErrors?.end_date?.message}
           disabled={disabled}
         />
+        <small className="text-gray-500 text-sm">
+          Select the month and year you ended or leave empty if current
+        </small>
       </div>
 
       <div>
         <label className="font-semibold">Responsibilities</label>
+        <small className="text-gray-500 text-sm block mb-2">
+          Briefly describe what you did in this role
+        </small>
         <div className="flex flex-wrap gap-4 mt-2">
           {responsibilityFields.map((responsibility, respIndex) => (
             <div key={responsibility.id} className="items-center gap-2 w-full">
@@ -122,7 +140,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
                 className="text-red-500 hover:underline"
                 disabled={disabled}
               >
-                <FaX className="mb-12 text-sm"/>
+                <FaX className="mb-12 text-sm" />
               </button>
             </div>
           ))}

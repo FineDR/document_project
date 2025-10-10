@@ -21,6 +21,7 @@ interface Props {
 }
 
 const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props) => {
+  const [successMessage, setSuccessMessage] = useState("");
   const {
     register,
     handleSubmit,
@@ -41,10 +42,10 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
 
   const user = useSelector((state: RootState) => state.auth.user);
 
-  // Increase loader duration to 3 seconds
   const { loading, withLoader } = useTimedLoader(3000);
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  // Reset form for editing or new entry
   useEffect(() => {
     if (editingReference) {
       reset({
@@ -64,6 +65,13 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
     }
   }, [editingReference, reset]);
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     if (!user) return;
 
@@ -71,12 +79,12 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
       const startTime = Date.now();
       setElapsedTime(0);
 
-      // Track elapsed time for loader
       const interval = setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 100);
 
       try {
+        let message = "";
         const payload = {
           ...data,
           full_name: [user.first_name, user.middle_name, user.last_name]
@@ -87,11 +95,16 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
 
         if (editingReference && editingIndex !== null) {
           await updateReference(editingReference.id, payload.references[0]);
+          message = "✅ Reference updated successfully.";
         } else {
           await submitReferences(payload);
+          message = "✅ References submitted successfully.";
         }
 
-        reset();
+        reset({
+          references: [{ name: "", position: "", email: "", phone: "" }],
+        });
+        setSuccessMessage(message);
         onDone?.();
       } catch (error) {
         console.error("Error submitting references:", error);
@@ -101,19 +114,22 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
     });
   };
 
-  if (!user) {
-    return <p className="text-red-500">Not logged in</p>;
-  }
+  if (!user) return <p className="text-red-500">Not logged in</p>;
 
   return (
     <div className="p-4 border rounded-lg relative">
-      <h2 className="text-center text-primary text-2xl font-semibold mb-6">
+      <h2 className="text-center text-primary text-2xl font-semibold mb-2">
         {editingReference ? "Edit Reference" : "Fill the References Details"}
       </h2>
 
+      {/* Top guidance message */}
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Add at least one reference — for example, previous managers, team leads, or colleagues. Include their position, email, and phone number.
+      </p>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4 relative space-y-4">
+          <div key={field.id} className="p-4 relative space-y-4 ">
             <InputField
               type="text"
               label="Referee Name *"
@@ -122,6 +138,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.name` as const)}
               error={errors.references?.[index]?.name?.message}
               disabled={loading}
+              helperText="Tip: Full name of your reference."
             />
             <InputField
               type="text"
@@ -131,15 +148,17 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.position` as const)}
               error={errors.references?.[index]?.position?.message}
               disabled={loading}
+              helperText="Tip: Job title or position of your reference."
             />
             <InputField
               type="email"
-              placeholder="e.g., finesawa@gmail.com"
               label="Email *"
+              placeholder="e.g., example@gmail.com"
               name={`references.${index}.email`}
               register={register(`references.${index}.email` as const)}
               error={errors.references?.[index]?.email?.message}
               disabled={loading}
+              helperText="Tip: Professional email address."
             />
             <InputField
               type="text"
@@ -149,6 +168,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.phone` as const)}
               error={errors.references?.[index]?.phone?.message}
               disabled={loading}
+              helperText="Tip: Contact number including country code."
             />
 
             {fields.length > 1 && !editingReference && (
@@ -164,6 +184,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
           </div>
         ))}
 
+        {/* Buttons */}
         <div className="flex gap-4 flex-wrap mx-4">
           {!editingReference && (
             <Button
@@ -181,12 +202,19 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
           />
         </div>
 
-        {/* Reusable Loader with elapsed time */}
+        {/* Loader with elapsed time */}
         <Loader
           loading={loading}
           message={loading ? `Processing references... (${elapsedTime}s elapsed)` : ""}
         />
       </form>
+
+      {/* Success message */}
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

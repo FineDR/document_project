@@ -6,7 +6,7 @@ import { store } from "../store/store";
 
 export type EducationDetails = z.infer<typeof educationSchema>;
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const getAuthHeaders = () => {
   const state: RootState = store.getState();

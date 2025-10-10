@@ -43,12 +43,14 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
     control,
     name: "languages",
   });
-  const user = useSelector((state: RootState) => state.auth.user);
 
-  // Reusable timed loader with 3s minimum
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const { loading, withLoader } = useTimedLoader(3000);
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  // Reset form for editing or new entry
   useEffect(() => {
     if (editingLanguage) {
       reset({
@@ -59,8 +61,17 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
           },
         ],
       });
+    } else {
+      reset({ languages: [{ language: "", proficiency: "" }] });
     }
   }, [editingLanguage, reset]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   if (!user) return <p className="text-red-500">Not logged in</p>;
 
@@ -82,12 +93,16 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
       };
 
       try {
+        let message = "";
         if (editingLanguage) {
           await updateLanguage(editingLanguage.id, payload.languages[0]);
+          message = "✅ Language updated successfully.";
         } else {
           await submitLanguages(payload);
+          message = "✅ Languages submitted successfully.";
         }
-        reset();
+        reset({ languages: [{ language: "", proficiency: "" }] });
+        setSuccessMessage(message);
         onDone?.();
       } catch (error) {
         console.error("Error submitting languages:", error);
@@ -99,20 +114,24 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
 
   return (
     <div className="p-4 border rounded-lg mb-4 relative">
+      {/* Top guidance message */}
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        Add the languages you know and indicate your proficiency level. For example, English (Fluent), Swahili (Native), French (Intermediate).
+      </p>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative">
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Language *
-              <InputField
-                type="text"
-                placeholder="e.g., English, Swahili, French"
-                register={register(`languages.${index}.language` as const)}
-                name={`languages.${index}.language`}
-                error={errors.languages?.[index]?.language?.message}
-                disabled={loading}
-              />
-            </label>
+          <div key={field.id} className="space-y-2 p-4 relative">
+            <InputField
+              type="text"
+              label="Language *"
+              placeholder="e.g., English, Swahili, French"
+              name={`languages.${index}.language`}
+              register={register(`languages.${index}.language` as const)}
+              error={errors.languages?.[index]?.language?.message}
+              disabled={loading}
+              helperText="Enter the language name."
+            />
 
             <SelectInputField<FormFields>
               label="Proficiency *"
@@ -153,14 +172,18 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
           />
         </div>
 
-        {/* Reusable loader with elapsed time */}
+        {/* Loader with elapsed time */}
         <Loader
           loading={loading}
-          message={
-            loading ? `Processing languages... (${elapsedTime}s elapsed)` : ""
-          }
+          message={loading ? `Processing languages... (${elapsedTime}s elapsed)` : ""}
         />
       </form>
+
+      {successMessage && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

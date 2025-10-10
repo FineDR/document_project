@@ -24,13 +24,13 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="fixed top-0 z-50 w-full">
+      <div className="bg-white/30 backdrop-blur-md fixed top-0 z-50 w-full">
         <TopNav />
         <MobileNavBar />
         <NavBar />
       </div>
 
-      <main className="flex-1 w-full px-4 mt-14">
+      <main className="flex-1 w-full px-4 mt-20">
         <Routes>
           {filteredRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={<route.element />} />

@@ -2,7 +2,7 @@ import { Home } from "../pages/Home";
 import Help from "../pages/Help";
 import Pricing from "../pages/Pricing";
 import Documents from "../pages/Documents";
-import Templates from "../pages/Templates";
+import CVTemplates from "../pages/CVTemplates";
 import CreateDocs from "../pages/CreateDocs";
 import CvDocument from "../pages/CvDocument";
 import CVPage from "../pages/ProfileCVDetails";
@@ -21,15 +21,16 @@ import AllDocuments from "../pages/AllDocuments";
 import MyCv from "../pages/MyCv";
 import CreateDocument from "../pages/CreateDocument";
 import CVEditor from "../pages/CVEditor";
-export interface pageRouteConfig {
+import PDFReports from "../pages/PDFReports";
+export interface pageRouteConfig<P = {}> {
   forNav?: boolean;
   path: string;
-  element: React.ComponentType;
+  element: React.ComponentType<P>;
   private?: boolean;
   name: string;
   layout?: boolean;
   dropdown?: { name: string; path: string; active: boolean }[];
-  showAsButton?: boolean; // ✅ Add this
+  showAsButton?: boolean;
 }
 
 export const routes: pageRouteConfig[] = [
@@ -46,14 +47,29 @@ export const routes: pageRouteConfig[] = [
     element: Dashboard,
     name: "Panel",    // 👈 fixed spelling
     layout: true,
-  },{
+  }, {
     forNav: true,
     path: "/jobs",
     element: JobPage,
     name: "Jobs",
     layout: true,
-  },
+  }, 
+  
+  // {
+  //   forNav: true,
+  //   path: "/payments",
+  //   element: PaymentComponent,
+  //   name: "Payments",
+  //   layout: true,
 
+  // },
+  {
+    forNav: true,
+    path: "/help",
+    element: Help,
+    name: "Help",
+    layout: true,
+  },
   {
     forNav: false,
     path: "/verify-email",
@@ -83,26 +99,26 @@ export const routes: pageRouteConfig[] = [
       },
     ],
   },
- {
-  forNav: true,
-  path: "/documents/templates",
-  element: Templates,
-  name: "Templates",
-  layout: true,
-  dropdown: [
-    { name: "CV Templates", path: "/documents/templates/cv", active: true },
-    { name: "Cover Letter Templates", path: "/documents/templates/cover-letter", active: false },
-    { name: "Portfolio Templates", path: "/documents/templates/portfolio", active: false },
-    { name: "Certificate Templates", path: "/documents/templates/certificate", active: false },
-  ],
-},
-{
-  forNav: false,
-  path: "/documents/templates/cv",
-  element: Templates,
-  name: "CV Templates",
-  layout: true,
-},
+  {
+    forNav: true,
+    path: "/documents/templates",
+    element: CVTemplates,
+    name: "Templates",
+    layout: true,
+    dropdown: [
+      { name: "CV Templates", path: "/documents/templates/cv", active: true },
+      { name: "Cover Letter Templates", path: "/documents/templates/cover-letter", active: false },
+      { name: "Portfolio Templates", path: "/documents/templates/portfolio", active: false },
+      { name: "Certificate Templates", path: "/documents/templates/certificate", active: false },
+    ],
+  },
+  {
+    forNav: false,
+    path: "/documents/templates/cv",
+    element: CVTemplates,
+    name: "CV Templates",
+    layout: true,
+  },
   {
     forNav: true,
     path: "/create",
@@ -110,8 +126,9 @@ export const routes: pageRouteConfig[] = [
     name: "Create",
     layout: true,
     dropdown: [
-      { name: "New CV", path: "/create/cv", active: true },
-      { name: "New Official Letter", path: "/create/official-letter", active: true },
+      { name: "CV", path: "/create/cv", active: true },
+      { name: "Official Letter", path: "/create/official-letter", active: true },
+      { name: "Pdf reports", path: "/create/pdf-reports", active: true },
       { name: "New Portfolio", path: "/create/portfolio", active: false },
       { name: "New Certificate", path: "/create/certificate", active: false },
     ],
@@ -131,20 +148,23 @@ export const routes: pageRouteConfig[] = [
     name: "Create Official Letter",
     layout: true,
   },
+{
+  forNav: false,
+  path: "/create/pdf-reports",
+  element: PDFReports, // now allowed
+  name: "Create PDF Reports",
+  layout: true,
+},
+
   {
     forNav: false,
-    path:"/official-letter",
+    path: "/official-letter",
     element: OfficialLetter,
     name: "Create Official Letter",
     layout: false,
   },
-  {
-    forNav: true,
-    path: "/help",
-    element: Help,
-    name: "Help",
-    layout: true,
-  },
+
+
   {
     forNav: false,
     path: "/profile",
