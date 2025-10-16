@@ -37,6 +37,7 @@ export interface PersonalDetails {
   date_of_birth: string;
   nationality: string;
   profile_summary: string;
+  profile_image?: string;
   user: number;
 }
 

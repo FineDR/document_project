@@ -1,4 +1,4 @@
-/* SkillsSection.tsx */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
@@ -12,20 +12,15 @@ interface Props {
 
 const SkillsSection = ({ cv }: Props) => {
   const skillSet = cv.skill_sets?.[0];
-  const [skillsData, setSkillsData] = useState<SkillSet | null>(
-    skillSet || null
-  );
+  const [skillsData, setSkillsData] = useState<SkillSet | null>(skillSet || null);
   const [showForm, setShowForm] = useState(false);
-  const [editingSkillType, setEditingSkillType] = useState<
-    "technical" | "soft" | null
-  >(null);
+  const [editingSkillType, setEditingSkillType] = useState<"technical" | "soft" | null>(null);
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
 
   const technicalSkills =
     skillsData?.technical_skills?.filter((s) => s.value.trim() !== "") || [];
   const softSkills =
     skillsData?.soft_skills?.filter((s) => s.value.trim() !== "") || [];
-
   const hasSkills = technicalSkills.length > 0 || softSkills.length > 0;
 
   const handleEdit = (type: "technical" | "soft") => {
@@ -73,105 +68,106 @@ const SkillsSection = ({ cv }: Props) => {
     <>
       <CVCard title="Skills">
         {!hasSkills ? (
-          <p className="text-gray-500 italic">No skills added yet</p>
+          <p className="font-sans text-subHeadingGray italic text-sm">
+            No skills added yet
+          </p>
         ) : (
-          <>
-            {/* Technical Skills */}
-            <div className="relative transition-all duration-300 ease-in-out bg-white rounded-lg overflow-hidden border border-gray-200 p-4 group">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-semibold text-gray-800">
+          <div className="space-y-6 font-sans text-subHeadingGray">
+            {/* Technical Skills Card */}
+            <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
+              <div className="flex justify-between items-center mb-4 text-sm">
+                <h4 className="font-semibold text-base text-subHeadingGray">
                   Technical Skills
                 </h4>
                 <button
+                  className="text-blue-600 hover:underline text-sm"
                   onClick={() => handleEdit("technical")}
-                  className="text-blue-600 text-sm hover:underline"
                 >
                   Edit
                 </button>
               </div>
-
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {technicalSkills.length > 0 ? (
                   technicalSkills.map((skill) => (
                     <span
                       key={skill.id}
-                      className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full flex items-center gap-2"
+                      className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
                     >
                       {skill.value}
                       {skill.id && (
                         <button
                           onClick={() => handleDelete("technical", skill.id)}
                           disabled={loadingDelete === skill.id}
-                          className="text-gray-400 hover:text-red-600"
+                          className="text-gray-400 hover:text-redMain text-sm"
                         >
-                          {loadingDelete === skill.id ? "⏳" : <FaTrash />}
+                          {loadingDelete === skill.id ? "⏳" : <FaTrash size={12} />}
                         </button>
                       )}
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic">
+                  <p className="italic text-sm text-subHeadingGray">
                     No technical skills added
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Soft Skills */}
-            <div className="relative transition-all duration-300 ease-in-out bg-white rounded-lg overflow-hidden border border-gray-200 p-4 group mt-4">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-semibold text-gray-800">Soft Skills</h4>
+            {/* Soft Skills Card */}
+            <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
+              <div className="flex justify-between items-center mb-4 text-sm">
+                <h4 className="font-semibold text-base text-subHeadingGray">
+                  Soft Skills
+                </h4>
                 <button
+                  className="text-purple-600 hover:underline text-sm"
                   onClick={() => handleEdit("soft")}
-                  className="text-purple-600 text-sm hover:underline"
                 >
                   Edit
                 </button>
               </div>
-
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {softSkills.length > 0 ? (
                   softSkills.map((skill) => (
                     <span
                       key={skill.id}
-                      className="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full flex items-center gap-2"
+                      className="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
                     >
                       {skill.value}
                       {skill.id && (
                         <button
                           onClick={() => handleDelete("soft", skill.id)}
                           disabled={loadingDelete === skill.id}
-                          className="text-gray-400 hover:text-red-600"
+                          className="text-gray-400 hover:text-redMain text-sm"
                         >
-                          {loadingDelete === skill.id ? "⏳" : <FaTrash />}
+                          {loadingDelete === skill.id ? "⏳" : <FaTrash size={12} />}
                         </button>
                       )}
                     </span>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic">No soft skills added</p>
+                  <p className="italic text-sm text-subHeadingGray">
+                    No soft skills added
+                  </p>
                 )}
               </div>
             </div>
-          </>
+          </div>
         )}
       </CVCard>
 
-      {/* Modal Form */}
+      {/* Modal for editing skills */}
       {showForm && editingSkillType && skillsData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 relative">
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-lg"
               onClick={handleCloseForm}
             >
               ✕
             </button>
-            <h2 className="text-2xl font-semibold mb-4">
-              Edit{" "}
-              {editingSkillType === "technical"
-                ? "Technical Skills"
-                : "Soft Skills"}
+            <h2 className="text-base font-semibold mb-4 text-center">
+              Edit {editingSkillType === "technical" ? "Technical Skills" : "Soft Skills"}
             </h2>
             <SkillsForm
               skillSet={skillsData}

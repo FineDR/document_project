@@ -2,7 +2,10 @@ import { NavLink, useLocation } from "react-router-dom";
 import image from "../../assets/imagehome.jpg";
 import { MdOutlineWaterDrop } from "react-icons/md";
 import { FaFileAlt, FaEnvelope } from "react-icons/fa";
-
+  export const documentTypes = [
+    { name: "CV", icon: <FaFileAlt className="text-lg sm:text-xl" />, description: "Professional curriculum vitae" },
+    { name: "Official Letter", icon: <FaEnvelope className="text-lg sm:text-xl" />, description: "Professional official letter template" }
+  ];
 const Home = () => {
   const location = useLocation();
   const baseBtnClass =
@@ -12,10 +15,7 @@ const Home = () => {
   const inactiveBtnClass =
     "border border-red-600 text-white bg-red-600 hover:bg-red-600 hover:text-white";
 
-  const documentTypes = [
-    { name: "CV", icon: <FaFileAlt className="text-lg sm:text-xl" />, description: "Professional curriculum vitae" },
-    { name: "Official Letter", icon: <FaEnvelope className="text-lg sm:text-xl" />, description: "Professional official letter template" }
-  ];
+
 
   return (
     <div className="relative min-h-[80vh] sm:min-h-screen mt-14 w-full">
@@ -27,7 +27,7 @@ const Home = () => {
       />
 
       {/* Reddish overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-900/70 to-red-700/70 z-10" />
+      <div className="absolute inset-0 bg-redBg bg-opacity-50 dark:bg-grayBg dark:bg-grayBg/50 z-10" />
 
       {/* Decorations (fewer on mobile) */}
       <div className="absolute inset-0 z-20">
@@ -46,15 +46,15 @@ const Home = () => {
       {/* Main content */}
       <section className="relative z-30 flex flex-col justify-center items-center min-h-[80vh] sm:min-h-screen text-center px-4 sm:px-6 md:px-8 py-6 sm:py-10">
         <div className="w-full max-w-3xl mx-auto">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white drop-shadow mb-3 sm:mb-6">
-            Welcome to <span className="text-red-300">SmartDocs</span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-extrabold text-white drop-shadow mb-3 sm:mb-6">
+            Welcome to <span className="text-gray-900">SmartDocs</span>
           </h1>
           <p className="text-white text-xs sm:text-base md:text-lg lg:text-xl font-light mb-6 sm:mb-10">
-            One professional platform for generating CVs and Official Letters — effortlessly.
+            One professional platform for generating documents — effortlessly.
           </p>
 
           {/* Document types */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-12">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-12">
             {documentTypes.map((doc, i) => (
               <div
                 key={i}
@@ -71,7 +71,7 @@ const Home = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Action buttons */}

@@ -76,8 +76,8 @@ const CVPage = () => {
       typeof error === "string"
         ? error
         : "detail" in error
-        ? error.detail
-        : "Failed to load CV";
+          ? error.detail
+          : "Failed to load CV";
 
     return (
       <main className="p-6 container mx-auto min-h-screen flex flex-col items-center justify-center">
@@ -103,8 +103,9 @@ const CVPage = () => {
 
   // ✅ Main CV Page
   return (
-    <main className="p-6 container mx-auto bg-gray-50 min-h-screen mt-10 space-y-8">
-      <section className="bg-white shadow-md rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6">
+    <main className="p-6 container mx-auto min-h-screen mt-10 space-y-8">
+      <section className="bg-whiteBg shadow-md rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6">
+      
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center text-2xl font-bold">
             {user?.first_name?.charAt(0) ?? ""}
@@ -126,11 +127,10 @@ const CVPage = () => {
           onClick={handleLogout}
           type="button"
           disabled={isLoggingOut}
-          className={`${
-            isLoggingOut
+          className={`${isLoggingOut
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-red-500 hover:bg-red-600"
-          } text-white px-5 py-2 rounded-lg shadow-md flex items-center gap-2`}
+            } text-white px-5 py-2 rounded-lg shadow-md flex items-center gap-2`}
           label="Logout"
         >
           {isLoggingOut && <ClipLoader color="white" size={18} />}
@@ -138,9 +138,7 @@ const CVPage = () => {
         </Button>
       </section>
 
-      <h1 className="text-3xl font-semibold text-center text-red-600">
-        Profile Summary
-      </h1>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <PersonalInfoSection cv={cvData!} />

@@ -32,7 +32,7 @@ const SelectInputField = <T extends FieldValues>({
       <select
         id={name.toString()}
         {...register(name)}
-        className="border p-2 rounded bg-white"
+        className="border p-2 rounded bg-whiteBg"
         defaultValue=""
         disabled={disabled} // apply disabled
         style={{ backgroundColor: disabled ? "#f3f3f3" : "white" }} // visual cue

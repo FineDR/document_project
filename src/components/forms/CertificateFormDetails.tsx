@@ -12,37 +12,31 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { useAppDispatch as useDispatch } from "../../hooks/reduxHooks";
 import { addCertificate, updateCertificat } from "../../features/certificates/certificatesSlice";
+import type { Certificate } from "../../types/cv/cv";
 
 type FormFields = z.infer<typeof certificationsSchema>;
 
-interface CertificateFormDetailsProps {
-  editingCert?: any | null;
+interface Props {
+  editingCert?: Certificate | null;
   onClose?: () => void;
+  onUpdate?: (updatedCert: Certificate) => void;
 }
 
-const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editingCert }) => {
+const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdate }) => {
   const dispatch = useDispatch();
-
-  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<FormFields>({
-    defaultValues: { certificates: [{ name: "", issuer: "", date: "" }] },
-    resolver: zodResolver(certificationsSchema),
-  });
-
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const { fields, append, remove, replace } = useFieldArray({
-    control,
-    name: "certificates",
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<FormFields>({
+    resolver: zodResolver(certificationsSchema),
+    defaultValues: { certificates: [{ name: "", issuer: "", date: "" }] },
   });
+
+  const { fields, append, remove, replace } = useFieldArray({ control, name: "certificates" });
 
   const { withLoader } = useTimedLoader(3000);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [active, setActive] = useState(false);
-  const hoverStyle = "hover:bg-blue-600/60";
-
-  const handleOnClick = () => setActive(!active);
 
   // Prefill form if editing
   useEffect(() => {
@@ -54,18 +48,18 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
   }, [editingCert, replace, reset]);
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    if (!user) return;
+
     const payload = {
-      full_name: user?.first_name + " " + user?.last_name,
-      email: user?.email,
+      full_name: [user.first_name, user.last_name].filter(Boolean).join(" "),
+      email: user.email,
       certificates: data.certificates.map(cert => ({
         name: cert.name,
         issuer: cert.issuer,
         date: cert.date,
-        profile: user?.profile?.id,
-      }))
+        profile: user.profile?.id,
+      })),
     };
-
-    console.log("Submitted Data:", payload);
 
     await withLoader(async () => {
       setLoading(true);
@@ -76,20 +70,30 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
         let resultAction;
         let message = "";
 
-        if (editingCert) {
+        if (editingCert?.id) {
           resultAction = await dispatch(updateCertificat({ id: editingCert.id, data: payload }));
-          message = "✅ Certificate updated successfully!";
+          if (updateCertificat.fulfilled.match(resultAction)) {
+            const updatedCert = resultAction.payload;
+            message = "Certificate updated successfully ✅";
+            setSuccessMessage(message);
+            reset({ certificates: [{ name: "", issuer: "", date: "" }] });
+            onUpdate?.(updatedCert);
+          } else {
+            console.error("Failed to update certificate:", resultAction.payload);
+          }
         } else {
           resultAction = await dispatch(addCertificate(payload));
-          message = "✅ Certificate added successfully!";
+          if (addCertificate.fulfilled.match(resultAction)) {
+            const updatedCert = resultAction.payload;
+            message = "Certificate added successfully ✅";
+            setSuccessMessage(message);
+            reset({ certificates: [{ name: "", issuer: "", date: "" }] });
+            onUpdate?.(updatedCert);
+          } else {
+            console.error("Failed to add certificate:", resultAction.payload);
+          }
         }
 
-        if (resultAction.meta.requestStatus === "fulfilled") {
-          setSuccessMessage(message);
-          reset({ certificates: [{ name: "", issuer: "", date: "" }] });
-        } else {
-          console.error("Failed to save certificate:", resultAction.payload);
-        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -100,23 +104,21 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
   };
 
   return (
-    <section className="mx-auto p-6 bg-white border rounded-lg m-8">
-      <h2 className="text-center text-primary text-2xl font-semibold mb-6">
+    <section className="w-full mx-auto p-6 bg-whiteBg border rounded-md shadow-md">
+      <h2 className="text-h2 font-semibold text-center mb-4">
         {editingCert ? "Edit Certificate" : "Add Certificate"}
       </h2>
-      {/* Guidance message */}
-      <p className="text-gray-600 text-sm mb-4 text-center">
+
+      <p className="text-subHeadingGray text-sm mb-6 text-center">
         Fill in your certificate details. Required fields are marked with *.
       </p>
 
-      
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4 space-y-4 relative ">
+          <div key={field.id} className="p-4 space-y-4 relative">
             <InputField
               type="text"
-              label="Certificate Name *"
+              label={`Certificate Name *`}
               placeholder="e.g., AWS Certified Cloud Practitioner"
               name={`certificates.${index}.name`}
               register={register(`certificates.${index}.name`)}
@@ -124,7 +126,7 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
               disabled={loading}
             />
             <p className="text-gray-500 text-xs">
-              Enter the full name of the certificate or course you completed.
+              Enter the full name of the certificate or course completed.
             </p>
 
             <InputField
@@ -137,7 +139,7 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
               disabled={loading}
             />
             <p className="text-gray-500 text-xs">
-              The organization or company that issued the certificate.
+              Name of the organization or platform that issued this certificate.
             </p>
 
             <InputField
@@ -149,7 +151,7 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
               disabled={loading}
             />
             <p className="text-gray-500 text-xs">
-              The date you were awarded the certificate.
+              The date the certificate was awarded.
             </p>
 
             {fields.length > 1 && (
@@ -157,7 +159,7 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
                 type="button"
                 onClick={() => remove(index)}
                 disabled={loading}
-                className="text-red-500 underline text-sm"
+                className="text-red-500 underline text-sm mt-1"
               >
                 Remove
               </button>
@@ -165,31 +167,40 @@ const CertificateFormDetails: React.FC<CertificateFormDetailsProps> = ({ editing
           </div>
         ))}
 
-        <div className="flex flex-wrap gap-3 justify-start px-4">
+        <div className="flex flex-wrap gap-3 justify-start">
           <Button
             type="button"
             label="+ Add Certificate"
             onClick={() => append({ name: "", issuer: "", date: "" })}
             disabled={loading}
-            className="bg-red-500 text-white hover:bg-red-600"
+            className="bg-redMain text-white hover:bg-redMain/80"
           />
           <Button
             type="submit"
-            label={editingCert ? "Update" : "Submit"}
+            onClick={() => { }}
+            label={editingCert ? "Update" : "Save"}
             disabled={loading}
-            onClick={handleOnClick}
-            className={`${active ? hoverStyle : ""}`}
+            className="bg-redMain text-white hover:bg-redMain/80"
           />
+          {onClose && (
+            <Button
+              type="button"
+              label="Cancel"
+              onClick={onClose}
+              className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+              disabled={loading}
+            />
+          )}
         </div>
 
         <Loader
           loading={loading}
-          message={loading ? `Saving... (${elapsedTime}s)` : ""}
+          message={loading ? `Saving certificates... (${elapsedTime}s)` : ""}
         />
       </form>
 
       {successMessage && (
-        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
           {successMessage}
         </div>
       )}

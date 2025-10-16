@@ -14,7 +14,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none print:max-w-none font-serif">
+    <div className="max-w-4xl mx-auto bg-whiteBg shadow-lg print:shadow-none print:max-w-none font-serif">
       {/* Header Section */}
       <header className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8 print:p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

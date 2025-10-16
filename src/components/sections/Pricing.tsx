@@ -17,7 +17,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, isActive = false }) => 
   return (
     <div
       className={`border rounded-lg p-8 flex flex-col shadow-md transition-all duration-300 transform
-        ${isActive ? "border-red-500 bg-red-50 scale-105 ring-2 ring-red-400 z-10" : "border-gray-300 bg-white"}
+        ${isActive ? "border-red-500 bg-red-50 scale-105 ring-2 ring-red-400 z-10" : "border-gray-300 bg-whiteBg"}
       `}
     >
       <h2 className={`text-2xl font-semibold mb-4 text-center ${isActive ? "text-red-600" : "text-black"}`}>

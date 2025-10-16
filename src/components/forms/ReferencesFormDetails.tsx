@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { z } from "zod";
 import InputField from "../formElements/InputField";
 import Button from "../formElements/Button";
 import { referencesSchema } from "../forms/cvValidationSchema";
@@ -21,13 +21,17 @@ interface Props {
 }
 
 const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props) => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { loading, withLoader } = useTimedLoader(3000);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
+
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors },
     reset,
+    formState: { errors },
   } = useForm<FormFields>({
     resolver: zodResolver(referencesSchema),
     defaultValues: {
@@ -40,12 +44,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
     name: "references",
   });
 
-  const user = useSelector((state: RootState) => state.auth.user);
-
-  const { loading, withLoader } = useTimedLoader(3000);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  // Reset form for editing or new entry
+  // Prefill form if editing
   useEffect(() => {
     if (editingReference) {
       reset({
@@ -59,12 +58,11 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
         ],
       });
     } else {
-      reset({
-        references: [{ name: "", position: "", email: "", phone: "" }],
-      });
+      reset({ references: [{ name: "", position: "", email: "", phone: "" }] });
     }
   }, [editingReference, reset]);
 
+  // Clear success message after timeout
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(""), 5000);
@@ -72,26 +70,22 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
     }
   }, [successMessage]);
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    if (!user) return;
+  if (!user) return <p className="text-red-500 text-center">Not logged in</p>;
 
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
     await withLoader(async () => {
       const startTime = Date.now();
       setElapsedTime(0);
+      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
-      const interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 100);
+      const payload = {
+        ...data,
+        full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
+        email: user.email,
+      };
 
       try {
         let message = "";
-        const payload = {
-          ...data,
-          full_name: [user.first_name, user.middle_name, user.last_name]
-            .filter(Boolean)
-            .join(" "),
-          email: user.email,
-        };
 
         if (editingReference && editingIndex !== null) {
           await updateReference(editingReference.id, payload.references[0]);
@@ -101,9 +95,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
           message = "✅ References submitted successfully.";
         }
 
-        reset({
-          references: [{ name: "", position: "", email: "", phone: "" }],
-        });
+        reset({ references: [{ name: "", position: "", email: "", phone: "" }] });
         setSuccessMessage(message);
         onDone?.();
       } catch (error) {
@@ -114,22 +106,19 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
     });
   };
 
-  if (!user) return <p className="text-red-500">Not logged in</p>;
-
   return (
-    <div className="p-4 border rounded-lg relative">
-      <h2 className="text-center text-primary text-2xl font-semibold mb-2">
-        {editingReference ? "Edit Reference" : "Fill the References Details"}
+    <section className="w-full mx-auto p-6 bg-whiteBg border rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold text-center mb-4">
+        {editingReference ? "Edit Reference" : "Add Reference Details"}
       </h2>
 
-      {/* Top guidance message */}
-      <p className="text-gray-600 text-sm mb-4 text-center">
-        Add at least one reference — for example, previous managers, team leads, or colleagues. Include their position, email, and phone number.
+      <p className="text-gray-600 text-sm mb-6 text-center">
+        Add at least one reference — for example, previous managers, team leads, or colleagues. Include their position, email, and phone number. Required fields are marked with *.
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4 relative space-y-4 ">
+          <div key={field.id} className="p-4  space-y-4 relative">
             <InputField
               type="text"
               label="Referee Name *"
@@ -172,50 +161,48 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
             />
 
             {fields.length > 1 && !editingReference && (
-              <button
+              <Button
                 type="button"
-                className="absolute bottom-2 right-2 text-red-500 text-sm disabled:opacity-50"
+                label="Remove"
                 onClick={() => remove(index)}
                 disabled={loading}
-              >
-                Remove
-              </button>
+                className="bg-red-500 text-white hover:bg-red-600 absolute bottom-2 right-2"
+              />
             )}
           </div>
         ))}
 
-        {/* Buttons */}
-        <div className="flex gap-4 flex-wrap mx-4">
+        <div className="flex gap-4 flex-wrap">
           {!editingReference && (
             <Button
               type="button"
-              label="Add Reference"
+              label="+ Add Reference"
               onClick={() => append({ name: "", position: "", email: "", phone: "" })}
               disabled={loading}
+              className="bg-red-600 text-white hover:bg-red-700"
             />
           )}
           <Button
             type="submit"
-            onClick={() => {}}
             label={editingReference ? "Update" : "Submit"}
             disabled={loading}
+            onClick={() => {}}
+            className="bg-red-600 text-white hover:bg-red-700"
           />
         </div>
 
-        {/* Loader with elapsed time */}
         <Loader
           loading={loading}
           message={loading ? `Processing references... (${elapsedTime}s elapsed)` : ""}
         />
       </form>
 
-      {/* Success message */}
       {successMessage && (
-        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
           {successMessage}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

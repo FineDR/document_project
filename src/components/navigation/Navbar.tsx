@@ -2,7 +2,7 @@ import { DropdownMenu } from "./DropdownMenu";
 import { Link, NavLink } from "react-router-dom";
 import { Logo } from "./Logo";
 import { useState } from "react";
-import { RiMenu4Fill } from "react-icons/ri";
+import { RiMenuLine } from "react-icons/ri";
 import { TfiClose } from "react-icons/tfi";
 import { routes } from "../../routes/pageRouteConfig";
 import { useSelector } from "react-redux";
@@ -82,7 +82,7 @@ export const MobileNavBar = () => {
   const closeMenu = () => setIsOpen(false);
   
   return (
-    <nav className="md:hidden bg-red-50 shadow-md bg-white/30 backdrop-blur-md px-4 py-3 border-b-2 border-red-200">
+    <nav className="md:hidden shadow-md px-4 py-3 ">
       <div className="flex justify-between items-center">
         <div className="text-xl font-bold text-red-700">
           <Logo />
@@ -92,7 +92,7 @@ export const MobileNavBar = () => {
           className="text-red-600 text-3xl focus:outline-none p-2 rounded-full hover:bg-red-100 transition-colors"
           aria-label="Toggle menu"
         >
-          {isOpen ? <TfiClose /> : <RiMenu4Fill />}
+          {isOpen ? <TfiClose /> : <RiMenuLine />}
         </button>
       </div>
       {isOpen && (

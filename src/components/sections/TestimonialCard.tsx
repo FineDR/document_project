@@ -14,7 +14,7 @@ const TestimonialCard = ({
   avatarColor = "bg-red-200" 
 }: TestimonialCardProps) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md relative">
+    <div className="bg-whiteBg p-6 rounded-lg shadow-md relative">
       <FaQuoteLeft className="text-red-200 text-2xl absolute top-4 left-4" />
       <p className="text-red-800 mb-4 pl-8">
         {quote}

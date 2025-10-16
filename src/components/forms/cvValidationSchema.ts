@@ -14,6 +14,13 @@ export const personalInformationSchema = z.object({
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
   profile_summary: z.string().optional(),
+  profile_image: z
+  .any()
+  .refine((files) => !files || files.length === 0 || files[0]?.size <= 5_000_000, {
+    message: "File size must be less than 5MB",
+  })
+  .optional()
+
 });
 
 export const careerObjectiveSchema = z.object({

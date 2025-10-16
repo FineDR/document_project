@@ -12,7 +12,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ data }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none print:max-w-none font-serif">
+    <div className="max-w-4xl mx-auto bg-whiteBg shadow-lg print:shadow-none print:max-w-none font-serif">
       {/* Header */}
       <header className="text-center pb-6 mb-8 p-8 print:p-6">
         <h1 className="text-3xl font-bold text-blue-800 mb-2 print:text-3xl uppercase">

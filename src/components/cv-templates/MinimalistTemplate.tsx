@@ -10,7 +10,7 @@ const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
     new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short" });
 
   return (
-    <div className="max-w-4xl mx-auto bg-white print:max-w-none font-serif">
+    <div className="max-w-4xl mx-auto bg-whiteBg print:max-w-none font-serif">
       {/* Header */}
       <header className="mb-8 p-6 text-center">
         <h1 className="text-3xl font-bold text-blue-800 mb-4">

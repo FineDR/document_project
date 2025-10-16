@@ -1,4 +1,4 @@
-// src/components/sections/ReferencesSection.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
@@ -11,10 +11,9 @@ interface Props {
 }
 
 const ReferencesSection = ({ cv }: Props) => {
-  const [references, setReferences] = useState<Reference[]>(
-    cv.references || []
-  );
+  const [references, setReferences] = useState<Reference[]>(cv.references || []);
   const [showModal, setShowModal] = useState(false);
+  const [editingReference, setEditingReference] = useState<Reference | null>(null);
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
 
   const handleDelete = async (id?: number) => {
@@ -30,43 +29,64 @@ const ReferencesSection = ({ cv }: Props) => {
     }
   };
 
+  const handleEditClick = (reference: Reference) => {
+    setEditingReference(reference);
+    setShowModal(true);
+  };
+
+  const handleDone = (updatedReference?: Reference) => {
+    if (!updatedReference || !updatedReference.id) {
+      setEditingReference(null);
+      setShowModal(false);
+      return;
+    }
+
+    const exists = references.find((r) => r.id === updatedReference.id);
+    setReferences((prev) =>
+      exists
+        ? prev.map((r) => (r.id === updatedReference.id ? updatedReference : r))
+        : [...prev, updatedReference]
+    );
+
+    setEditingReference(null);
+    setShowModal(false);
+  };
+
   return (
     <>
       <CVCard title="References">
-        <div className="flex justify-end items-center mb-3">
-          {/* <h4 className="font-semibold text-gray-800">References</h4> */}
-          {references.length > 0 && (
-            <button
-              onClick={() => setShowModal(true)}
-              className="text-blue-600 text-sm hover:underline"
-            >
-              Edit
-            </button>
-          )}
-        </div>
-
         {references.length === 0 ? (
-          <p className="text-gray-500 italic">No references added yet</p>
+          <p className="text-gray-400 italic font-sans">No references added yet</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans text-subHeadingGray">
             {references.map((reference, index) => (
               <div
                 key={reference.id || index}
-                className="relative transition-all duration-300 ease-in-out bg-white rounded-lg border border-gray-200 p-4 group shadow-sm"
+                className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                {/* Name */}
-                <h4 className="font-semibold text-gray-800">
-                  {reference.name}
-                </h4>
+                {/* Top-right actions */}
+                <div className="absolute top-4 right-4 flex gap-3 text-sm">
+                  <span
+                    className="text-redMain font-medium cursor-pointer hover:underline"
+                    onClick={() => handleEditClick(reference)}
+                  >
+                    Edit
+                  </span>
+                  <span
+                    className="text-gray-400 hover:text-redMain cursor-pointer"
+                    onClick={() => handleDelete(reference.id)}
+                  >
+                    {loadingDelete === reference.id ? "⏳" : <FaTrash />}
+                  </span>
+                </div>
 
-                {/* Position as badge */}
+                {/* Reference Details */}
+                <h4 className="font-semibold text-gray-800">{reference.name}</h4>
                 {reference.position && (
                   <span className="inline-block mt-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                     {reference.position}
                   </span>
                 )}
-
-                {/* Contact info */}
                 <div className="mt-3 space-y-1 text-sm text-gray-700">
                   {reference.email && (
                     <p>
@@ -79,45 +99,34 @@ const ReferencesSection = ({ cv }: Props) => {
                     </p>
                   )}
                 </div>
-
-                {/* Delete button (hover only) */}
-                <button
-                  className="absolute top-3 right-3 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-600 transition"
-                  onClick={() => handleDelete(reference.id)}
-                  disabled={loadingDelete === reference.id}
-                >
-                  {loadingDelete === reference.id ? (
-                    <span className="animate-spin">⏳</span>
-                  ) : (
-                    <FaTrash size={16} />
-                  )}
-                </button>
               </div>
             ))}
           </div>
         )}
       </CVCard>
 
-      {/* Modal */}
-      {showModal && references.length > 0 && (
+      {/* Modal for editing reference */}
+      {showModal && editingReference && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              onClick={() => setShowModal(false)}
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <span
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
+              onClick={() => {
+                setShowModal(false);
+                setEditingReference(null);
+              }}
             >
               ✕
-            </button>
-           
+            </span>
 
-            {references.map((reference, index) => (
-              <ReferencesFormDetails
-                key={reference.id || index}
-                editingReference={reference}
-                editingIndex={index}
-                onDone={() => setShowModal(false)}
-              />
-            ))}
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
+              Edit Reference
+            </h2>
+
+            <ReferencesFormDetails
+              editingReference={editingReference}
+              onDone={handleDone}
+            />
           </div>
         </div>
       )}

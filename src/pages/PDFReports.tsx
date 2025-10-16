@@ -36,7 +36,7 @@ const PDFReports: React.FC = () => {
           {reportPages.map((pageContent, idx) => (
             <div
               key={idx}
-              className="bg-white w-full aspect-[210/297] shadow-lg rounded-lg border border-gray-300 flex-shrink-0 overflow-hidden"
+              className="bg-whiteBg w-full aspect-[210/297] shadow-lg rounded-lg border border-gray-300 flex-shrink-0 overflow-hidden"
             >
               <ReportForm content={pageContent} />
             </div>
@@ -48,7 +48,7 @@ const PDFReports: React.FC = () => {
           {previewPages.map((pageContent, idx) => (
             <div
               key={idx}
-              className="bg-white w-full aspect-[210/297] shadow-lg rounded-lg border border-gray-300 flex-shrink-0 overflow-hidden"
+              className="bg-whiteBg w-full aspect-[210/297] shadow-lg rounded-lg border border-gray-300 flex-shrink-0 overflow-hidden"
             >
               <PreviewPage content={pageContent} />
             </div>

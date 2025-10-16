@@ -215,7 +215,7 @@ TANZANIA"
             <h3 className="text-xl font-semibold text-red-900 flex items-center">
               <FaEye className="mr-2" /> Preview Your Letter
             </h3>
-            <div className="bg-white p-8 border border-red-200 rounded-lg shadow-md">
+            <div className="bg-whiteBg p-8 border border-red-200 rounded-lg shadow-md">
               <div className="mb-6">
                 <p className="text-right text-red-700">{formData.senderAddress}</p>
                 <p className="text-right text-red-700">{new Date(formData.date).toLocaleDateString()}</p>
@@ -273,7 +273,7 @@ TANZANIA"
                     ? 'bg-red-600 text-white'
                     : currentStep > step
                       ? 'bg-red-100 text-red-600 border-2 border-red-600'
-                      : 'bg-white text-red-600 border-2 border-red-200'
+                      : 'bg-whiteBg text-red-600 border-2 border-red-200'
                     }`}
                 >
                   {currentStep > step ? <FaCheck /> : step}
@@ -294,7 +294,7 @@ TANZANIA"
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-whiteBg rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 md:p-8">
             {renderStepContent()}
           </div>

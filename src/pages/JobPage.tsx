@@ -139,7 +139,7 @@ const JobPage: React.FC = () => {
     const category = extractCategoryFromTitle(job.title);
     
     return (
-      <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full">
+      <div className="bg-whiteBg rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full">
         <div className="p-5 flex-grow">
           <div className="flex justify-between items-start mb-3">
             <h2 className="text-xl font-bold text-gray-800 line-clamp-2">{job.title || "No Title Provided"}</h2>
@@ -185,7 +185,7 @@ const JobPage: React.FC = () => {
 
   // Skeleton Loader Component
   const JobCardSkeleton = () => (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-pulse">
+    <div className="bg-whiteBg rounded-xl shadow-md overflow-hidden border border-gray-100 animate-pulse">
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <div className="h-6 bg-gray-200 rounded w-3/4"></div>
@@ -221,7 +221,7 @@ const JobPage: React.FC = () => {
   const CategorySection = ({ category, jobs }: { category: string; jobs: any[] }) => (
     <div className="mb-10">
       <div 
-        className="flex items-center justify-between p-4 bg-white rounded-t-xl border border-gray-200 cursor-pointer"
+        className="flex items-center justify-between p-4 bg-whiteBg rounded-t-xl border border-gray-200 cursor-pointer"
         onClick={() => toggleCategory(category)}
       >
         <div className="flex items-center">
@@ -257,22 +257,22 @@ const JobPage: React.FC = () => {
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 text-center">
+          <div className="bg-whiteBg p-5 rounded-xl shadow-sm border border-gray-100 text-center">
             <div className="text-3xl font-bold text-blue-600 mb-2">{jobs.length}</div>
             <div className="text-gray-600">Available Positions</div>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 text-center">
+          <div className="bg-whiteBg p-5 rounded-xl shadow-sm border border-gray-100 text-center">
             <div className="text-3xl font-bold text-green-600 mb-2">{categories.length - 1}</div>
             <div className="text-gray-600">Job Categories</div>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 text-center">
+          <div className="bg-whiteBg p-5 rounded-xl shadow-sm border border-gray-100 text-center">
             <div className="text-3xl font-bold text-purple-600 mb-2">24h</div>
             <div className="text-gray-600">Updates Frequency</div>
           </div>
         </div>
 
         {/* Professional Filter Controls */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-10">
+        <div className="bg-whiteBg rounded-xl shadow-sm border border-gray-100 p-6 mb-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
@@ -285,7 +285,7 @@ const JobPage: React.FC = () => {
                   placeholder="Search jobs by title, company, or location..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-whiteBg placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 {searchQuery && (
                   <button
@@ -356,7 +356,7 @@ const JobPage: React.FC = () => {
                     </button>
                     
                     {showFilters && (
-                      <div className="absolute z-10 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                      <div className="absolute z-10 mt-2 w-56 bg-whiteBg rounded-lg shadow-lg border border-gray-200 overflow-hidden">
                         <div className="py-1">
                           {categories
                             .filter(cat => cat !== "All")
@@ -432,7 +432,7 @@ const JobPage: React.FC = () => {
 
         {/* Empty State */}
         {!loading && !error && jobs.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100 mb-10">
+          <div className="text-center py-12 bg-whiteBg rounded-xl shadow-sm border border-gray-100 mb-10">
             <div className="inline-flex items-center justify-center p-3 bg-gray-100 rounded-full mb-4">
               <FaSearch className="text-gray-500 text-xl" />
             </div>
@@ -478,7 +478,7 @@ const JobPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+                  <div className="text-center py-12 bg-whiteBg rounded-xl shadow-sm border border-gray-100">
                     <div className="inline-flex items-center justify-center p-3 bg-gray-100 rounded-full mb-4">
                       <FaSearch className="text-gray-500 text-xl" />
                     </div>
@@ -495,7 +495,7 @@ const JobPage: React.FC = () => {
                           setSearchQuery("");
                           setSelectedCategory("All");
                         }}
-                        className="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-whiteBg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         Clear Filters
                       </button>

@@ -55,7 +55,7 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ onSuccess }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-90 z-50">
-      <div className="max-w-md w-full mx-auto p-6 bg-white shadow-2xl rounded-2xl border border-gray-200">
+      <div className="max-w-md w-full mx-auto p-6 bg-whiteBg shadow-2xl rounded-2xl border border-gray-200">
         <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800">
           Make Payment
         </h2>

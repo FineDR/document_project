@@ -1,57 +1,78 @@
 import type { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
- interface AdvancedTemplateProps {
-  isPreview?: boolean; // optional prop
+interface AdvancedTemplateProps {
+    isPreview?: boolean; // optional prop
 }
 const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
     const user = useSelector((state: RootState) => state.auth.user);
 
-      if (!user && isPreview) {
-    return (
-      <div className="space-y-2 p-2">
-        {/* Header */}
-        <div className="bg-gray-300 h-4 w-32 rounded animate-pulse mx-auto mb-2"></div>
-        <div className="flex justify-center gap-2 mb-2">
-          <div className="bg-gray-200 h-3 w-16 rounded animate-pulse"></div>
-          <div className="bg-gray-200 h-3 w-16 rounded animate-pulse"></div>
-        </div>
+    if (!user && isPreview) {
+        return (
+            <div className="space-y-2 p-2">
+                {/* Header */}
+                <div className="bg-gray-300 h-4 w-32 rounded animate-pulse mx-auto mb-2"></div>
+                <div className="flex justify-center gap-2 mb-2">
+                    <div className="bg-gray-200 h-3 w-16 rounded animate-pulse"></div>
+                    <div className="bg-gray-200 h-3 w-16 rounded animate-pulse"></div>
+                </div>
 
-        {/* Two-column preview blocks */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <div className="bg-gray-200 h-3 w-full rounded animate-pulse"></div>
-            <div className="bg-gray-200 h-6 w-full rounded animate-pulse"></div>
-          </div>
-          <div className="space-y-1">
-            <div className="bg-gray-200 h-3 w-full rounded animate-pulse"></div>
-            <div className="bg-gray-200 h-6 w-full rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+                {/* Two-column preview blocks */}
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                        <div className="bg-gray-200 h-3 w-full rounded animate-pulse"></div>
+                        <div className="bg-gray-200 h-6 w-full rounded animate-pulse"></div>
+                    </div>
+                    <div className="space-y-1">
+                        <div className="bg-gray-200 h-3 w-full rounded animate-pulse"></div>
+                        <div className="bg-gray-200 h-6 w-full rounded animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-lg border border-gray-300 rounded-lg overflow-auto">
+        <div className="bg-whiteBg w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-lg border border-gray-300 rounded-lg overflow-auto">
             {user ? (
                 <div className="m-4">
-                    {/* --- Full Name --- */}
-                    <h2 className="text-3xl font-bold text-center uppercase mb-4">
-                        {user.profile.full_name}
-                    </h2>
+                    {/* --- Header with Profile Image --- */}
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
+                            {/* Profile Image */}
+                            {user?.personal_details?.profile_image && (
+                                <img
+                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user.personal_details.profile_image}`}
+                                    alt="Profile"
+                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
+                                    style={{ borderRadius: 0 }} // no rounding
+                                />
+                            )}
 
-                    {/* --- Contact Info --- */}
-                    <div className="flex flex-wrap justify-center items-center text-sm text-gray-700 text-center gap-x-2 gap-y-1">
-                        <div>{user.personal_details.phone}</div>
-                        <span className="text-blue-600 font-semibold">|</span>
-                        <div>{user.email}</div>
-                        <span className="text-blue-600 font-semibold">|</span>
-                        <div>{user.personal_details.address}</div>
-                        <span className="text-blue-600 font-semibold">|</span>
-                        <div className="break-all">{user.personal_details.github}</div>
-                        <span className="text-blue-600 font-semibold">|</span>
-                        <div className="break-all">{user.personal_details.linkedin}</div>
+                            {/* Name and Contact */}
+                            <div className="flex flex-col justify-center text-center sm:text-left">
+                                {/* Full Name */}
+                                <h1
+                                    className="text-3xl font-bold uppercase text-blue-800 mb-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.profile?.full_name || "Full Name"}
+                                </h1>
+
+                                {/* Contact Info */}
+                                <div
+                                    className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.personal_details?.phone && <span>{user.personal_details.phone}</span>}
+                                    {user?.email && <span>| {user.email}</span>}
+                                    {user?.personal_details?.address && <span>| {user.personal_details.address}</span>}
+                                    {user?.personal_details?.github && <span>| {user.personal_details.github}</span>}
+                                    {user?.personal_details?.linkedin && <span>| {user.personal_details.linkedin}</span>}
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
 
                     <div className="flex flex-col gap-x-2 gap-y-1 text-gray-700">
                         <h2 className="text-base uppercase mt-4">Profile summary</h2>

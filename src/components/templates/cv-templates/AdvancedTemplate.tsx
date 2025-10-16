@@ -32,25 +32,47 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
 
   return (
-    <div className="bg-white w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-xl border border-gray-300 rounded-lg overflow-auto font-sans">
+    <div className="bg-whiteBg w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-xl border border-gray-300 rounded-lg overflow-auto font-sans">
       {user ? (
         <div className="space-y-6">
 
           {/* --- Header / Name & Role --- */}
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl font-extrabold uppercase text-gray-900">{user.profile.full_name}</h1>
-            <div className="flex flex-wrap justify-center items-center text-sm text-gray-600 gap-x-3 gap-y-1 mt-1">
-              <span>{user.personal_details.phone}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span>{user.email}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span>{user.personal_details.address}</span>
-            </div>
-            <div className="flex justify-center flex-wrap gap-3 mt-1 text-blue-600 text-sm">
-              <a href={user.personal_details.github} target="_blank" className="underline">{user.personal_details.github}</a>
-              <a href={user.personal_details.linkedin} target="_blank" className="underline">{user.personal_details.linkedin}</a>
-            </div>
-          </div>
+          <div className="flex flex-col items-center mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
+                            {/* Profile Image */}
+                            {user?.personal_details?.profile_image && (
+                                <img
+                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user.personal_details.profile_image}`}
+                                    alt="Profile"
+                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
+                                    style={{ borderRadius: 0 }} // no rounding
+                                />
+                            )}
+
+                            {/* Name and Contact */}
+                            <div className="flex flex-col justify-center text-center sm:text-left">
+                                {/* Full Name */}
+                                <h1
+                                    className="text-3xl font-bold uppercase text-blue-800 mb-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.profile?.full_name || "Full Name"}
+                                </h1>
+
+                                {/* Contact Info */}
+                                <div
+                                    className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.personal_details?.phone && <span>{user.personal_details.phone}</span>}
+                                    {user?.email && <span>| {user.email}</span>}
+                                    {user?.personal_details?.address && <span>| {user.personal_details.address}</span>}
+                                    {user?.personal_details?.github && <span>| {user.personal_details.github}</span>}
+                                    {user?.personal_details?.linkedin && <span>| {user.personal_details.linkedin}</span>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
           {/* --- Two Column Layout --- */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -69,7 +91,7 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Education</h2>
                 <div className="space-y-2">
                   {user.educations.map((edu) => (
-                    <div key={edu.id} className="p-3 bg-white rounded-lg shadow-sm border-l-4 border-blue-400">
+                    <div key={edu.id} className="p-3 bg-whiteBg rounded-lg shadow-sm border-l-4 border-blue-400">
                       <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
                       <span className="text-gray-600">{edu.institution}</span>
                       <div className="text-gray-500 text-sm mt-1">

@@ -94,3 +94,8 @@ export const REPORT_ENDPOINTS = {
 export const SCHEMA_ENDPOINTS = {
   schema: "api/schema/",
 };
+export const TEMPLATE_DOWNLOAD: Record<string, string> = {
+  Basic: "api/cv/download/basic/",
+  Intermediate: "api/cv/download/intermediate/",
+  Advanced: "api/cv/download/advanced/",
+};

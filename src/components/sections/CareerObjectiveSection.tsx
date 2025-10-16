@@ -23,10 +23,8 @@ const CareerObjectiveSection = ({ cv }: Props) => {
   const [activeModalIndex, setActiveModalIndex] = useState<number | null>(null);
   const [loadingDeleteIndex, setLoadingDeleteIndex] = useState<number | null>(null);
 
-  // Reusable loader with minimum duration 1.5s
   const { loading: loaderActive, withLoader } = useTimedLoader(1500);
 
-  // DELETE a single career objective
   const handleDelete = async (index: number) => {
     const objToDelete = careerObjectives[index];
     if (!objToDelete?.id) return;
@@ -44,14 +42,12 @@ const CareerObjectiveSection = ({ cv }: Props) => {
     });
   };
 
-  // HANDLE update/add from modal form
   const handleDone = async (updated: CareerObjective, index?: number) => {
     await withLoader(async () => {
       try {
         let savedObj: CareerObjective;
 
         if (index !== undefined) {
-          // Update existing
           savedObj = await updateCareerObjective(updated.id!, {
             career_objective: updated.career_objective,
           });
@@ -59,7 +55,6 @@ const CareerObjectiveSection = ({ cv }: Props) => {
             prev.map((item, i) => (i === index ? savedObj : item))
           );
         } else {
-          // Create new
           savedObj = await submitCareerObjective({
             career_objective: updated.career_objective,
           });
@@ -77,49 +72,51 @@ const CareerObjectiveSection = ({ cv }: Props) => {
     <>
       <CVCard title="Career Objectives">
         {careerObjectives.length === 0 ? (
-          <p className="text-gray-500 italic">No career objectives added yet</p>
+          <p className="text-gray-400 italic font-sans">
+            No career objectives added yet
+          </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans text-subHeadingGray">
             {careerObjectives.map((obj, index) => (
               <div
                 key={obj.id}
-                className="transition-all duration-300 ease-in-out bg-white rounded-lg overflow-hidden border border-gray-200 p-4 relative group"
+                className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                <div className="absolute top-2 right-2 flex gap-2">
+                <div className="absolute top-4 right-4 flex gap-3">
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-redMain font-medium hover:underline text-sm"
                     onClick={() => setActiveModalIndex(index)}
                   >
                     Edit
                   </button>
                   <button
-                    className="text-gray-400 hover:underline hover:text-red-500"
+                    className="text-gray-400 hover:text-redMain"
                     onClick={() => handleDelete(index)}
                     disabled={loadingDeleteIndex === index || loaderActive}
                   >
-                    {loadingDeleteIndex === index ? "⏳" : <FaTrash size={16} />}
+                    {loadingDeleteIndex === index ? "⏳" : <FaTrash />}
                   </button>
                 </div>
-                <br />
-                <hr className="border-gray-100" />
-                <p className="text-gray-700 mt-4">{obj.career_objective}</p>
+
+                <p className="mt-2">{obj.career_objective}</p>
               </div>
             ))}
           </div>
         )}
       </CVCard>
 
-      {/* Modals: only open the active one */}
+      {/* Modal for editing career objective */}
       {activeModalIndex !== null && careerObjectives[activeModalIndex] && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 relative">
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-lg"
               onClick={() => setActiveModalIndex(null)}
             >
               ✕
             </button>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+
+            <h2 className="text-h2 font-semibold text-subHeadingGray mb-4">
               Edit Career Objective
             </h2>
 
@@ -129,12 +126,8 @@ const CareerObjectiveSection = ({ cv }: Props) => {
               onDone={(updated) => handleDone(updated, activeModalIndex)}
             />
 
-            {/* Global loader for modal */}
             {loaderActive && (
-              <Loader
-                loading={loaderActive}
-                message="Processing your request..."
-              />
+              <Loader loading={loaderActive} message="Processing your request..." />
             )}
           </div>
         </div>

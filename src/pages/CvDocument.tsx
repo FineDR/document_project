@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import {
   FaUser,
@@ -13,7 +12,6 @@ import {
   FaAddressBook,
   FaEdit,
 } from "react-icons/fa";
-
 import { useAppSelector } from "../hooks/reduxHooks";
 
 import PersonalDetailsForm from "../components/forms/PersonalDetailsForm";
@@ -27,19 +25,18 @@ import AchievementFormDetails from "../components/forms/AchievementFormDetails";
 import ReferencesFormDetails from "../components/forms/ReferencesFormDetails";
 import SkillsForm from "../components/forms/SkillsForm";
 
-// Sidebar sections
+// Sidebar categories
 const categories = [
-  { key: "certification", label: "Certification", icon: <FaCertificate /> },
   { key: "personal_information", label: "Personal Information", icon: <FaUser /> },
+  { key: "language", label: "Language", icon: <FaLanguage /> },
   { key: "work_experience", label: "Work Experience", icon: <FaBriefcase /> },
   { key: "career_objective", label: "Career Objective", icon: <FaBullseye /> },
-  { key: "skills", label: "Skills", icon: <FaStar /> },
   { key: "education", label: "Education", icon: <FaGraduationCap /> },
-  { key: "language", label: "Language", icon: <FaLanguage /> },
-  
+  { key: "certification", label: "Certification", icon: <FaCertificate /> },
   { key: "projects", label: "Projects", icon: <FaProjectDiagram /> },
   { key: "achievements", label: "Achievements", icon: <FaTrophy /> },
   { key: "references", label: "References", icon: <FaAddressBook /> },
+  { key: "skills", label: "Skills", icon: <FaStar /> },
 ];
 
 // Mapping category keys → form components
@@ -56,41 +53,32 @@ const categoryComponents: Record<string, React.ComponentType<any>> = {
   skills: SkillsForm,
 };
 
-const CvDocument = () => {
+const CvDocument: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  // ✅ Get auth state from Redux
   const { access, user } = useAppSelector((state) => state.auth);
   const isLoggedIn = Boolean(access && user);
 
   const SelectedComponent = selectedCategory ? categoryComponents[selectedCategory] : null;
 
   return (
-    <div className="h-screen bg-gray-100 sm:p-8 mt-8 border-t">
-      <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 mt-10">
-        Fill Your CV Details Below
-      </h2>
+    <div className="h-auto sm:p-8 mt-8 border-t font-sans w-full">
+      <div className="prose prose-professional w-full text-center mt-10">
+        <h1 className="text-h1 font-bold text-redMain mt-5">Fill Your CV Details Below</h1>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-150px)]">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4 w-full px-4 md:h-[calc(100vh-150px)]">
         {/* Sidebar */}
-        <aside className="col-span-1 bg-white rounded-xl border shadow p-4">
-          <h3 className="text-lg font-semibold text-gray-700 text-center mb-2 uppercase">
-            CV Sections
-          </h3>
+        <aside className="col-span-1 bg-whiteBg rounded-xl border shadow p-4">
+          <h3 className="text-lg font-semibold text-subHeadingGray text-center mb-2 uppercase">CV Sections</h3>
           <p className="text-xs text-center text-gray-400 mb-4">Select a section to fill</p>
-          <hr className="text-red-500" />
-
-          <ul className="space-y-2">
+          <hr className="border-redMain" />
+          <ul className="space-y-2 mt-4">
             {categories.map((category) => (
               <li key={category.key}>
                 <button
                   onClick={() => setSelectedCategory(category.key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all 
-                    ${
-                      selectedCategory === category.key
-                        ? "bg-red-100 text-red-600"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all
+                    ${selectedCategory === category.key ? "bg-redBg text-redMain" : "text-gray-600 hover:bg-gray-100"}`}
                 >
                   <span className="text-base">{category.icon}</span>
                   <span>{category.label}</span>
@@ -100,38 +88,34 @@ const CvDocument = () => {
           </ul>
         </aside>
 
-        {/* Right Content */}
-        <main className="col-span-1 md:col-span-3 bg-white rounded-xl shadow p-6">
+        {/* Main content */}
+        <main className="col-span-1 md:col-span-3 bg-whiteBg rounded-xl shadow p-6 md:overflow-y-auto w-full">
           <div className="flex items-center justify-between mb-4 border-b pb-2">
             <div className="flex items-center gap-2">
-              <FaEdit className="text-red-500 text-xl" />
-              <h2 className="text-lg font-semibold text-gray-700">CV Editor</h2>
+              <FaEdit className="text-redMain text-xl" />
+              <h2 className="text-lg font-semibold text-subHeadingGray">CV Editor</h2>
             </div>
             <span className="text-xs text-gray-400 italic">Customize each section</span>
           </div>
 
-          <div className="min-h-[200px]">
+          <div className="min-h-[200px] w-full">
             {SelectedComponent ? (
               isLoggedIn ? (
                 selectedCategory === "skills" ? (
                   <SelectedComponent
-                    skillSet={user?.skill_sets} // pass existing skills if any
+                    skillSet={user?.skill_sets}
                     onClose={() => setSelectedCategory(null)}
-                    onUpdate={(updatedSkillSet: any) => {
-                      console.log("Updated skills:", updatedSkillSet);
-                      // Optionally update Redux or local state here
-                    }}
                   />
                 ) : (
                   <SelectedComponent />
                 )
               ) : (
-                <p className="text-red-500 text-center text-sm mt-10">
+                <p className="text-redMain text-center text-sm mt-10">
                   🚫 You must be logged in to access this section.
                 </p>
               )
             ) : (
-              <p className="text-gray-500 text-sm text-center mt-10">
+              <p className="text-subHeadingGray text-center text-sm mt-10">
                 Please select a section from the left to begin editing your CV.
               </p>
             )}

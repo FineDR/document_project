@@ -36,9 +36,7 @@ const ProjectsSection = ({ cv }: Props) => {
 
   const handleDone = (updatedProject: any) => {
     setProjects((prev) =>
-      prev.map((proj) =>
-        proj.id === updatedProject.id ? updatedProject : proj
-      )
+      prev.map((proj) => (proj.id === updatedProject.id ? updatedProject : proj))
     );
     setShowModal(false);
     setEditingProject(null);
@@ -48,51 +46,41 @@ const ProjectsSection = ({ cv }: Props) => {
     <>
       <CVCard title="Projects">
         {projects.length === 0 ? (
-          <p className="text-gray-500 italic">No projects added yet</p>
+          <p className="text-gray-400 italic font-sans">No projects added yet</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans text-subHeadingGray">
             {projects.map((project: any, index: number) => (
               <div
                 key={project.id || index}
-                className="relative transition-all duration-300 ease-in-out bg-white rounded-lg border border-gray-200 p-4 group"
+                className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
                 {/* Top-right actions */}
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <button
-                    className="text-blue-600 text-sm hover:underline"
+                <div className="absolute top-4 right-4 flex gap-3 text-sm">
+                  <span
+                    className="text-redMain font-medium cursor-pointer hover:underline"
                     onClick={() => handleEditClick(project)}
                   >
                     Edit
-                  </button>
-                  <button
-                    className="text-gray-400 text-sm hover:underline hover:text-red-500"
+                  </span>
+                  <span
+                    className="text-gray-400 hover:text-redMain cursor-pointer"
                     onClick={() => handleDelete(project.id)}
-                    disabled={loadingDelete === project.id}
                   >
-                    {loadingDelete === project.id ? (
-                      "⏳"
-                    ) : (
-                      <FaTrash size={16} />
-                    )}
-                  </button>
+                    {loadingDelete === project.id ? "⏳" : <FaTrash />}
+                  </span>
                 </div>
 
-                {/* Divider */}
-                <hr className="border-gray-200 mt-8" />
+                <hr className="border-gray-100 mt-6" />
 
                 {/* Project content */}
                 <div className="flex flex-col gap-2 mt-4">
-                  <h4 className="font-semibold text-gray-800">
-                    {project.title}
-                  </h4>
+                  <h4 className="font-semibold text-gray-800">{project.title}</h4>
                   {project.position && (
-                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1.5 rounded-full">
+                    <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1.5 rounded-full w-fit">
                       {project.position}
                     </span>
                   )}
-
                   <p className="text-gray-700 mt-2">{project.description}</p>
-
                   {project.link && (
                     <p className="text-sm text-blue-600 mt-2">
                       <a
@@ -105,22 +93,16 @@ const ProjectsSection = ({ cv }: Props) => {
                       </a>
                     </p>
                   )}
-
-                  {project.technologies && project.technologies.length > 0 && (
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-600 mb-2">
-                        Technologies:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.technologies.map((tech: any, i: number) => (
-                          <span
-                            key={i}
-                            className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
-                          >
-                            {tech.value}
-                          </span>
-                        ))}
-                      </div>
+                  {project.technologies?.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {project.technologies.map((tech: any, i: number) => (
+                        <span
+                          key={i}
+                          className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                        >
+                          {tech.value}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -130,19 +112,20 @@ const ProjectsSection = ({ cv }: Props) => {
         )}
       </CVCard>
 
+      {/* Modal for editing project */}
       {showModal && editingProject && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <span
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
               onClick={() => {
                 setShowModal(false);
                 setEditingProject(null);
               }}
             >
               ✕
-            </button>
-            {/* <h2 className="text-2xl font-semibold text-gray-800 mb-4">Edit Project</h2> */}
+            </span>
+
             <ProjectFormDetails
               existingProjects={[editingProject]}
               onDone={handleDone}

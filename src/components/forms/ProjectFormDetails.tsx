@@ -32,6 +32,9 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const { loading, withLoader } = useTimedLoader(1000);
   const [successMessage, setSuccessMessage] = useState("");
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [active, setActive] = useState(false);
+  const hoverStyle = "hover:bg-red-500/60";
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(projectSchema),
@@ -49,10 +52,9 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
     remove: removeProject,
   } = useFieldArray({ control, name: "projects" });
 
-  const [active, setActive] = useState(false);
-  const hoverStyle = "hover:bg-red-500/60";
-  const handleOnclick = () => setActive(!active);
+  const handleOnClick = () => setActive(!active);
 
+  // Prefill form if editing
   useEffect(() => {
     if (existingProjects) reset({ projects: existingProjects });
   }, [existingProjects, reset]);
@@ -68,6 +70,10 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     await withLoader(async () => {
+      const startTime = Date.now();
+      setElapsedTime(0);
+      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
+
       const payload = { ...data, email: user.email };
 
       try {
@@ -96,6 +102,8 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
         setSuccessMessage(message);
       } catch (error) {
         console.error("Error submitting projects:", error);
+      } finally {
+        clearInterval(interval);
       }
     });
   };
@@ -118,22 +126,18 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="relative border p-4 rounded-lg bg-white m-4">
-        {/* Guidance message at top */}
-        <p className="text-gray-600 text-sm mb-4 text-center">
-          Add your projects clearly — include title, description, technologies used, and links if any.
+      <section className="w-full mx-auto p-6 bg-whiteBg border rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          {existingProjects ? "Edit Projects" : "Add Project Details"}
+        </h2>
+
+        <p className="text-gray-600 text-sm mb-6 text-center">
+          Add your projects clearly — include title, description, technologies used, and links if any. Required fields are marked with *.
         </p>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-6 m-4 mx-auto"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {projectFields.map((project, index) => (
-            <div
-              key={(project as any).id ?? index}
-              className="p-4 mb-6 relative "
-            >
-              {/* Pass showHelperText to display helper tips */}
+            <div key={(project as any).id ?? index} className="p-4 mb-6 relative">
               <ProjectInput
                 projectIndex={index}
                 disabled={loading}
@@ -141,30 +145,28 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
               />
 
               {projectFields.length > 1 && !existingProjects && (
-                <button
+                <Button
                   type="button"
+                  label="Remove Project"
                   onClick={() => removeProject(index)}
                   disabled={loading}
-                  className="text-red-600 underline mx-4 disabled:opacity-50"
-                >
-                  Remove Project
-                </button>
+                  className="bg-red-500 text-white hover:bg-red-600 mt-2"
+                />
               )}
 
               {existingProjects && (project as any).id && (
-                <button
+                <Button
                   type="button"
+                  label="Delete Project"
                   onClick={() => handleDelete((project as any).id)}
                   disabled={loading}
-                  className="text-red-600 underline mx-4 disabled:opacity-50"
-                >
-                  Delete
-                </button>
+                  className="bg-red-500 text-white hover:bg-red-600 mt-2"
+                />
               )}
             </div>
           ))}
 
-          <div className="flex gap-4 flex-wrap mx-4">
+          <div className="flex flex-wrap gap-4 justify-start">
             {!existingProjects && (
               <Button
                 type="button"
@@ -178,31 +180,31 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
                   })
                 }
                 disabled={loading}
-                className="text-green-600 mx-4 disabled:opacity-50"
+                className="bg-red-600 text-white hover:bg-red-700"
               />
             )}
 
             <Button
               type="submit"
               label={existingProjects ? "Update" : "Submit"}
-              onClick={handleOnclick}
+              onClick={handleOnClick}
               disabled={loading}
-              className={`${active ? hoverStyle : ""} disabled:opacity-50`}
+              className={`${active ? hoverStyle : ""} bg-red-600 text-white hover:bg-red-700`}
             />
           </div>
 
           <Loader
             loading={loading}
-            message={existingProjects ? "Updating project..." : "Saving project..."}
+            message={loading ? `Processing projects... (${elapsedTime}s elapsed)` : ""}
           />
         </form>
 
         {successMessage && (
-          <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
+          <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
             {successMessage}
           </div>
         )}
-      </div>
+      </section>
     </FormProvider>
   );
 };

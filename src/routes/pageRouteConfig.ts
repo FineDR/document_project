@@ -8,7 +8,7 @@ import CvDocument from "../pages/CvDocument";
 import CVPage from "../pages/ProfileCVDetails";
 import Dashboard from "../pages/Dashboard";
 import CreateOfficialLetter from "../pages/CreateOfficialLetter";
-import JobPage from "../pages/JobPage";
+// import JobPage from "../pages/JobPage";
 import OfficialLetter from "../pages/OfficialLetter";
 import { Verification } from "../components/sections/Verification";
 // import CoverLetterDocument from "../pages/CoverLetterDocument";
@@ -47,13 +47,14 @@ export const routes: pageRouteConfig[] = [
     element: Dashboard,
     name: "Panel",    // 👈 fixed spelling
     layout: true,
-  }, {
-    forNav: true,
-    path: "/jobs",
-    element: JobPage,
-    name: "Jobs",
-    layout: true,
   }, 
+  // {
+  //   forNav: true,
+  //   path: "/jobs",
+  //   element: JobPage,
+  //   name: "Jobs",
+  //   layout: true,
+  // }, 
   
   // {
   //   forNav: true,

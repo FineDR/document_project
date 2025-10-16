@@ -7,11 +7,11 @@ import AboutSection from '../components/sections/AboutSection';
 
 export const Home = () => {
   return (
-    <main className="space-y-4">
+    <main className="space-y-4 bg-background">
       <HOME/>
       <Services/>
-      <Help />
       <AboutSection/>
+      <Help />
 
       {/* <PRICING /> */}
     </main>

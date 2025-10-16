@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { FaCheckCircle } from "react-icons/fa";
 import axios from "axios";
+import Button from "../formElements/Button"; // Assuming you have a Button component
 
 export const Verification = () => {
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState("Verifying...");
   const token = searchParams.get("token");
 
-  // ✅ Fix: move this inside the component
-  const backendUrl = import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:8000";
-
+  const backendUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
   useEffect(() => {
     if (token) {
@@ -31,18 +30,16 @@ export const Verification = () => {
   }, [token, backendUrl]);
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-xl p-8 max-w-md text-center">
-        <FaCheckCircle className="text-green-500 text-5xl mx-auto mb-4" />
-        <h2 className="text-2xl font-semibold mb-2 text-gray-800">
-          {message}
-        </h2>
-        <a
-          href="/"
-          className="inline-block mt-4 bg-red-500 text-white px-6 py-2 rounded-full transition"
-        >
-          Go to Login
-        </a>
+    <div className="flex justify-center items-center min-h-screen bg-redBg px-4 font-sans">
+      <div className="bg-whiteBg shadow-lg rounded-xl p-8 max-w-md text-center">
+        <FaCheckCircle className="text-redMain text-5xl mx-auto mb-4" />
+        <h2 className="text-h2 font-semibold mb-2 text-subHeadingGray">{message}</h2>
+        <Button
+          type="button"
+          label="Go to Login"
+          onClick={() => (window.location.href = "/")}
+          className="mt-4 bg-redMain text-white px-6 py-2 rounded-full hover:bg-red-600 transition-all font-medium"
+        />
       </div>
     </div>
   );

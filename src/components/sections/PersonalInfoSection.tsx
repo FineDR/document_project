@@ -10,7 +10,7 @@ interface Props {
 
 const PersonalInfoSection = ({ cv }: Props) => {
   const info = cv.personal_details || null;
-  const profile = cv.profiles || null;
+  const profile = cv.profile || null;
   const [showModal, setShowModal] = useState(false);
 
   const formatLinkText = (url: string, platform: string) =>
@@ -31,14 +31,14 @@ const PersonalInfoSection = ({ cv }: Props) => {
     <>
       <CVCard title="Personal Information">
         {!hasData ? (
-          <p className="text-gray-500 italic">No personal information added yet</p>
+          <p className="text-gray-400 italic font-sans">No personal information added yet</p>
         ) : (
-          <div className="text-gray-700 space-y-4">
-            <div className="grid grid-cols-1 gap-4 mt-4">
-              {/* Personal Details */}
-              <div className="relative space-y-1 rounded-lg p-4 border hover:bg-blue-50 hover:shadow-xl transition-all duration-200">
+          <div className="space-y-6 font-sans text-subHeadingGray">
+            <div className="grid grid-cols-1 gap-6 mt-4">
+              {/* Personal Details Frame */}
+              <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
                 <button
-                  className="absolute top-2 right-2 text-blue-600 hover:underline"
+                  className="absolute top-4 right-4 text-redMain font-medium hover:underline"
                   onClick={() => setShowModal(true)}
                 >
                   Edit
@@ -51,10 +51,10 @@ const PersonalInfoSection = ({ cv }: Props) => {
                 <p><strong>Nationality:</strong> {info?.nationality || "-"}</p>
               </div>
 
-              {/* Links */}
-              <div className="relative space-y-1 rounded-lg p-4 border hover:bg-purple-50 hover:shadow-xl transition-all duration-200">
+              {/* Links Frame */}
+              <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-purple-50 transition-all duration-200">
                 <button
-                  className="absolute top-2 right-2 text-blue-600 hover:underline"
+                  className="absolute top-4 right-4 text-redMain font-medium hover:underline"
                   onClick={() => setShowModal(true)}
                 >
                   Edit
@@ -66,7 +66,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-redMain hover:underline"
                     >
                       {formatLinkText(info.linkedin, "LinkedIn")}
                     </a>
@@ -79,7 +79,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-redMain hover:underline"
                     >
                       {formatLinkText(info.github, "GitHub")}
                     </a>
@@ -92,7 +92,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-redMain hover:underline"
                     >
                       {formatLinkText(info.website, "Website")}
                     </a>
@@ -107,15 +107,15 @@ const PersonalInfoSection = ({ cv }: Props) => {
       {/* Modal for editing personal details */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6 relative">
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-lg"
               onClick={() => setShowModal(false)}
             >
               ✕
             </button>
             <PersonDetailForm
-              existingDetails={info || {}}
+              existingDetails={{...info,profile_image:undefined}}
               onDone={() => setShowModal(false)}
             />
           </div>

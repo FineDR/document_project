@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
@@ -31,13 +32,11 @@ const LanguagesSection = ({ cv }: Props) => {
   const handleDone = (updatedLanguage?: Language) => {
     if (updatedLanguage) {
       const exists = languages.find(lang => lang.id === updatedLanguage.id);
-      if (exists) {
-        setLanguages(prev =>
-          prev.map(lang => (lang.id === updatedLanguage.id ? updatedLanguage : lang))
-        );
-      } else {
-        setLanguages(prev => [...prev, updatedLanguage]);
-      }
+      setLanguages(prev =>
+        exists
+          ? prev.map(lang => (lang.id === updatedLanguage.id ? updatedLanguage : lang))
+          : [...prev, updatedLanguage]
+      );
     }
     setEditingLanguage(null);
     setShowModal(false);
@@ -47,31 +46,28 @@ const LanguagesSection = ({ cv }: Props) => {
     <>
       <CVCard title="Languages">
         {languages.length === 0 ? (
-          <p className="text-gray-500 italic">No languages added yet</p>
+          <p className="text-gray-400 italic font-sans">No languages added yet</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans text-subHeadingGray">
             {languages.map(lang => (
               <div
                 key={lang.id}
-                className="relative transition-all duration-300 ease-in-out bg-white rounded-lg overflow-hidden border border-gray-200 p-4 group"
+                className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-sm font-medium">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-medium text-sm">
                     {lang.language.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium">{lang.language}</p>
+                    <p className="font-medium text-gray-800">{lang.language}</p>
                     <p className="text-sm text-gray-600">{lang.proficiency}</p>
                   </div>
                 </div>
 
-                <div className="absolute top-2 right-2 flex gap-3">
-                  {/* Delete button */}
-                  
-
-                  {/* Edit as text */}
+                {/* Top-right Edit/Delete buttons */}
+                <div className="absolute top-4 right-4 flex gap-3 text-sm">
                   <span
-                    className="text-blue-600 cursor-pointer text-sm hover:underline"
+                    className="text-redMain font-medium cursor-pointer hover:underline"
                     onClick={() => {
                       setEditingLanguage(lang);
                       setShowModal(true);
@@ -80,7 +76,7 @@ const LanguagesSection = ({ cv }: Props) => {
                     Edit
                   </span>
                   <span
-                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                    className="text-gray-400 hover:text-redMain cursor-pointer"
                     onClick={() => handleDelete(lang.id)}
                   >
                     {loadingDelete === lang.id ? "⏳" : <FaTrash />}
@@ -92,12 +88,12 @@ const LanguagesSection = ({ cv }: Props) => {
         )}
       </CVCard>
 
-      {/* Modal for editing single language */}
+      {/* Modal for editing language */}
       {showModal && editingLanguage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
             <span
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
               onClick={() => setShowModal(false)}
             >
               ✕

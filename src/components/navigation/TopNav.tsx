@@ -19,7 +19,7 @@ import { loginUser, googleAuthUser } from "../../features/auth/authSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-
+import ThemeToggle from "../common/ThemeToggle";
 
 
 interface GoogleUser {
@@ -78,64 +78,45 @@ const TopNav = () => {
   };
 
   return (
-    <div className="w-full bg-red-50">
-      <div className="container mx-auto">
-        <div className="w-screen h-10 bg-red-50 flex items-center gap-4 px-4 relative">
-          <div
-            className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex flex-row mx-4 cursor-pointer"
-            onClick={toggleSignIn}
-          >
-            SIGN IN{" "}
-            <span className="hover:text-2xl hover:text-red-600">
-              <RiArrowDropDownLine />
-            </span>
-          </div>
-          <div
-            className="text-red-700 lowercase text-base flex font-bold hover:text-red-500 lowercase flex-row cursor-pointer"
-            onClick={toggleSignUp}
-          >
-            SIGN UP{" "}
-            <span className="hover:text-2xl hover:text-red-600">
-              <RiArrowDropDownLine />
-            </span>
-          </div>
+   <div className="w-full">
+  <div className="w-full bg-redBg/50 dark:bg-gray-300 backdrop-blur-md">
+    <div className="container mx-auto flex justify-between items-center h-12 px-4">
+      
+      {/* SIGN IN / SIGN UP */}
+      <div className="flex items-center gap-4 mx-4">
+        <div
+          className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+          onClick={toggleSignIn}
+        >
+          SIGN IN
+          <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+        </div>
+        <div
+          className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+          onClick={toggleSignUp}
+        >
+          SIGN UP
+          <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
         </div>
       </div>
 
-      {/* Centered modal overlays */}
-      {signInIsOpen && (
-        <div
-          className="bg-white p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[400px] mt-28 sm:mt-20"
-          onClick={closeModals}
-        >
-          <div
-            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mt-20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <SignIn onClose={closeModals} />
-          </div>
-        </div>
-      )}
+      {/* Theme toggle */}
+      <div className="flex items-center">
+        <ThemeToggle />
+      </div>
 
-      {signUpIsOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 mt-50"
-          onClick={closeModals}
-        >
-          <div
-            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <SignUp onClose={closeModals} />
-          </div>
-        </div>
-      )}
     </div>
+  </div>
+
+  {/* Modals */}
+  {signInIsOpen && <SignIn onClose={closeModals} />}
+  {signUpIsOpen && <SignUp onClose={closeModals} />}
+</div>
+
   );
 };
 
 export default TopNav;
-
 
 
 // ✅ SignIn with icon close

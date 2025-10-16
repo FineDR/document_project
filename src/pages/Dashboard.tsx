@@ -55,7 +55,7 @@ const Dashboard = () => {
             key={stat.title}
             className={`flex items-center p-6 rounded-xl shadow-lg ${stat.bg} hover:scale-105 transform transition-all duration-300`}
           >
-            <div className={`p-4 rounded-full bg-white/70 ${stat.color} mr-4 text-3xl`}>
+            <div className={`p-4 rounded-full bg-whiteBg/70 ${stat.color} mr-4 text-3xl`}>
               <stat.icon />
             </div>
             <div>
@@ -67,7 +67,7 @@ const Dashboard = () => {
       </div>
 
       {/* Pie Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="bg-whiteBg rounded-xl shadow-lg p-6">
         <h3 className="text-2xl font-semibold mb-4 text-gray-800">User Distribution</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>

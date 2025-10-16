@@ -128,8 +128,8 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
 };
 
   return (
-    <div className="p-4 border rounded-lg bg-white">
-      <h2 className="text-center text-primary text-2xl font-semibold mb-6 mt-4">
+    <div className="p-4 border rounded-lg bg-whiteBg">
+      <h2 className="text-center  text-2xl font-semibold mb-6 mt-4">
         {editingExperience ? "Edit Work Experience" : "Add Work Experience"}
       </h2>
 

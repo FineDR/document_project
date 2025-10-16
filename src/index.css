@@ -2,7 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base global styles */
 html, body {
-    @apply font-sans;
-  }
-  
+  @apply font-sans min-h-screen transition-colors duration-300;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+/* Default theme (Light) */
+:root,
+html.light {
+  --bg: #FFFFFF;
+  --text: #4B5563; 
+  --red-main: #DC2626;
+  --subheading-gray: #374151; 
+}
+
+html.dark {
+  --bg: #E5E7EB;             
+  --text: #374151;           
+  --red-main: #EF4444;       
+  --subheading-gray: #9CA3AF;
+}
+
+
+
+/* Professional theme */
+html.professional {
+  --bg: #FEE2E2;
+  --text: #374151;
+  --red-main: #DC2626;
+  --subheading-gray: #374151;
+}
+
+/* Utility mappings */
+@layer utilities {
+  .bg-background { background-color: var(--bg); }
+  .text-text { color: var(--text); }
+  .text-primary { color: var(--red-main); }
+  .text-subheading { color: var(--subheading-gray); }
+}

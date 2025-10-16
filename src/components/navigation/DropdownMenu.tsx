@@ -50,7 +50,7 @@ export const DropdownMenu = ({ title, items, onItemClick }: DropdownMenuProps) =
         </span>
       </button>
       <div
-        className={`absolute left-0 mt-1 bg-white shadow-lg rounded-lg z-[9999] w-48 transition-all duration-200 border border-gray-200 ${
+        className={`absolute left-0 mt-1 bg-whiteBg shadow-lg rounded-lg z-[9999] w-48 transition-all duration-200 border border-gray-200 ${
           open ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-2"
         }`}
       >

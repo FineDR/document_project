@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
@@ -13,8 +14,7 @@ const AchievementsSection = ({ cv }: Props) => {
   const [achievements, setAchievements] = useState<Achievement[]>(
     cv.achievement_profile?.achievements || []
   );
-  const [editingAchievement, setEditingAchievement] =
-    useState<Achievement | null>(null);
+  const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
 
@@ -36,9 +36,7 @@ const AchievementsSection = ({ cv }: Props) => {
       const exists = achievements.find((a) => a.id === updatedAchievement.id);
       if (exists) {
         setAchievements((prev) =>
-          prev.map((a) =>
-            a.id === updatedAchievement.id ? updatedAchievement : a
-          )
+          prev.map((a) => (a.id === updatedAchievement.id ? updatedAchievement : a))
         );
       } else {
         setAchievements((prev) => [...prev, updatedAchievement]);
@@ -52,20 +50,20 @@ const AchievementsSection = ({ cv }: Props) => {
     <>
       <CVCard title="Achievements">
         {achievements.length === 0 ? (
-          <p className="text-gray-500 italic">No achievements added yet</p>
+          <p className="text-gray-400 italic font-sans text-sm">
+            No achievements added yet
+          </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans text-subHeadingGray">
             {achievements.map((achievement, index) => (
               <div
                 key={achievement.id || index}
-                className="relative transition-all duration-300 ease-in-out bg-white rounded-lg overflow-hidden border border-gray-200 p-4 group"
+                className="relative rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                <div className="absolute top-2 right-2 flex gap-3">
-                  {/* Delete button with icon */}
-
-                  {/* Edit text button */}
+                {/* Top-right actions */}
+                <div className="absolute top-3 right-3 flex gap-3 text-sm">
                   <span
-                    className="text-blue-600 cursor-pointer text-sm hover:underline"
+                    className="text-redMain font-medium cursor-pointer hover:underline"
                     onClick={() => {
                       setEditingAchievement(achievement);
                       setShowModal(true);
@@ -74,34 +72,35 @@ const AchievementsSection = ({ cv }: Props) => {
                     Edit
                   </span>
                   <span
-                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                    className="text-gray-400 hover:text-redMain cursor-pointer"
                     onClick={() => handleDelete(achievement.id)}
                   >
-                    {loadingDelete === achievement.id ? "⏳" : <FaTrash />}
+                    {loadingDelete === achievement.id ? "⏳" : <FaTrash size={12} />}
                   </span>
                 </div>
-                <br />
-                <hr />
-                <p className="mt-4">
-                  <span>{achievement.value}</span>
-                </p>
+
+                {/* Achievement details */}
+                <p className="mt-4 text-sm text-subHeadingGray">{achievement.value}</p>
               </div>
             ))}
           </div>
         )}
       </CVCard>
 
-      {/* Modal for editing single achievement */}
+      {/* Modal for editing achievement */}
       {showModal && editingAchievement && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <span
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
               onClick={() => setShowModal(false)}
             >
               ✕
             </span>
-         
+
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
+              Edit Achievement
+            </h2>
 
             <AchievementFormDetails
               editingAchievement={editingAchievement}

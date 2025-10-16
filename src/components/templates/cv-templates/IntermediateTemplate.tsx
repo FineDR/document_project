@@ -30,25 +30,48 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
     );
   }
   return (
-    <div className="bg-white w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-lg border border-gray-300 rounded-lg overflow-auto font-sans">
+    <div className="bg-whiteBg w-[210mm] h-[297mm] max-w-full max-h-[90vh] mx-auto p-6 shadow-lg border border-gray-300 rounded-lg overflow-auto font-sans">
       {user ? (
         <div className="space-y-6">
 
           {/* --- Header / Name --- */}
-          <div className="text-center">
-            <h1 className="text-3xl font-bold uppercase text-gray-900">{user.profile.full_name}</h1>
-            <div className="flex flex-wrap justify-center items-center text-sm text-gray-700 gap-x-3 gap-y-1 mt-2">
-              <span>{user.personal_details.phone}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span>{user.email}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span>{user.personal_details.address}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span className="text-blue-600 underline break-all">{user.personal_details.github}</span>
-              <span className="text-blue-600 font-semibold">|</span>
-              <span className="text-blue-600 underline break-all">{user.personal_details.linkedin}</span>
-            </div>
-          </div>
+          <div className="flex flex-col items-center mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
+                            {/* Profile Image */}
+                            {user?.personal_details?.profile_image && (
+                                <img
+                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user.personal_details.profile_image}`}
+                                    alt="Profile"
+                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
+                                    style={{ borderRadius: 0 }} // no rounding
+                                />
+                            )}
+
+                            {/* Name and Contact */}
+                            <div className="flex flex-col justify-center text-center sm:text-left">
+                                {/* Full Name */}
+                                <h1
+                                    className="text-3xl font-bold uppercase text-blue-800 mb-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.profile?.full_name || "Full Name"}
+                                </h1>
+
+                                {/* Contact Info */}
+                                <div
+                                    className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
+                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                                >
+                                    {user?.personal_details?.phone && <span>{user.personal_details.phone}</span>}
+                                    {user?.email && <span>| {user.email}</span>}
+                                    {user?.personal_details?.address && <span>| {user.personal_details.address}</span>}
+                                    {user?.personal_details?.github && <span>| {user.personal_details.github}</span>}
+                                    {user?.personal_details?.linkedin && <span>| {user.personal_details.linkedin}</span>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
           {/* --- Profile Summary --- */}
           <div className="bg-gray-50 p-4 rounded-lg shadow-sm">

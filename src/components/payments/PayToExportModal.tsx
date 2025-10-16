@@ -66,7 +66,7 @@ export default function PayToExportModal({ cvId, onClose, onPaid }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-md p-6 relative">
+      <div className="bg-whiteBg rounded-xl w-full max-w-md p-6 relative">
         <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-700" onClick={onClose}>✕</button>
         <h3 className="text-xl font-semibold mb-4">Pay to Download (TZS 3,000)</h3>
 

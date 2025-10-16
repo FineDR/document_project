@@ -18,6 +18,8 @@ import carerObjectiveReducer from "../features/carerobjectives/carerObjectivesSl
 import educationReducer from "../features/educations/educationsSlice";
 import civReducer from "../features/cv/cvSlice";
 import paymentReducer from "../features/payments/paymentsSlice";
+import downloadsReducer from "../features/downloads/downloadsSlice"
+import uiReducer from "../store/uiSlice"
 // import profileReducer from "../features/certificates/profileSlice";
 
 
@@ -63,6 +65,8 @@ export const store = configureStore({
     language: languagesReducer,
     cv: civReducer,
     payments: paymentReducer,
+     downloads: downloadsReducer,
+     ui: uiReducer,
     // profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>

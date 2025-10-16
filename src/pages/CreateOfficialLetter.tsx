@@ -48,7 +48,7 @@ const letterTemplates = [
     name: 'Classic Business',
     description: 'Traditional business letter format',
     render: (values: FormLetterFields, generatedContent: LetterResponse) => (
-      <div className="bg-white p-10 border border-gray-300 rounded-lg shadow-md" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
+      <div className="bg-whiteBg p-10 border border-gray-300 rounded-lg shadow-md" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
         <div className="mb-8 text-right">
           <p className="text-gray-800">{values.senderName}</p>
           <p className="text-gray-800">{values.senderPhone}</p>
@@ -79,7 +79,7 @@ const letterTemplates = [
     name: 'Modern Professional',
     description: 'Clean, contemporary design with subtle styling',
     render: (values: FormLetterFields, generatedContent: LetterResponse) => (
-      <div className="bg-white p-10 border-l-4 border-blue-500 rounded-lg shadow-md" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
+      <div className="bg-whiteBg p-10 border-l-4 border-blue-500 rounded-lg shadow-md" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
         <div className="mb-10">
           <div className="flex justify-between items-start">
             <div>
@@ -118,7 +118,7 @@ const letterTemplates = [
     name: 'Formal Block',
     description: 'Traditional block format with formal styling',
     render: (values: FormLetterFields, generatedContent: LetterResponse) => (
-      <div className="bg-white p-12 border-2 border-gray-800 rounded-lg shadow-lg" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
+      <div className="bg-whiteBg p-12 border-2 border-gray-800 rounded-lg shadow-lg" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
         <div className="mb-10 text-center">
           <h1 className="text-2xl font-serif font-bold text-gray-900 uppercase tracking-wider">Official Correspondence</h1>
           <div className="w-32 h-1 bg-gray-800 mx-auto mt-3"></div>
@@ -167,7 +167,7 @@ const letterTemplates = [
     name: 'Minimal Clean',
     description: 'Simple, clean design with minimal elements',
     render: (values: FormLetterFields, generatedContent: LetterResponse) => (
-      <div className="bg-white p-10 rounded-lg shadow-sm" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
+      <div className="bg-whiteBg p-10 rounded-lg shadow-sm" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}>
         <div className="mb-10">
           <div className="flex justify-between">
             <div>
@@ -385,7 +385,7 @@ const CreateOfficialLetter = () => {
                     ? "bg-red-600 text-white shadow-lg"
                     : currentStep > step.id
                       ? "bg-red-100 text-red-600 border-2 border-red-600"
-                      : "bg-white text-red-600 border-2 border-red-200"
+                      : "bg-whiteBg text-red-600 border-2 border-red-200"
                   }`}
               >
                 {currentStep > step.id ? <FaCheck /> : step.id}
@@ -746,76 +746,76 @@ const CreateOfficialLetter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8 mt-10">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-red-900 mb-2">
-            Create Official Letter
-          </h1>
-          <p className="text-red-700">
-            Provide minimal details and let AI generate a professional letter for you
-          </p>
-        </div>
-        {/* Step Indicator */}
-        {renderStepIndicator()}
-        {/* Main Content */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="p-6 md:p-8">{renderStepContent()}</div>
-          {/* Navigation Buttons */}
-          <div className="bg-red-50 px-6 py-4 flex justify-between">
-            <button
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className={`flex items-center px-4 py-2 rounded-lg ${currentStep === 1
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-red-100 text-red-700 hover:bg-red-200"
-                }`}
-            >
-              <FaArrowLeft className="mr-2" /> Back
-            </button>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Button
-                type="submit"
-                onClick={() => { }}
-                label={
-                  currentStep === 3
-                    ? "Generate Letter"
-                    : "Continue"
-                }
-                disabled={
-                  loading || (currentStep === 3 && !isValid) || pdfGenerating || !generatedContent
-                }
-                className="bg-red-600 text-white hover:bg-red-700 flex items-center"
-              >
-                {currentStep === 3 ? (
+  <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 mt-10 font-sans">
+  <div className="max-w-4xl mx-auto">
+    {/* Header */}
+    <div className="text-center mb-10 prose prose-professional">
+      <h1 className="text-h1 font-bold text-redMain mb-2">
+        Create Official Letter
+      </h1>
+      <p className="text-subHeadingGray">
+        Provide minimal details and let AI generate a professional letter for you
+      </p>
+    </div>
+
+    {/* Step Indicator */}
+    {renderStepIndicator()}
+
+    {/* Main Content */}
+    <div className="bg-whiteBg rounded-xl shadow-lg overflow-hidden">
+      <div className="p-6 md:p-8">{renderStepContent()}</div>
+
+      {/* Navigation Buttons */}
+      <div className="bg-redBg px-6 py-4 flex justify-between">
+        <button
+          onClick={prevStep}
+          disabled={currentStep === 1}
+          className={`flex items-center px-4 py-2 rounded-lg text-base font-medium transition-all ${
+            currentStep === 1
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-redBg text-redMain hover:bg-red-100"
+          }`}
+        >
+          <FaArrowLeft className="mr-2" /> Back
+        </button>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Button
+            type="submit"
+            onClick={() => {}}
+            label={currentStep === 3 ? "Generate Letter" : "Continue"}
+            disabled={
+              loading || (currentStep === 3 && !isValid) || pdfGenerating || !generatedContent
+            }
+            className="bg-redMain text-white hover:bg-red-600 flex items-center px-4 py-2 rounded-lg font-medium transition-all"
+          >
+            {currentStep === 3 ? (
+              <>
+                {pdfGenerating ? (
                   <>
-                    {pdfGenerating ? (
-                      <>
-                        <FaSpinner className="animate-spin mr-2" /> Generating...
-                      </>
-                    ) : (
-                      <>
-                        <FaDownload className="mr-2" /> Generate Letter
-                      </>
-                    )}
+                    <FaSpinner className="animate-spin mr-2" /> Generating...
                   </>
                 ) : (
                   <>
-                    Continue <FaArrowRight className="ml-2" />
+                    <FaDownload className="mr-2" /> Generate Letter
                   </>
                 )}
-              </Button>
-            </form>
-          </div>
-        </div>
-        {/* Loader */}
-        <Loader
-          loading={loading}
-          message="Generating your official letter..."
-        />
+              </>
+            ) : (
+              <>
+                Continue <FaArrowRight className="ml-2" />
+              </>
+            )}
+          </Button>
+        </form>
       </div>
     </div>
+
+    {/* Loader */}
+    <Loader loading={loading} message="Generating your official letter..." />
+  </div>
+</div>
+
   );
 };
 
