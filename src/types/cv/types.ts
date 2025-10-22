@@ -72,16 +72,19 @@ export interface PersonalInformation {
     achievements: string[];
     references: Reference[];
   }
-  export interface Letter {
-  id: any;
-  recipient: string;
-  recipientTitle: string;
-  recipientAddress: string;
-  sender: string;
-  senderTitle: string;
-  senderAddress: string;
-  date: string; // ISO date string
+export interface Letter {
+  id: number | string;            // keep flexible for backend IDs
+  recipient: string;              // recipientName
+  recipientTitle: string;         // salutation or recipient's designation
+  recipientAddress: string;       // organization + address + city
+  sender: string;                 // senderName
+  senderTitle: string;            // optional: sender designation
+  senderAddress: string;           // city or office address
+  date: string;                   // ISO date string
   subject: string;
-  content: string;
-  closing: string;
+  content: string;                // body of the letter
+  closing: string;                // closingPhrase
+  senderSignature?: string;       // typed or uploaded signature (base64)
+  lang: "en" | "sw";              // language of the letter
+  alignContact: "start" | "end";  // alignment for contact info (left/right)
 }

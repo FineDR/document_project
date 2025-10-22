@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
+import { type LetterFormValues } from '../../components/forms/LetterForm';
+import { generateLetter } from '../../api/services/letterApi';
 import {
     getLetter,
     getLetters,
@@ -59,6 +60,21 @@ export const addLetter = createAsyncThunk<Letter, any>(
     }
 );
 
+export const generateLetterBodyAI = createAsyncThunk<
+    string, // returns the AI-generated body
+    LetterFormValues, // input: form data
+    { rejectValue: string }
+>(
+    "letters/generateAI",
+    async (letterData, { rejectWithValue }) => {
+        try {
+            const response = await generateLetter(letterData);
+            return response.data.body; // assume API returns { body: "generated text" }
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to generate AI letter body");
+        }
+    }
+);
 export const updateLetterById = createAsyncThunk<Letter, { id: number; data: any }>(
     "letters/updateById",
     async ({ id, data }, { rejectWithValue }) => {
@@ -144,7 +160,7 @@ export const lettersSlice = createSlice({
             .addCase(updateLetterById.pending, (state) => {
                 state.loading = true;
                 state.status = 'loading';
-                state.error = null; 
+                state.error = null;
             })
             .addCase(updateLetterById.fulfilled, (state, action) => {
                 state.loading = false;
@@ -164,6 +180,25 @@ export const lettersSlice = createSlice({
                 state.status = 'loading';
                 state.error = null;
             })
+        builder
+            .addCase(generateLetterBodyAI.pending, (state) => {
+                state.loading = true;
+                state.status = "loading";
+                state.error = null;
+            })
+            .addCase(generateLetterBodyAI.fulfilled, (state, action) => {
+                state.loading = false;
+                state.status = "succeeded";
+                if (state.selectedLetter) {
+                    state.selectedLetter.content = action.payload;
+                }
+            })
+            .addCase(generateLetterBodyAI.rejected, (state, action) => {
+                state.loading = false;
+                state.status = "failed";
+                state.error = action.payload as string;
+            })
+
             .addCase(deleteLetterById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.status = 'succeeded';

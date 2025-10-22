@@ -12,7 +12,9 @@ export interface InputFieldProps {
   disabled?: boolean;
   visible?: boolean;
   autoFocus?: boolean;
-  helperText?: string; // ✅ new prop
+  helperText?: string;
+  value?: string; // ✅ controlled value
+  onChange?: (val: string) => void; // ✅ callback to update parent
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -27,12 +29,13 @@ const InputField: React.FC<InputFieldProps> = ({
   visible = true,
   autoFocus = false,
   helperText,
+  value,      // controlled
+  onChange,   // controlled
 }) => {
   if (!visible) return null;
 
   return (
     <div className="relative mb-6 w-full">
-      {/* Input field */}
       <input
         id={name}
         type={type}
@@ -41,12 +44,16 @@ const InputField: React.FC<InputFieldProps> = ({
         disabled={disabled}
         autoFocus={autoFocus}
         {...register}
+        value={value || ""}   // ✅ controlled input
+        onChange={(e) => {
+          register.onChange(e);        // update react-hook-form
+          if (onChange) onChange(e.target.value); // update parent state (live preview)
+        }}
         className={`peer block w-full appearance-none rounded-md border border-gray-300 px-3 pt-5 pb-2 text-base text-gray-900 placeholder-transparent focus:outline-none focus:ring-2 ${
           error ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
         } ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-whiteBg"}`}
       />
 
-      {/* Floating label */}
       <label
         htmlFor={name}
         className={`absolute left-3 top-0 -translate-y-1/2 bg-whiteBg px-1 text-sm text-gray-500 transition-all duration-200
@@ -58,10 +65,7 @@ const InputField: React.FC<InputFieldProps> = ({
         {required && <span className="text-red-500">*</span>}
       </label>
 
-      {/* Error message */}
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
-
-      {/* Helper text */}
       {!error && helperText && (
         <p className="mt-1 text-sm text-center text-gray-500">{helperText}</p>
       )}

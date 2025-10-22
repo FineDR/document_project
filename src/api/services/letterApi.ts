@@ -10,3 +10,6 @@ export const createLetter = (data: any) => axiosClient.post(LETTERS_ENDPOINTS.li
 export const updateLetter = (id: number, data: any) => axiosClient.put(LETTERS_ENDPOINTS.detail(id), data);
 
 export const deleteLetter = (id: number) => axiosClient.delete(LETTERS_ENDPOINTS.detail(id));
+
+
+export const generateLetter = (data: any) => axiosClient.post(LETTERS_ENDPOINTS.generate, data);

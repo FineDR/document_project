@@ -23,7 +23,7 @@ export const sampleCVData: User = {
     profile_summary: "To make the content of the panel (main section) fit properly within the available space (without overflowing vertically), you need to adjust the layout so that: The full layout doesn't exceed the screen height (h-screen) unnecessarily. The content section is scrollable when it overflows. You remove redundant h-screen on inner containers.",
     user: 11
   },
-  profiles: {
+  profile: {
     id: 1,
     certificates: [
       { id: 1, name: "asfsgsgdf", issuer: "fgjfhk", date: "2025-08-22", profile: 1 },
@@ -31,7 +31,6 @@ export const sampleCVData: User = {
     ],
     full_name: "Finesawa M Lekwa",
     email: "jefoy56487@bizmud.com",
-    user: 11
   },
   educations: [
     { id: 1, degree: "Bachelor of Science", institution: "University of Example", location: "Dar es Salaam", start_date: "2018-09-01", end_date: "2022-06-30", grade: "Upper Second Class", user: 11 },
