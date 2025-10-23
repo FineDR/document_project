@@ -53,7 +53,7 @@ const Services = () => {
           {services.map((service) => (
             <div
               key={service.id}
-              className="bg-whiteBg dark:bg-grayBg dark:border-transparent p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-redMain hover:shadow-lg transition-shadow duration-300"
+              className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-4 rounded-xl bg-redMain/10 group-hover:bg-redMain/20 transition-colors duration-300">

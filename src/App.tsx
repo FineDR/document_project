@@ -8,7 +8,7 @@ import "./index.css";
 import { routes, documentRoutes, myDocumentsRoutes } from "./routes/pageRouteConfig";
 import { useSelector } from "react-redux";
 import type { RootState } from "./store/store";
-
+import OfflineWrapper from "./components/Offline/OfflineWrapper"
 function App() {
   const allRoutes = [...routes, ...documentRoutes, ...myDocumentsRoutes];
   const theme = useSelector((state: RootState) => state.ui.theme);
@@ -42,11 +42,13 @@ function App() {
       <main
         className="flex-1 w-full mt-20 transition-colors duration-300 bg-[var(--bg)] text-[var(--text)]"
       >
-        <Routes>
-          {filteredRoutes.map((route) => (
-            <Route key={route.path} path={route.path} element={<route.element />} />
-          ))}
-        </Routes>
+        <OfflineWrapper>
+          <Routes>
+            {filteredRoutes.map((route) => (
+              <Route key={route.path} path={route.path} element={<route.element />} />
+            ))}
+          </Routes>
+        </OfflineWrapper>
       </main>
 
       {location.pathname !== "/create/cv" && <Footer />}

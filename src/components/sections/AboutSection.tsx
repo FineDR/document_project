@@ -1,4 +1,4 @@
-import {  FaUsers, FaLightbulb, FaAward, FaFileAlt } from 'react-icons/fa';
+import { FaUsers, FaLightbulb, FaAward, FaFileAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const AboutSection = () => {
@@ -88,7 +88,7 @@ const AboutSection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1, duration: 0.5 }}
-                className="bg-whiteBg dark:bg-grayBg dark:border-transparent p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-redMain hover:shadow-lg transition-shadow duration-300"
+                className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="text-redMain mb-4 text-3xl">{feature.icon}</div>
                 <h4 className="text-lg font-semibold text-redMain mb-2">{feature.title}</h4>
