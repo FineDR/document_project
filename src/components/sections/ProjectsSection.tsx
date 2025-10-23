@@ -57,7 +57,7 @@ const ProjectsSection = ({ cv }: Props) => {
                 {/* Top-right actions */}
                 <div className="absolute top-4 right-4 flex gap-3 text-sm">
                   <span
-                    className="text-redMain font-medium cursor-pointer hover:underline"
+                    className="text-redMain font-medium cursor-pointer hover:underline dark:text-redMain"
                     onClick={() => handleEditClick(project)}
                   >
                     Edit
@@ -74,15 +74,15 @@ const ProjectsSection = ({ cv }: Props) => {
 
                 {/* Project content */}
                 <div className="flex flex-col gap-2 mt-4">
-                  <h4 className="font-semibold text-gray-800">{project.title}</h4>
+                  <h4 className="font-semibold text-gray-800 dark:text-gray-50">{project.title}</h4>
                   {project.position && (
                     <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1.5 rounded-full w-fit">
                       {project.position}
                     </span>
                   )}
-                  <p className="text-gray-700 mt-2">{project.description}</p>
+                  <p className="text-gray-700 mt-2 dark:text-white">{project.description}</p>
                   {project.link && (
-                    <p className="text-sm text-blue-600 mt-2">
+                    <p className="text-sm text-redMain mt-2">
                       <a
                         href={project.link}
                         target="_blank"

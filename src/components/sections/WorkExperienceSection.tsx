@@ -61,7 +61,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
                 {/* Top-right buttons: Edit & Delete */}
                 <div className="absolute top-4 right-4 flex gap-2 text-sm">
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-redMain hover:underline"
                     onClick={() => {
                       setEditingExperience(exp);
                       setShowModal(true);

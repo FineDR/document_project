@@ -48,7 +48,7 @@ const Help = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1, duration: 0.5 }}
-              className="p-6 bg-whiteBg dark:bg-grayBg rounded-2xl shadow-md border border-redBg dark:border-grayBg hover:shadow-lg transition-shadow duration-300"
+              className="bg-whiteBg dark:bg-grayBg dark:border-transparent p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-redMain hover:shadow-lg transition-shadow duration-300"
             >
               <h2 className="text-h2 text-redMain mb-2">{faq.question}</h2>
               <p className="text-base text-subHeadingGray">{faq.answer}</p>
@@ -57,7 +57,7 @@ const Help = () => {
         </div>
 
         {/* Footer CTA */}
-        <p className="text-center text-sm text-subHeadingGray mt-12">
+        {/* <p className="text-center text-sm text-subHeadingGray mt-12">
           Still have questions?{" "}
           <a
             href="/contact"
@@ -66,7 +66,7 @@ const Help = () => {
             Contact Support
           </a>
           .
-        </p>
+        </p> */}
       </div>
     </main>
   );

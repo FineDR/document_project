@@ -13,7 +13,7 @@ export const Logo = () => {
 
       {/* Text Part */}
       <div className="text-2xl font-bold tracking-tight">
-        <span className="text-gray-700">Smart</span>
+        <span className="text-gray-700 dark:text-gray-100">Smart</span>
         <span className="text-red-500">Docs</span>
       </div>
     </div>

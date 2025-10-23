@@ -55,12 +55,12 @@ const LanguagesSection = ({ cv }: Props) => {
                 className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-medium text-sm">
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-redMain text-redMain dark:text-white rounded-full flex items-center justify-center font-medium text-sm">
                     {lang.language.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-800">{lang.language}</p>
-                    <p className="text-sm text-gray-600">{lang.proficiency}</p>
+                    <p className="font-medium text-gray-800 dark:text-white">{lang.language}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-100">{lang.proficiency}</p>
                   </div>
                 </div>
 

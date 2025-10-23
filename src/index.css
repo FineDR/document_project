@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base global styles */
+/* Base Global Styles */
 html, body {
   @apply font-sans min-h-screen transition-colors duration-300;
   background-color: var(--bg);
@@ -11,25 +11,28 @@ html, body {
   padding: 0;
 }
 
-/* Default theme (Light) */
+/* =============================
+   THEME DEFINITIONS
+============================= */
+
+/* Default (Light) Theme */
 :root,
 html.light {
-  --bg: #FFFFFF;
-  --text: #4B5563; 
+  --bg: #ffffff;
+  --text: #4B5563;
   --red-main: #DC2626;
-  --subheading-gray: #374151; 
+  --subheading-gray: #374151;
 }
 
+/* Dark Theme */
 html.dark {
-  --bg: #E5E7EB;             
-  --text: #374151;           
-  --red-main: #EF4444;       
-  --subheading-gray: #9CA3AF;
+  --bg: #1F2937; /* deep dark gray */
+  --text: #F3F4F6; /* soft white */
+  --red-main: #F87171; /* brighter red */
+  --subheading-gray: #D1D5DB;
 }
 
-
-
-/* Professional theme */
+/* Professional Theme */
 html.professional {
   --bg: #FEE2E2;
   --text: #374151;
@@ -37,10 +40,35 @@ html.professional {
   --subheading-gray: #374151;
 }
 
-/* Utility mappings */
+/* =============================
+   Utility Mappings
+============================= */
 @layer utilities {
-  .bg-background { background-color: var(--bg); }
-  .text-text { color: var(--text); }
-  .text-primary { color: var(--red-main); }
-  .text-subheading { color: var(--subheading-gray); }
+  .bg-background {
+    background-color: var(--bg);
+  }
+  .text-text {
+    color: var(--text);
+  }
+  .text-primary {
+    color: var(--red-main);
+  }
+  .text-subheading {
+    color: var(--subheading-gray);
+  }
+}
+
+.light-theme {
+  --bg: #ffffff;
+  --text: #374151;
+  --red-main: #dc2626;
+  --subheading-gray: #374151;
+
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+.light-theme * {
+  color: inherit !important;
+  background-color: inherit !important;
 }

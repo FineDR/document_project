@@ -27,7 +27,7 @@ const Home = () => {
       />
 
       {/* Reddish overlay */}
-      <div className="absolute inset-0 bg-redBg bg-opacity-50 dark:bg-grayBg dark:bg-grayBg/50 z-10" />
+      <div className="absolute inset-0 bg-redBg bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-90 z-10" />
 
       {/* Decorations (fewer on mobile) */}
       <div className="absolute inset-0 z-20">

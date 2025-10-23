@@ -80,7 +80,7 @@ const SkillsSection = ({ cv }: Props) => {
                   Technical Skills
                 </h4>
                 <button
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-blue-600 hover:underline text-sm dark:text-redMain"
                   onClick={() => handleEdit("technical")}
                 >
                   Edit
@@ -120,7 +120,7 @@ const SkillsSection = ({ cv }: Props) => {
                   Soft Skills
                 </h4>
                 <button
-                  className="text-purple-600 hover:underline text-sm"
+                  className="text-purple-600 dark:text-redMain hover:underline text-sm"
                   onClick={() => handleEdit("soft")}
                 >
                   Edit

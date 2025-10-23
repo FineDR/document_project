@@ -28,7 +28,7 @@ const AboutSection = () => {
       <div className="container mx-auto">
         {/* Header */}
         <header className="text-center mb-16">
-          <h2 className="text-h1 font-bold text-redMain mb-4">About GenDocs</h2>
+          <h2 className="text-h1 font-bold text-redMain mb-4">About SmartDocs</h2>
           <p className="text-base sm:text-lg text-subHeadingGray max-w-2xl mx-auto leading-relaxed">
             Empowering professionals with elegant document creation tools since 2023.
           </p>
@@ -88,7 +88,7 @@ const AboutSection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1, duration: 0.5 }}
-                className="bg-whiteBg dark:bg-grayBg dark:border-transparent p-6 rounded-xl shadow-md border-l-4 border-redMain hover:shadow-lg transition-shadow duration-300"
+                className="bg-whiteBg dark:bg-grayBg dark:border-transparent p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-redMain hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="text-redMain mb-4 text-3xl">{feature.icon}</div>
                 <h4 className="text-lg font-semibold text-redMain mb-2">{feature.title}</h4>

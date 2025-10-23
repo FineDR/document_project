@@ -115,12 +115,13 @@ const CVTemplates = () => {
               onClick={() => setModalOpen(false)}
             >
               <motion.div
-                className="relative grid grid-cols-[70%_30%] gap-4 w-[90%] max-w-[1200px] h-[90%] bg-whiteBg rounded-xl shadow-lg p-6 overflow-hidden"
+                className="relative grid grid-cols-[70%_30%] gap-4 w-[90%] max-w-[1200px] h-[90%] bg-whiteBg rounded-xl shadow-lg p-6 overflow-hidden light-theme"
                 onClick={(e) => e.stopPropagation()}
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
               >
+
                 <button
                   className="absolute top-4 right-4 z-50 text-gray-500 hover:text-gray-700"
                   onClick={() => setModalOpen(false)}
@@ -152,16 +153,18 @@ const CVTemplates = () => {
                       type="submit"
                       name="Use Template"
                       label="Use Template"
-                      className="mt-6 bg-green-600 text-white w-full px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                      className="!bg-green-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-green-700 mt-6 transition"
                     />
+
                   ) : (
                     <Button
                       onClick={() => handleDownload(selectedTemplateName ?? "Basic")}
                       type="button"
                       name="Download Template"
                       label="Download Your CV"
-                      className="mt-6 bg-blue-600 text-white w-full px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                      className="!bg-blue-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-blue-700 mt-6 transition"
                     />
+
                   )}
                 </div>
               </motion.div>

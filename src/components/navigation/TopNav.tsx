@@ -79,7 +79,7 @@ const TopNav = () => {
 
   return (
    <div className="w-full">
-  <div className="w-full bg-redBg/50 dark:bg-gray-300 backdrop-blur-md">
+  <div className="w-full bg-redBg/50 dark:bg-bg backdrop-blur-md">
     <div className="container mx-auto flex justify-between items-center h-12 px-4">
       
       {/* SIGN IN / SIGN UP */}
@@ -217,7 +217,7 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[350px] mt-28 sm:mt-20"
+        className="bg-white dark:bg-background p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[350px] mt-28 sm:mt-20"
         onClick={(e) => e.stopPropagation()}
       >
         <RiCloseLine
@@ -283,7 +283,7 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
               )}
             </form>
             <div className="flex flex-col items-center mt-4">
-              <p className="text-gray-500 mb-2">Or sign up with Google</p>
+              <p className="text-gray-500 mb-2 dark:text-gray-100">Or sign up with Google</p>
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google signup failed. Try again.")} />
             </div>
           </>

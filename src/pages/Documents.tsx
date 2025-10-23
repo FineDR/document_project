@@ -61,7 +61,7 @@ const Documents = () => {
               {/* Card Header */}
               <div className="p-6 flex items-center space-x-4 bg-redBg rounded-t-xl">
                 <div className="p-3 bg-whiteBg rounded-lg">{doc.icon}</div>
-                <h3 className="text-xl font-bold text-redMain">{doc.title}</h3>
+                <h3 className="text-xl font-bold text-redMain dark:text-gray-100">{doc.title}</h3>
               </div>
 
               {/* Card Body */}

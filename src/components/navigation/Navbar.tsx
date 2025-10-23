@@ -45,8 +45,8 @@ export const NavBar = () => {
                     to={link.path}
                     className={({ isActive }) =>
                       isActive
-                        ? "text-gray-700 text-lg transition"
-                        : "text-red-700 hover:text-red-500 text-lg transition"
+                        ? "text-gray-700 dark:text-gray-100 text-lg transition"
+                        : "text-redMain text-lg transition"
                     }
                   >
                     {link.name}
@@ -89,7 +89,7 @@ export const MobileNavBar = () => {
         </div>
         <button
           onClick={handleToggle}
-          className="text-red-600 text-3xl focus:outline-none p-2 rounded-full hover:bg-red-100 transition-colors"
+          className="text-red-600 text-3xl focus:outline-none p-2 rounded-full  transition-colors"
           aria-label="Toggle menu"
         >
           {isOpen ? <TfiClose /> : <RiMenuLine />}
@@ -120,10 +120,10 @@ export const MobileNavBar = () => {
                       to={link.path}
                       onClick={closeMenu}
                       className={({ isActive }) =>
-                        isActive
-                          ? "text-red-600 font-bold text-lg transition block w-full py-2 px-4 bg-red-100 rounded-lg"
-                          : "text-red-700 hover:text-red-500 font-medium transition block w-full py-2 px-4 hover:bg-red-100 rounded-lg"
-                      }
+                      isActive
+                        ? "text-gray-700 dark:text-gray-100 text-lg transition"
+                        : "text-redMain text-lg transition"
+                    }
                     >
                       {link.name}
                     </NavLink>

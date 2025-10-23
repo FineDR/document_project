@@ -40,7 +40,7 @@ function App() {
       </div>
 
       <main
-        className="flex-1 w-full px-4 mt-20 transition-colors duration-300 bg-[var(--bg)] text-[var(--text)]"
+        className="flex-1 w-full mt-20 transition-colors duration-300 bg-[var(--bg)] text-[var(--text)]"
       >
         <Routes>
           {filteredRoutes.map((route) => (

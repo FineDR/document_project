@@ -84,8 +84,8 @@ const EducationSection = ({ cv }: Props) => {
                 </div>
 
                 {/* Education Details */}
-                <h4 className="font-semibold text-gray-800 mt-4">{education.degree}</h4>
-                <p className="text-gray-700">
+                <h4 className="font-semibold text-gray-800 mt-4 dark:text-white">{education.degree}</h4>
+                <p className="text-gray-700 dark:text-gray-100">
                   {education.institution} – {education.location}
                 </p>
                 {education.grade && (

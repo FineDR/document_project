@@ -1,42 +1,39 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  darkMode: 'class',
+  darkMode: 'class', // Enables toggling via html.dark
   theme: {
     extend: {
       colors: {
-        redBg: '#FEE2E2',
-        grayBg:'#E5E7EB',
-        whiteBg:'#FFFFFF',
-        redMain: '#DC2626',
-        subHeadingGray: '#374151',
+        redMain: 'var(--red-main)', // use CSS variables directly
+        subHeadingGray: 'var(--subheading-gray)',
+        text: 'var(--text)',
+        background: 'var(--bg)',
       },
       container: {
-      center: true,        // centers the container horizontally
-      padding: {
-        DEFAULT: "1rem",   // default padding on all sides
-        sm: "2rem",        // small screens
-        lg: "4rem",        // large screens
-        xl: "5rem",        // extra large screens
+        center: true,
+        padding: {
+          DEFAULT: '1rem',
+          sm: '2rem',
+          lg: '4rem',
+          xl: '5rem',
+        },
+        screens: {
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+          xl: '1280px',
+          '2xl': '1536px',
+        },
       },
-      screens: {
-        sm: "640px",
-        md: "768px",
-        lg: "1024px",
-        xl: "1280px",
-        "2xl": "1536px",
-      },
-    },
-
       fontFamily: {
-        // Only Times New Roman globally
         sans: ['"Times New Roman"', 'serif'],
       },
       fontSize: {
-        h1: ['2rem', { lineHeight: '2.5rem', fontWeight: '700' }],      // main headings
-        h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],      // subheadings
-        base: ['1rem', { lineHeight: '1.75rem', fontWeight: '400' }],   // normal paragraphs
-        button: ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],  // buttons
+        h1: ['2rem', { lineHeight: '2.5rem', fontWeight: '700' }],
+        h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],
+        base: ['1rem', { lineHeight: '1.75rem', fontWeight: '400' }],
+        button: ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],
       },
       spacing: {
         '1': '0.25rem',
@@ -50,63 +47,21 @@ export default {
         '12': '3rem',
         '16': '4rem',
       },
-      typography: (theme) => ({
+      typography: {
         DEFAULT: {
           css: {
-            fontFamily: theme('fontFamily.sans'),
-            color: theme('colors.paragraphGray'),
-            a: { color: theme('colors.redMain'), '&:hover': { color: theme('colors.redMain') } },
-            h1: {
-              fontSize: theme('fontSize.h1')[0],
-              lineHeight: theme('fontSize.h1')[1].lineHeight,
-              fontWeight: theme('fontSize.h1')[1].fontWeight,
-              color: theme('colors.redMain'),
-            },
-            h2: {
-              fontSize: theme('fontSize.h2')[0],
-              lineHeight: theme('fontSize.h2')[1].lineHeight,
-              fontWeight: theme('fontSize.h2')[1].fontWeight,
-              color: theme('colors.subHeadingGray'),
-            },
-            p: {
-              fontSize: theme('fontSize.base')[0],
-              lineHeight: theme('fontSize.base')[1].lineHeight,
-              fontWeight: theme('fontSize.base')[1].fontWeight,
-              color: theme('colors.paragraphGray'),
-            },
+            color: 'var(--text)',
+            a: { color: 'var(--red-main)' },
+            h1: { color: 'var(--red-main)' },
+            h2: { color: 'var(--subheading-gray)' },
+            p: { color: 'var(--text)' },
           },
         },
-        professional: {
-          css: {
-            fontFamily: theme('fontFamily.sans'),
-            color: theme('colors.paragraphGray'),
-            a: { color: theme('colors.redMain') },
-            h1: {
-              fontSize: theme('fontSize.h1')[0],
-              lineHeight: theme('fontSize.h1')[1].lineHeight,
-              fontWeight: theme('fontSize.h1')[1].fontWeight,
-              color: theme('colors.redMain'),
-            },
-            h2: {
-              fontSize: theme('fontSize.h2')[0],
-              lineHeight: theme('fontSize.h2')[1].lineHeight,
-              fontWeight: theme('fontSize.h2')[1].fontWeight,
-              color: theme('colors.subHeadingGray'),
-            },
-            p: {
-              fontSize: theme('fontSize.base')[0],
-              lineHeight: theme('fontSize.base')[1].lineHeight,
-              fontWeight: theme('fontSize.base')[1].fontWeight,
-              color: theme('colors.paragraphGray'),
-            },
-          },
-        },
-      }),
+      },
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
-
   ],
 };

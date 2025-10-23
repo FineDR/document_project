@@ -81,13 +81,13 @@ const ReferencesSection = ({ cv }: Props) => {
                 </div>
 
                 {/* Reference Details */}
-                <h4 className="font-semibold text-gray-800">{reference.name}</h4>
+                <h4 className="font-semibold text-gray-800 dark:text-white">{reference.name}</h4>
                 {reference.position && (
                   <span className="inline-block mt-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                     {reference.position}
                   </span>
                 )}
-                <div className="mt-3 space-y-1 text-sm text-gray-700">
+                <div className="mt-3 space-y-1 text-sm text-gray-700 dark:text-white">
                   {reference.email && (
                     <p>
                       <strong>Email:</strong> {reference.email}

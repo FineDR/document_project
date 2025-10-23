@@ -112,7 +112,7 @@ const CVPage = () => {
             {user?.last_name?.charAt(0) ?? ""}
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
               {[user.first_name, user.middle_name, user.last_name]
                 .filter(Boolean)
                 .join(" ")}

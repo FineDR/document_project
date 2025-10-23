@@ -38,7 +38,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
               {/* Personal Details Frame */}
               <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
                 <button
-                  className="absolute top-4 right-4 text-redMain font-medium hover:underline"
+                  className="absolute top-4 right-4 text-redMain font-medium hover:underline dark:text-redMain"
                   onClick={() => setShowModal(true)}
                 >
                   Edit
@@ -54,7 +54,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
               {/* Links Frame */}
               <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-purple-50 transition-all duration-200">
                 <button
-                  className="absolute top-4 right-4 text-redMain font-medium hover:underline"
+                  className="absolute top-4 right-4 text-redMain font-medium hover:underline dark:text-redMain"
                   onClick={() => setShowModal(true)}
                 >
                   Edit
@@ -66,7 +66,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-redMain hover:underline"
+                      className="text-redMain hover:underline dark:text-redMain "
                     >
                       {formatLinkText(info.linkedin, "LinkedIn")}
                     </a>
@@ -79,7 +79,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-redMain hover:underline"
+                      className="text-redMain hover:underline dark:text-redMain"
                     >
                       {formatLinkText(info.github, "GitHub")}
                     </a>
@@ -92,7 +92,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
                       href={info.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-redMain hover:underline"
+                      className="text-redMain hover:underline dark:text-redMain"
                     >
                       {formatLinkText(info.website, "Website")}
                     </a>

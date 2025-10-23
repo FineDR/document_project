@@ -62,8 +62,8 @@ export const DropdownMenu = ({ title, items, onItemClick }: DropdownMenuProps) =
             className={({ isActive }) =>
               `block px-4 py-2 text-sm transition-colors ${
                 isActive 
-                  ? "bg-gray-600 text-white text-lg text" 
-                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-600"
+                  ? "bg-gray-600 dark:bg-gray-800 text-white text-lg text" 
+                  : "text-gray-700 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-100"
               }`
             }
           >
