@@ -79,24 +79,24 @@ const TopNav = () => {
 
   return (
     <div className="w-full">
-      <div className="w-full bg-redBg/50 dark:bg-bg backdrop-blur-md">
+      <div className="w-full bg-background/50 dark:bg-bg backdrop-blur-md">
         <div className="container mx-auto flex justify-between items-center h-12 px-4">
 
           {/* SIGN IN / SIGN UP */}
           <div className="flex items-center gap-4 mx-4">
             <div
-              className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+              className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
               onClick={toggleSignIn}
             >
-              SIGN IN
-              <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+              sign in
+              <RiArrowDropDownLine className="ml-1 text-2xl" />
             </div>
             <div
-              className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+              className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
               onClick={toggleSignUp}
             >
-              SIGN UP
-              <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+              sign up
+              <RiArrowDropDownLine className="ml-1 text-2xl" />
             </div>
           </div>
 
@@ -505,7 +505,7 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
               <div className="scale-105 hover:scale-110 transition-transform duration-200">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
-                  text="signup_with" 
+                  text="signup_with"
                   onError={() => toast.error("Google signup failed. Try again.")}
                 />
               </div>

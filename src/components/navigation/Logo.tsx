@@ -1,20 +1,19 @@
-import { FaRegFileAlt } from "react-icons/fa"; // document icon
-import { HiOutlineSparkles } from "react-icons/hi2"; // for "smart" feel
-import logo from "../../assets/logo_docs.png"
+import logo from "../../assets/logo_docs.png";
+
 export const Logo = () => {
   return (
-    <div className="flex items-center space-x-2 p-3 rounded-xl select-none">
+    <div className="flex items-center space-x-2 p-3 rounded-xl select-none bg-background">
       {/* Icon Part */}
       <div className="relative flex items-center justify-center">
-        {/* <FaRegFileAlt className="text-gray-700 text-4xl drop-shadow-sm" />
-        <HiOutlineSparkles className="text-red-500 text-xl absolute -top-1 -right-2" /> */}
-        <img src={logo} alt="" className="h-10 w-10" />
+        <img src={logo} alt="Smart Docs Logo" className="h-10 w-10" />
+        {/* Optional: add sparkle icon overlay if desired */}
+        {/* <HiOutlineSparkles className="text-primary text-xl absolute -top-1 -right-2" /> */}
       </div>
 
       {/* Text Part */}
-      <div className="text-2xl font-bold tracking-tight">
-        <span className="text-gray-700 dark:text-gray-100">Smart</span>
-        <span className="text-red-500">Docs</span>
+      <div className="text-2xl font-bold tracking-tight flex gap-1">
+        <span className="text-text dark:text-text">Smart</span>
+        <span className="text-primary">Docs</span>
       </div>
     </div>
   );

@@ -1,43 +1,33 @@
-import { DropdownMenu } from "./DropdownMenu";
-import { Link, NavLink } from "react-router-dom";
-import { Logo } from "./Logo";
 import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { RiMenuLine } from "react-icons/ri";
 import { TfiClose } from "react-icons/tfi";
+import { DropdownMenu } from "./DropdownMenu";
+import { Logo } from "./Logo";
 import { routes } from "../../routes/pageRouteConfig";
-import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 
 export const NavBar = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const isAdmin = user?.is_staff || user?.is_superuser;
-  
-  return (
-    // <div className="container bg-gray-50 mx-auto">
-     
-    // </div>
 
-     <nav className="hidden md:flex container mx-auto  px-6 py-3 justify-between items-center p-8 ">
-      <div className="text-2xl text-gray-700">
+  return (
+    <nav className="hidden md:flex container mx-auto px-6 py-3 justify-between items-center">
+      <div className="text-2xl text-text">
         <Logo />
       </div>
       <ul className="flex gap-8 items-center">
         {routes
           .filter((link) => link.forNav)
           .map((link) => {
-            // Only show /panel route for admins
             if (link.path === "/panel" && !isAdmin) return null;
-            const activeDropdownItems =
-              link.dropdown?.filter((item) => item.active) || [];
+
+            const activeDropdownItems = link.dropdown?.filter((item) => item.active) || [];
             if (activeDropdownItems.length > 0) {
-              return (
-                <DropdownMenu
-                  key={link.name}
-                  title={link.name}
-                  items={activeDropdownItems}
-                />
-              );
+              return <DropdownMenu key={link.name} title={link.name} items={activeDropdownItems} />;
             }
+
             if (!link.dropdown) {
               return (
                 <li key={link.name}>
@@ -45,8 +35,8 @@ export const NavBar = () => {
                     to={link.path}
                     className={({ isActive }) =>
                       isActive
-                        ? "text-gray-700 dark:text-gray-100 text-lg transition"
-                        : "text-redMain text-lg transition"
+                        ? "text-text dark:text-text text-lg transition"
+                        : "text-primary text-lg hover:text-redMain transition"
                     }
                   >
                     {link.name}
@@ -56,13 +46,14 @@ export const NavBar = () => {
             }
             return null;
           })}
+
         {routes
           .filter((r) => r.showAsButton)
           .map((r) => (
             <li key={r.name}>
               <Link
                 to={r.path}
-                className="bg-red-600 text-white font-semibold px-6 py-2 rounded-full border-2 border-red-600 hover:bg-red-700 hover:border-red-700 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                className="bg-redMain text-white font-semibold px-6 py-2 rounded-full  hover:bg-redMain hover:border-redMain/50  hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
               >
                 {r.name}
               </Link>
@@ -77,32 +68,33 @@ export const MobileNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   const isAdmin = user?.is_staff || user?.is_superuser;
-  
+
   const handleToggle = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
-  
+
   return (
-    <nav className="md:hidden shadow-md px-4 py-3 ">
+    <nav className="md:hidden shadow-md px-4 py-3 bg-background text-text">
       <div className="flex justify-between items-center">
-        <div className="text-xl font-bold text-red-700">
+        <div className="text-xl font-bold text-primary">
           <Logo />
         </div>
         <button
           onClick={handleToggle}
-          className="text-red-600 text-3xl focus:outline-none p-2 rounded-full  transition-colors"
+          className="text-primary text-3xl focus:outline-none p-2 rounded-full transition-colors"
           aria-label="Toggle menu"
         >
           {isOpen ? <TfiClose /> : <RiMenuLine />}
         </button>
       </div>
+
       {isOpen && (
         <ul className="flex flex-col items-start gap-4 mt-4 pb-4">
           {routes
             .filter((link) => link.forNav)
             .map((link) => {
               if (link.path === "/panel" && !isAdmin) return null;
-              const activeDropdownItems =
-                link.dropdown?.filter((item) => item.active) || [];
+
+              const activeDropdownItems = link.dropdown?.filter((item) => item.active) || [];
               if (activeDropdownItems.length > 0) {
                 return (
                   <DropdownMenu
@@ -113,6 +105,7 @@ export const MobileNavBar = () => {
                   />
                 );
               }
+
               if (!link.dropdown) {
                 return (
                   <li key={link.name} className="w-full">
@@ -120,10 +113,10 @@ export const MobileNavBar = () => {
                       to={link.path}
                       onClick={closeMenu}
                       className={({ isActive }) =>
-                      isActive
-                        ? "text-gray-700 dark:text-gray-100 text-lg transition"
-                        : "text-redMain text-lg transition"
-                    }
+                        isActive
+                          ? "text-text dark:text-text text-lg transition"
+                          : "text-primary text-lg hover:text-redMain transition"
+                      }
                     >
                       {link.name}
                     </NavLink>
@@ -132,6 +125,7 @@ export const MobileNavBar = () => {
               }
               return null;
             })}
+
           {routes
             .filter((r) => r.showAsButton)
             .map((r) => (
@@ -139,7 +133,7 @@ export const MobileNavBar = () => {
                 <Link
                   to={r.path}
                   onClick={closeMenu}
-                  className="bg-red-600 text-white font-semibold px-6 py-3 rounded-full border-2 border-red-600 hover:bg-red-700 hover:border-red-700 hover:shadow-lg transition duration-300 ease-in-out block w-full text-center"
+                  className="bg-redMain text-white font-semibold px-6 py-3 rounded-full  hover:bg-redMain hover:border-redMain/50 hover:shadow-lg transition duration-300 ease-in-out block w-full text-center"
                 >
                   {r.name}
                 </Link>

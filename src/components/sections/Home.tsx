@@ -47,7 +47,7 @@ const Home = () => {
       <section className="relative z-30 flex flex-col justify-center items-center min-h-[80vh] sm:min-h-screen text-center px-4 sm:px-6 md:px-8 py-6 sm:py-10">
         <div className="w-full max-w-3xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-extrabold text-white drop-shadow mb-3 sm:mb-6">
-            Welcome to <span className="text-gray-900">SmartDocs</span>
+            Welcome to <span className="text-gray-900 dark:text-redMain">SmartDocs</span>
           </h1>
           <p className="text-white text-xs sm:text-base md:text-lg lg:text-xl font-light mb-6 sm:mb-10">
             One professional platform for generating documents — effortlessly.
