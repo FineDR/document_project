@@ -8,20 +8,14 @@ import CvDocument from "../pages/CvDocument";
 import CVPage from "../pages/ProfileCVDetails";
 import Dashboard from "../pages/Dashboard";
 import CreateOfficialLetter from "../pages/CreateOfficialLetter";
-// import JobPage from "../pages/JobPage";
 import OfficialLetter from "../pages/OfficialLetter";
 import { Verification } from "../components/sections/Verification";
-// import CoverLetterDocument from "../pages/CoverLetterDocument";
-// import PortfolioDocument from "../pages/PortfolioDocument";
-// import CertificsateDocument from "../pages/CertificateDocument";
-// import MyCoverLetter from "../pages/MyCoverLetter";
-// import MyPortifolio from "../pages/MyPortifolio";
-// import MyCertificate from "../pages/MyCertificate";
 import AllDocuments from "../pages/AllDocuments";
 import MyCv from "../pages/MyCv";
 import CreateDocument from "../pages/CreateDocument";
 import CVEditor from "../pages/CVEditor";
 import PDFReports from "../pages/PDFReports";
+
 export interface pageRouteConfig<P = {}> {
   forNav?: boolean;
   path: string;
@@ -31,6 +25,11 @@ export interface pageRouteConfig<P = {}> {
   layout?: boolean;
   dropdown?: { name: string; path: string; active: boolean }[];
   showAsButton?: boolean;
+  seo?: {
+    title: string;
+    description: string;
+    keywords?: string;
+  };
 }
 
 export const routes: pageRouteConfig[] = [
@@ -40,36 +39,33 @@ export const routes: pageRouteConfig[] = [
     element: Home,
     name: "Home",
     layout: true,
+    seo: {
+      title: "Smart Docs - Home",
+      description: "Smart Docs - Create, manage, and edit CVs, documents, and templates efficiently.",
+      keywords: "Smart Docs, CV Templates, Document Editor, Official Letters, PDF Reports"
+    }
   },
   {
     forNav: true,
-    path: "/panel",   // 👈 fixed spelling
+    path: "/panel",
     element: Dashboard,
-    name: "Panel",    // 👈 fixed spelling
+    name: "Panel",
     layout: true,
-  }, 
-  // {
-  //   forNav: true,
-  //   path: "/jobs",
-  //   element: JobPage,
-  //   name: "Jobs",
-  //   layout: true,
-  // }, 
-  
-  // {
-  //   forNav: true,
-  //   path: "/payments",
-  //   element: PaymentComponent,
-  //   name: "Payments",
-  //   layout: true,
-
-  // },
+    seo: {
+      title: "Smart Docs - Dashboard",
+      description: "Dashboard overview for Smart Docs users. Manage your documents and activities."
+    }
+  },
   {
     forNav: true,
     path: "/help",
     element: Help,
     name: "Help",
     layout: true,
+    seo: {
+      title: "Smart Docs - Help",
+      description: "Get help and support for using Smart Docs features and tools."
+    }
   },
   {
     forNav: false,
@@ -77,6 +73,10 @@ export const routes: pageRouteConfig[] = [
     element: Verification,
     name: "Verification",
     layout: true,
+    seo: {
+      title: "Smart Docs - Email Verification",
+      description: "Verify your email address to activate your Smart Docs account."
+    }
   },
   {
     forNav: true,
@@ -87,18 +87,14 @@ export const routes: pageRouteConfig[] = [
     dropdown: [
       { name: "All Documents", path: "/documents", active: true },
       { name: "My CVs", path: "/documents/cvs", active: false },
-      {
-        name: "My Cover Letters",
-        path: "/documents/cover-letters",
-        active: false,
-      },
+      { name: "My Cover Letters", path: "/documents/cover-letters", active: false },
       { name: "My Portfolios", path: "/documents/portfolios", active: false },
-      {
-        name: "My Certificates",
-        path: "/documents/certificates",
-        active: false,
-      },
+      { name: "My Certificates", path: "/documents/certificates", active: false },
     ],
+    seo: {
+      title: "Smart Docs - Documents",
+      description: "Access all your documents, CVs, and templates in one place."
+    }
   },
   {
     forNav: true,
@@ -112,6 +108,10 @@ export const routes: pageRouteConfig[] = [
       { name: "Portfolio Templates", path: "/documents/templates/portfolio", active: false },
       { name: "Certificate Templates", path: "/documents/templates/certificate", active: false },
     ],
+    seo: {
+      title: "Smart Docs - Templates",
+      description: "Explore CV, Cover Letter, Portfolio, and Certificate templates professionally."
+    }
   },
   {
     forNav: false,
@@ -119,6 +119,10 @@ export const routes: pageRouteConfig[] = [
     element: CVTemplates,
     name: "CV Templates",
     layout: true,
+    seo: {
+      title: "Smart Docs - CV Templates",
+      description: "Browse professional CV templates for your career."
+    }
   },
   {
     forNav: true,
@@ -129,18 +133,25 @@ export const routes: pageRouteConfig[] = [
     dropdown: [
       { name: "CV", path: "/create/cv", active: true },
       { name: "Official Letter", path: "/create/official-letter", active: true },
-      { name: "Pdf reports", path: "/create/pdf-reports", active: true },
+      { name: "PDF Reports", path: "/create/pdf-reports", active: true },
       { name: "New Portfolio", path: "/create/portfolio", active: false },
       { name: "New Certificate", path: "/create/certificate", active: false },
     ],
+    seo: {
+      title: "Smart Docs - Create Documents",
+      description: "Create CVs, Official Letters, PDF reports, portfolios, and certificates with ease."
+    }
   },
-
   {
     forNav: false,
     path: "/pricing",
     element: Pricing,
     name: "Pricing",
     layout: true,
+    seo: {
+      title: "Smart Docs - Pricing",
+      description: "Explore affordable plans for professional document creation and management."
+    }
   },
   {
     forNav: false,
@@ -148,31 +159,44 @@ export const routes: pageRouteConfig[] = [
     element: CreateOfficialLetter,
     name: "Create Official Letter",
     layout: true,
+    seo: {
+      title: "Smart Docs - Create Official Letter",
+      description: "Create professional official letters for work or personal use."
+    }
   },
-{
-  forNav: false,
-  path: "/create/pdf-reports",
-  element: PDFReports, // now allowed
-  name: "Create PDF Reports",
-  layout: true,
-},
-
+  {
+    forNav: false,
+    path: "/create/pdf-reports",
+    element: PDFReports,
+    name: "Create PDF Reports",
+    layout: true,
+    seo: {
+      title: "Smart Docs - Create PDF Reports",
+      description: "Generate PDF reports quickly and professionally from your documents."
+    }
+  },
   {
     forNav: false,
     path: "/official-letter",
     element: OfficialLetter,
-    name: "Create Official Letter",
+    name: "Official Letter",
     layout: false,
+    seo: {
+      title: "Smart Docs - Official Letter",
+      description: "View or download official letters created on Smart Docs."
+    }
   },
-
-
   {
     forNav: false,
     path: "/profile",
     element: CVPage,
     name: "Profile",
     layout: true,
-    showAsButton: true, // ✅ Add this
+    showAsButton: true,
+    seo: {
+      title: "Smart Docs - Profile",
+      description: "Manage your profile and access your created documents easily."
+    }
   },
   {
     forNav: false,
@@ -180,6 +204,10 @@ export const routes: pageRouteConfig[] = [
     element: CreateDocument,
     name: "Create Document",
     layout: false,
+    seo: {
+      title: "Smart Docs - Create Document",
+      description: "Create new documents professionally and efficiently."
+    }
   },
 ];
 
@@ -190,36 +218,22 @@ export const documentRoutes: pageRouteConfig[] = [
     element: CvDocument,
     name: "Create CV",
     layout: true,
+    seo: {
+      title: "Smart Docs - Create CV",
+      description: "Create professional CVs with customizable templates."
+    }
   },
   {
     forNav: false,
-    path: "/editor/:templateId", // 👈 dynamic template route
+    path: "/editor/:templateId",
     element: CVEditor,
     name: "CV Editor",
     layout: true,
+    seo: {
+      title: "Smart Docs - CV Editor",
+      description: "Edit your CV with our interactive CV editor online."
+    }
   },
-
-  // {
-  //     forNav: false,
-  //     path: "/create/cover-letter",
-  //     element: CoverLetterDocument,
-  //     name: "Create Cover Letter",
-  //     layout: false,
-  // },
-  // {
-  //     forNav: false,
-  //     path: "/create/portfolio",
-  //     element: PortfolioDocument,
-  //     name: "Create Portfolio",
-  //     layout: false,
-  // },
-  // {
-  //     forNav: false,
-  //     path: "/create/certificate",
-  //     element: CertificsateDocument,
-  //     name: "Create Certificate",
-  //     layout: false,
-  // }
 ];
 
 export const myDocumentsRoutes: pageRouteConfig[] = [
@@ -229,6 +243,10 @@ export const myDocumentsRoutes: pageRouteConfig[] = [
     element: AllDocuments,
     name: "All Documents",
     layout: true,
+    seo: {
+      title: "Smart Docs - All Documents",
+      description: "View all documents you have created or stored in Smart Docs."
+    }
   },
   {
     forNav: false,
@@ -236,26 +254,9 @@ export const myDocumentsRoutes: pageRouteConfig[] = [
     element: MyCv,
     name: "My CVs",
     layout: false,
+    seo: {
+      title: "Smart Docs - My CVs",
+      description: "Access and manage your personal CVs in Smart Docs."
+    }
   },
-  // {
-  //     forNav: false,
-  //     path: "/documents/cover-letters",
-  //     element: MyCoverLetter,
-  //     name: "My Cover Letters",
-  //     layout: false,
-  // },
-  // {
-  //     forNav: false,
-  //     path: "/documents/portfolios",
-  //     element: MyPortifolio,
-  //     name: "My Portfolios",
-  //     layout: false,
-  // },
-  // {
-  //     forNav: false,
-  //     path: "/documents/certificates",
-  //     element: MyCertificate,
-  //     name: "My Certificates",
-  //     layout: false,
-  // }
 ];
