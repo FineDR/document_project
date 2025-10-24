@@ -78,40 +78,40 @@ const TopNav = () => {
   };
 
   return (
-   <div className="w-full">
-  <div className="w-full bg-redBg/50 dark:bg-bg backdrop-blur-md">
-    <div className="container mx-auto flex justify-between items-center h-12 px-4">
-      
-      {/* SIGN IN / SIGN UP */}
-      <div className="flex items-center gap-4 mx-4">
-        <div
-          className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
-          onClick={toggleSignIn}
-        >
-          SIGN IN
-          <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
-        </div>
-        <div
-          className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
-          onClick={toggleSignUp}
-        >
-          SIGN UP
-          <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+    <div className="w-full">
+      <div className="w-full bg-redBg/50 dark:bg-bg backdrop-blur-md">
+        <div className="container mx-auto flex justify-between items-center h-12 px-4">
+
+          {/* SIGN IN / SIGN UP */}
+          <div className="flex items-center gap-4 mx-4">
+            <div
+              className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+              onClick={toggleSignIn}
+            >
+              SIGN IN
+              <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+            </div>
+            <div
+              className="text-red-700 lowercase text-base font-bold hover:text-red-500 flex items-center cursor-pointer"
+              onClick={toggleSignUp}
+            >
+              SIGN UP
+              <RiArrowDropDownLine className="ml-1 text-2xl hover:text-red-600" />
+            </div>
+          </div>
+
+          {/* Theme toggle */}
+          <div className="flex items-center">
+            <ThemeToggle />
+          </div>
+
         </div>
       </div>
 
-      {/* Theme toggle */}
-      <div className="flex items-center">
-        <ThemeToggle />
-      </div>
-
+      {/* Modals */}
+      {signInIsOpen && <SignIn onClose={closeModals} />}
+      {signUpIsOpen && <SignUp onClose={closeModals} />}
     </div>
-  </div>
-
-  {/* Modals */}
-  {signInIsOpen && <SignIn onClose={closeModals} />}
-  {signUpIsOpen && <SignUp onClose={closeModals} />}
-</div>
 
   );
 };
@@ -213,83 +213,107 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-30 z-50 flex justify-center items-center"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center transition-all duration-300"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-background p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[350px] mt-28 sm:mt-20"
+        className="bg-background text-text p-8 rounded-2xl shadow-2xl relative w-[90%] max-w-md min-h-[420px] sm:min-h-[380px] transition-all duration-300 border border-gray-200 dark:border-gray-700"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close Icon */}
         <RiCloseLine
-          className="absolute top-2 right-2 text-blue-500 hover:text-red-500 cursor-pointer text-xl"
+          className="absolute top-4 right-4 text-subheading hover:text-redMain cursor-pointer text-2xl transition-colors"
           onClick={onClose}
         />
 
         {showSuccess ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
+          <div className="flex flex-col items-center justify-center h-full text-center px-6 py-8">
             <FaCheckCircle className="text-green-500 text-6xl mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            <h2 className="text-2xl font-semibold text-text mb-2">
               Login Successful
             </h2>
-            <p className="text-gray-600">Welcome back! You are now logged in.</p>
+            <p className="text-subheading text-sm">
+              Welcome back! You are now logged in.
+            </p>
             <button
               onClick={onClose}
-              className="mt-6 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600 transition"
+              className="mt-6 bg-redMain text-white px-6 py-2 rounded-full hover:opacity-90 transition-all shadow-md"
             >
               Close
             </button>
           </div>
         ) : (
           <>
-            <h1 className="text-center text-2xl uppercase font-semibold text-red-500 font-serif mt-4">
-              Sig<span className="text-primary">n In</span>
+            {/* Header */}
+            <h1 className="text-center text-3xl font-bold text-text font-serif mb-2">
+              Sign <span className="text-primary">In</span>
             </h1>
+            <p className="text-center text-subheading mb-6 text-sm">
+              Access your account easily using Google
+            </p>
 
+            {/* Error message */}
             {errorMsg && (
-              <div className="text-red-500 text-center mb-4">{errorMsg}</div>
+              <div className="text-redMain text-center mb-4 text-sm bg-red-50 dark:bg-red-900/20 py-2 px-3 rounded-lg">
+                {errorMsg}
+              </div>
             )}
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="w-full h-full object-cover mt-4 p-4"
-            >
-              <InputField
-                placeholder="email"
-                name="email"
-                type="email"
-                register={register("email")}
-                error={fieldErrors.email || errors.email?.message}
-              />
-              <InputField
-                placeholder="password"
-                name="password"
-                type="password"
-                register={register("password")}
-                error={fieldErrors.password || errors.password?.message}
-              />
+            {/* Hidden Manual Form */}
+            {false && (
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="w-full h-full object-cover mt-4 p-4"
+              >
+                <InputField
+                  placeholder="Email"
+                  name="email"
+                  type="email"
+                  register={register("email")}
+                  error={fieldErrors.email || errors.email?.message}
+                />
+                <InputField
+                  placeholder="Password"
+                  name="password"
+                  type="password"
+                  register={register("password")}
+                  error={fieldErrors.password || errors.password?.message}
+                />
+                <Button
+                  type="submit"
+                  name="submit"
+                  label="Submit"
+                  className={`w-full ${active ? hoverStyle : ""}`}
+                  onClick={handleClickedSignIn}
+                />
 
-              <Button
-                type="submit"
-                name="submit"
-                label="submit"
-                className={`w-full ${active ? hoverStyle : ""}`}
-                onClick={handleClickedSignIn}
-              />
+                {loading && (
+                  <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/60 flex justify-center items-center rounded-2xl">
+                    <ClipLoader color="#0f62fe" size={40} />
+                  </div>
+                )}
+              </form>
+            )}
 
-              {loading && (
-                <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center rounded-2xl">
-                  <ClipLoader color="#0f62fe" size={40} />
-                </div>
-              )}
-            </form>
-            <div className="flex flex-col items-center mt-4">
-              <p className="text-gray-500 mb-2 dark:text-gray-100">Or sign up with Google</p>
-              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google signup failed. Try again.")} />
+            {/* Google Login Section */}
+            <div className="flex flex-col items-center mt-6 space-y-3">
+              <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
+              <p className="text-subheading text-sm">Continue with Google</p>
+              <div className="scale-105 hover:scale-110 transition-transform duration-200">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() =>
+                    toast.error("Google sign-in failed. Try again.")
+                  }
+                />
+              </div>
             </div>
           </>
         )}
       </div>
     </div>
+
+
   );
 };
 
@@ -397,76 +421,100 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-30 z-50 flex justify-center items-center"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center transition-all duration-300"
       onClick={onClose}
     >
       <div
-        className="bg-white p-6 rounded-2xl shadow-xl relative w-[90%] max-w-md min-h-[400px] mt-28 sm:mt-20"
+        className="bg-background text-text p-8 rounded-2xl shadow-2xl relative w-[90%] max-w-md min-h-[420px] sm:min-h-[380px] transition-all duration-300 border border-gray-200 dark:border-gray-700"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close Icon */}
         <RiCloseLine
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-500 cursor-pointer text-xl"
+          className="absolute top-4 right-4 text-subheading hover:text-redMain cursor-pointer text-2xl transition-colors"
           onClick={onClose}
         />
 
         {showEmailInstruction ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
-            <FaEnvelopeOpenText className="text-red-500 text-6xl mb-4" />
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          <div className="flex flex-col items-center justify-center h-full text-center px-6 py-8">
+            <FaEnvelopeOpenText className="text-redMain text-6xl mb-4 animate-bounce" />
+            <h2 className="text-2xl font-semibold text-text mb-2">
               Check Your Email
             </h2>
-            <p className="text-gray-600">
-              We’ve sent a verification link to your email address.
-              <br />
+            <p className="text-subheading text-sm">
+              We’ve sent a verification link to your email address.<br />
               Please open your inbox and confirm your email to activate your account.
             </p>
             <button
               onClick={onClose}
-              className="mt-6 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600 transition"
+              className="mt-6 bg-redMain text-white px-6 py-2 rounded-full hover:brightness-110 transition-all shadow-md"
             >
               Close
             </button>
           </div>
         ) : (
           <>
-            <h1 className="text-center text-2xl uppercase font-semibold text-red-500 font-serif mt-4">
-              Sig<span className="text-primary">n Up</span>
+            {/* Header */}
+            <h1 className="text-center text-3xl font-bold text-text font-serif mb-2">
+              Sign <span className="text-primary">Up</span>
             </h1>
+            <p className="text-center text-subheading mb-6 text-sm">
+              Access your account easily using Google
+            </p>
 
+            {/* Error message */}
             {backendError && (
-              <div className="bg-red-100 text-red-700 p-2 rounded mb-3 text-center break-words">
+              <div className="bg-red-100 text-redMain dark:bg-red-900/20 p-2 rounded mb-3 text-center break-words text-sm">
                 {backendError}
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="w-full h-full mt-4 p-4 relative"
-            >
-              <InputField placeholder="Email" name="email" type="email" register={register("email")} />
-              <InputField placeholder="First Name" name="first_name" type="text" register={register("first_name")} />
-              <InputField placeholder="Middle Name" name="middle_name" type="text" register={register("middle_name")} />
-              <InputField placeholder="Last Name" name="last_name" type="text" register={register("last_name")} />
-              <InputField placeholder="Password" name="password" type="password" register={register("password")} />
-              <InputField placeholder="Confirm Password" name="confirmPassword" type="password" register={register("confirmPassword")} />
+            {/* Manual Form Hidden */}
+            {false && (
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="w-full h-full mt-4 p-4 relative"
+              >
+                <InputField placeholder="Email" name="email" type="email" register={register("email")} />
+                <InputField placeholder="First Name" name="first_name" type="text" register={register("first_name")} />
+                <InputField placeholder="Middle Name" name="middle_name" type="text" register={register("middle_name")} />
+                <InputField placeholder="Last Name" name="last_name" type="text" register={register("last_name")} />
+                <InputField placeholder="Password" name="password" type="password" register={register("password")} />
+                <InputField placeholder="Confirm Password" name="confirmPassword" type="password" register={register("confirmPassword")} />
 
-              <Button type="submit" label="Submit" className={`w-full ${active ? hoverStyle : ""}`} onClick={handleClickedSignUp} />
+                <Button
+                  type="submit"
+                  label="Submit"
+                  className={`w-full ${active ? hoverStyle : ""}`}
+                  onClick={handleClickedSignUp}
+                />
 
-              {loading && (
-                <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center rounded-2xl">
-                  <ClipLoader color="#0f62fe" size={40} />
-                </div>
-              )}
-            </form>
+                {loading && (
+                  <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/60 flex justify-center items-center rounded-2xl">
+                    <ClipLoader color="#0f62fe" size={40} />
+                  </div>
+                )}
+              </form>
+            )}
 
-            <div className="flex flex-col items-center mt-4">
-              <p className="text-gray-500 mb-2">Or sign up with Google</p>
-              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google signup failed. Try again.")} />
+            {/* Google Sign-Up Section */}
+            <div className="flex flex-col items-center mt-6 space-y-3">
+              <div className="w-full border-t border-gray-300 dark:border-gray-700 my-2"></div>
+              <p className="text-subheading text-sm font-medium tracking-wide">
+                Continue with Google
+              </p>
+              <div className="scale-105 hover:scale-110 transition-transform duration-200">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  text="signup_with" 
+                  onError={() => toast.error("Google signup failed. Try again.")}
+                />
+              </div>
             </div>
           </>
         )}
       </div>
     </div>
+
   );
 };
 
