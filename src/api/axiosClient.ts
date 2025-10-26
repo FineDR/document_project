@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,
+  withCredentials:true,
   // Do NOT set 'Content-Type' here globally
   // headers: { 'Content-Type': 'application/json' }
 });
