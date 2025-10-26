@@ -353,34 +353,28 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    const token = credentialResponse.credential;
-    if (!token) return;
+    const token = credentialResponse.credential; // ✅ Real Google token
+
+    if (!token) {
+      toast.error("Google authentication failed: no token received");
+      return;
+    }
 
     try {
-      const user = jwtDecode<GoogleUser>(token);
-      const payload = {
-        email: user.email,
-        first_name: user.given_name,
-        last_name: user.family_name,
-        googleId: user.sub,
-      };
-
-      console.log("Google SignUp Payload:", payload);
-      const resultAction = await dispatch(
-        googleAuthUser({ token })
-      );
+      // send token to backend
+      const resultAction = await dispatch(googleAuthUser({ token }));
 
       if (googleAuthUser.fulfilled.match(resultAction)) {
         toast.success("Signed up successfully with Google!");
         onClose();
       } else {
-        throw new Error((resultAction.payload as string) || "Google signup failed");
+        throw new Error(resultAction.payload as string);
       }
     } catch (err: any) {
-      console.error("Google signup error:", err);
-      toast.error(err.message || "Google signup failed. Try again.");
+      toast.error(err.message || "Google signup failed.");
     }
   };
+
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     setLoading(true);
