@@ -26,7 +26,7 @@ export const verifyEmail = (data: any) => axiosClient.post(AUTH_ENDPOINTS.verify
 export const users=()=>axiosClient.get(AUTH_ENDPOINTS.users);
 export const userDetails=()=>axiosClient.get(AUTH_ENDPOINTS.admin);
 export const signUpOrSignInWithGoogle = (data: any) =>
-  axiosClient.post(AUTH_ENDPOINTS.googleAuth, data,{ withCredentials: true });
+  axiosClient.post(AUTH_ENDPOINTS.googleAuth, data);
 
 
 
