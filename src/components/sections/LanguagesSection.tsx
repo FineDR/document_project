@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Language } from "../../types/cv/cv";
-import LanguagesFormDetails from "../forms/LanguagesForm ";
+import LanguagesFormDetails from "../forms/LanguagesForm";
 import { deleteLanguage } from "../../api/languages";
 
 interface Props {

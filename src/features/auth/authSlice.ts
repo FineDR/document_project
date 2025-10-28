@@ -18,6 +18,7 @@ interface AuthState {
     selectedUser?: User | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
+    hasAccount: boolean;
 }
 
 const initialState: AuthState = {
@@ -27,7 +28,8 @@ const initialState: AuthState = {
     loading: false,
     status: 'idle',
     error: null,
-    selectedUser: null
+    selectedUser: null,
+    hasAccount: false
 };
 
 interface LoginResponse {
@@ -36,6 +38,12 @@ interface LoginResponse {
     refresh: string;
 }
 
+interface GoogleAuthResponse {
+    user: User;
+    access: string;
+    refresh: string;
+    is_new_user: boolean;
+}
 
 
 
@@ -57,21 +65,25 @@ export const loginUser = createAsyncThunk<LoginResponse, { email: string; passwo
 )
 
 export const googleAuthUser = createAsyncThunk<
-    User,                    // return type
-    { token: string },       // argument type
-    { rejectValue: string }  // reject type
->("auth/googleAuth", async ({ token }, { rejectWithValue }) => {
-    try {
-        const response = await signUpOrSignInWithGoogle({ token });
-        localStorage.setItem("token", response.data.access);
-        localStorage.setItem("refreshToken", response.data.refresh);
-        return response.data.user;
-    } catch (err: any) {
-        return rejectWithValue(err.response?.data?.message || "Google Auth failed");
+    GoogleAuthResponse,
+    { token: string },
+    { rejectValue: string }
+>(
+    "auth/googleAuth",
+    async ({ token }, { rejectWithValue }) => {
+        try {
+            const response = await signUpOrSignInWithGoogle({ token });
+            const data = response.data;
+
+            localStorage.setItem("token", data.access);
+            localStorage.setItem("refreshToken", data.refresh);
+
+            return data; // { user, access, refresh, is_new_user }
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.message || "Google Auth failed");
+        }
     }
-});
-
-
+);
 
 export const registerUser = createAsyncThunk<User, { name: string; email: string; password: string }>(
     "auth/register",
@@ -109,17 +121,21 @@ export const updateUserProfile = createAsyncThunk<User, any>(
     }
 )
 export const logoutUser = createAsyncThunk<void>(
-    "auth/logout",
-    async (_, { rejectWithValue }) => {
-        try {
-            await logout();
-            localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.detail || "Logout failed");
-        }
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      await logout();
+    } catch (error: any) {
+      // log error, but still proceed
+      console.error(error.response?.data?.detail || error.message);
+      return rejectWithValue(error.response?.data?.detail || "Logout failed");
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
     }
+  }
 );
+
 
 
 export const authSlice = createSlice({
@@ -128,7 +144,19 @@ export const authSlice = createSlice({
     reducers: {
         clearSelected(state) {
             state.selectedUser = null;
-        }
+        },
+        restoreSession(state) {
+            const token = localStorage.getItem("token");
+            const refresh = localStorage.getItem("refreshToken");
+            if (token && refresh) {
+                state.access = token;
+                state.refresh = refresh;
+            } else {
+                state.access = null;
+                state.refresh = null;
+                state.user = null;
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -201,11 +229,15 @@ export const authSlice = createSlice({
             })
             .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null;
+                state.selectedUser = null; // <-- important!
+                state.access = null;
+                state.refresh = null;
                 state.status = 'idle';
                 state.error = null;
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
             })
+
             .addCase(googleAuthUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -214,13 +246,28 @@ export const authSlice = createSlice({
             })
             .addCase(googleAuthUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
-                state.status="succeeded";
+                state.user = action.payload.user;
+                state.access = action.payload.access;
+                state.refresh = action.payload.refresh;
+                state.status = "succeeded";
+
+                // Track if user is new
+                state.selectedUser = action.payload.is_new_user ? state.user : null;
+                state.hasAccount = !action.payload.is_new_user;
+
+                // ✅ Clear selectedUser if not new
+                if (!action.payload.is_new_user) {
+                    state.selectedUser = null;
+                }
+
+                localStorage.setItem("token", state.access!);
+                localStorage.setItem("refreshToken", state.refresh!);
             })
+
             .addCase(googleAuthUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-                state.status="failed";
+                state.status = "failed";
             });
 
         ;

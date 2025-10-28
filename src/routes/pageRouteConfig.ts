@@ -23,6 +23,7 @@ export interface pageRouteConfig<P = {}> {
   private?: boolean;
   name: string;
   layout?: boolean;
+  signedIn?:boolean;
   dropdown?: { name: string; path: string; active: boolean }[];
   showAsButton?: boolean;
   seo?: {
@@ -51,6 +52,7 @@ export const routes: pageRouteConfig[] = [
     element: Dashboard,
     name: "Panel",
     layout: true,
+    signedIn:true,
     seo: {
       title: "Smart Docs - Dashboard",
       description: "Dashboard overview for Smart Docs users. Manage your documents and activities."
@@ -130,6 +132,7 @@ export const routes: pageRouteConfig[] = [
     element: CreateDocs,
     name: "Create",
     layout: true,
+    signedIn:true,
     dropdown: [
       { name: "CV", path: "/create/cv", active: true },
       { name: "Official Letter", path: "/create/official-letter", active: true },
@@ -191,6 +194,7 @@ export const routes: pageRouteConfig[] = [
     path: "/profile",
     element: CVPage,
     name: "Profile",
+    signedIn:true,
     layout: true,
     showAsButton: true,
     seo: {

@@ -2,7 +2,7 @@ import logo from "../../assets/logo_docs.png";
 
 export const Logo = () => {
   return (
-    <div className="flex items-center space-x-2 p-3 rounded-xl select-none bg-background">
+    <div className="flex items-center space-x-2 p-3 rounded-xl select-none">
       {/* Icon Part */}
       <div className="relative flex items-center justify-center">
         <img src={logo} alt="Smart Docs Logo" className="h-10 w-10" />

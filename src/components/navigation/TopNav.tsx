@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiArrowDropDownLine, RiCloseLine } from "react-icons/ri"; // import close icon
 import InputField from "../formElements/InputField";
 import { useForm } from "react-hook-form";
@@ -15,11 +15,14 @@ import { FaCheckCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Button from "../formElements/Button";
 import { useAppDispatch } from "../../hooks/reduxHooks";
-import { loginUser, googleAuthUser } from "../../features/auth/authSlice";
+import { loginUser, googleAuthUser, logoutUser } from "../../features/auth/authSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { type RootState } from "../../store/store";
 import ThemeToggle from "../common/ThemeToggle";
+import { clearSelected } from "../../features/auth/authSlice";
 
 
 interface GoogleUser {
@@ -58,9 +61,42 @@ const SignUpSchema = z.object({
   last_name: z.string().nonempty("Last name is required"),
 });
 
+
 const TopNav = () => {
+  const dispatch = useAppDispatch();
+  const { user, selectedUser } = useSelector((state: RootState) => state.auth);
   const [signInIsOpen, setSignIn] = useState(false);
   const [signUpIsOpen, setSignUp] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
+
+  const token = localStorage.getItem("token");
+  const isSignedIn = !!user && !!token;
+
+  useEffect(() => {
+    if (!checkedAuth) {
+      if (isSignedIn) {
+        // Already signed in, do nothing
+        setSignIn(false);
+        setSignUp(false);
+      } 
+      else if (selectedUser) {
+        // Google new user -> show Sign Up
+        setSignUp(true);
+      }
+      // Optional: first-time visitor without token can be handled here
+      // else if (!token && !user) {
+      //   setSignUp(true);
+      // }
+
+      // Mark that we've checked
+      setCheckedAuth(true);
+
+      // Clear selectedUser so it doesn't trigger again
+      if (selectedUser) {
+        dispatch(clearSelected());
+      }
+    }
+  }, [checkedAuth, isSignedIn, selectedUser, dispatch]);
 
   const toggleSignIn = () => {
     setSignIn(!signInIsOpen);
@@ -77,44 +113,42 @@ const TopNav = () => {
     setSignUp(false);
   };
 
+  const showSignInButton = !isSignedIn && !signUpIsOpen;
+
   return (
     <div className="w-full">
       <div className="w-full bg-background/50 dark:bg-bg backdrop-blur-md">
         <div className="container mx-auto flex justify-between items-center h-12 px-4">
-
-          {/* SIGN IN / SIGN UP */}
-          <div className="flex items-center gap-4 mx-4">
-            <div
-              className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
-              onClick={toggleSignIn}
-            >
-              sign in
-              <RiArrowDropDownLine className="ml-1 text-2xl" />
-            </div>
-            <div
-              className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
-              onClick={toggleSignUp}
-            >
-              sign up
-              <RiArrowDropDownLine className="ml-1 text-2xl" />
-            </div>
+          <div className="flex items-center gap-4">
+            {showSignInButton && (
+              <div
+                className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
+                onClick={toggleSignIn}
+              >
+                sign in
+              </div>
+            )}
+            {!isSignedIn && !signInIsOpen && (
+              <div
+                className="text-primary lowercase text-base font-bold hover:text-redMain flex items-center cursor-pointer transition-colors"
+                onClick={toggleSignUp}
+              >
+                sign up
+              </div>
+            )}
           </div>
-
-          {/* Theme toggle */}
           <div className="flex items-center">
             <ThemeToggle />
           </div>
-
         </div>
       </div>
 
-      {/* Modals */}
       {signInIsOpen && <SignIn onClose={closeModals} />}
       {signUpIsOpen && <SignUp onClose={closeModals} />}
     </div>
-
   );
 };
+
 
 export default TopNav;
 

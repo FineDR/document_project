@@ -13,19 +13,23 @@ export const NavBar = () => {
   const isAdmin = user?.is_staff || user?.is_superuser;
 
   return (
-    <nav className="hidden md:flex container mx-auto px-6 py-3 justify-between items-center">
-      <div className="text-2xl text-text">
+    <div className="w-full ">
+    <nav className="hidden md:flex container mx-auto px-6 py-3 justify-between items-center ">
+      <div className="text-2xl text-text bg-redBg/30 dark:bg-grayBg/30 backdrop-blur-md">
         <Logo />
       </div>
       <ul className="flex gap-8 items-center">
         {routes
           .filter((link) => link.forNav)
+          .filter((link) => !link.signedIn || user) // show only public or signed-in routes if user is logged in
           .map((link) => {
             if (link.path === "/panel" && !isAdmin) return null;
 
             const activeDropdownItems = link.dropdown?.filter((item) => item.active) || [];
             if (activeDropdownItems.length > 0) {
-              return <DropdownMenu key={link.name} title={link.name} items={activeDropdownItems} />;
+              return (
+                <DropdownMenu key={link.name} title={link.name} items={activeDropdownItems} />
+              );
             }
 
             if (!link.dropdown) {
@@ -49,11 +53,12 @@ export const NavBar = () => {
 
         {routes
           .filter((r) => r.showAsButton)
+          .filter((r) => !r.signedIn || user) // show button only if public or user signed in
           .map((r) => (
             <li key={r.name}>
               <Link
                 to={r.path}
-                className="bg-redMain text-white font-semibold px-6 py-2 rounded-full  hover:bg-redMain hover:border-redMain/50  hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                className="bg-redMain text-white font-semibold px-6 py-2 rounded-full hover:bg-redMain hover:border-redMain/50 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
               >
                 {r.name}
               </Link>
@@ -61,6 +66,7 @@ export const NavBar = () => {
           ))}
       </ul>
     </nav>
+    </div>
   );
 };
 
@@ -91,6 +97,7 @@ export const MobileNavBar = () => {
         <ul className="flex flex-col items-start gap-4 mt-4 pb-4">
           {routes
             .filter((link) => link.forNav)
+            .filter((link) => !link.signedIn || user) // only show public or signed-in links
             .map((link) => {
               if (link.path === "/panel" && !isAdmin) return null;
 
@@ -128,12 +135,13 @@ export const MobileNavBar = () => {
 
           {routes
             .filter((r) => r.showAsButton)
+            .filter((r) => !r.signedIn || user)
             .map((r) => (
               <li key={r.name} className="w-full mt-2">
                 <Link
                   to={r.path}
                   onClick={closeMenu}
-                  className="bg-redMain text-white font-semibold px-6 py-3 rounded-full  hover:bg-redMain hover:border-redMain/50 hover:shadow-lg transition duration-300 ease-in-out block w-full text-center"
+                  className="bg-redMain text-white font-semibold px-6 py-3 rounded-full hover:bg-redMain hover:border-redMain/50 hover:shadow-lg transition duration-300 ease-in-out block w-full text-center"
                 >
                   {r.name}
                 </Link>

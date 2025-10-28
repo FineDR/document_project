@@ -5,6 +5,7 @@ export interface User {
   middle_name: string;
   last_name: string;
   is_staff?: boolean;
+  is_active?:boolean;
   is_superuser?: boolean;
   role?: "admin" | "user";
   career_objectives: CareerObjective[];

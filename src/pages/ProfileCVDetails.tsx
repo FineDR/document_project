@@ -139,7 +139,9 @@ const CVPage = () => {
       </section>
 
 
-
+            <div className="flex justify-end mx-4">
+              <a href="/create/cv" className="text-redMain">Add Profile Details</a>
+            </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <PersonalInfoSection cv={cvData!} />
         <ProjectsSection cv={cvData!} />
