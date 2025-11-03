@@ -124,7 +124,7 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
         {/* Dynamic Achievement Inputs */}
         <div className="space-y-4">
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-start gap-2">
+            <div key={field.id} className="flex flex-col items-start gap-2">
               <InputField
                 type="text"
                 label={`Achievement ${index + 1} *`}
@@ -134,9 +134,8 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
                 error={errors.achievement?.[index]?.value?.message}
                 disabled={loading}
                 autoFocus={index === fields.length - 1}
-                helperText="Include awards, certifications, completed projects, or personal milestones."
               />
-
+              <p className="text-gray-400 text-xs italic mt-1">Include awards, certifications, completed projects, or personal milestones.</p>
               {fields.length > 1 && (
                 <button
                   type="button"
@@ -159,14 +158,14 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
             onClick={() => append({ value: "" })}
             label="+ Add Achievement"
             disabled={loading}
-            className="bg-redMain text-white px-4 py-2 rounded hover:bg-redMain/80 disabled:opacity-50"
+            className="text-white px-4 py-2"
           />
           <Button
             type="submit"
             onClick={()=>{}}
             label={editingAchievement ? "Update" : "Save"}
             disabled={loading}
-            className="bg-redMain text-white px-6 py-2 rounded hover:bg-redMain/80 disabled:opacity-50"
+            className="text-white"
           />
         </div>
 

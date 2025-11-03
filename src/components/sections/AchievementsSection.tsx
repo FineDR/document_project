@@ -1,55 +1,74 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Achievement } from "../../types/cv/cv";
 import AchievementFormDetails from "../forms/AchievementFormDetails";
-import { deleteAchievement } from "../../api/achievements";
+import Loader from "../common/Loader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import {
+  fetchAchievements,
+  addAchievement,
+  editAchievement,
+  deleteAchievementById,
+
+} from "../../features/achievements/achievementsSlice";
 
 interface Props {
   cv: User;
 }
 
 const AchievementsSection = ({ cv }: Props) => {
-  const [achievements, setAchievements] = useState<Achievement[]>(
-    cv.achievement_profile?.achievements || []
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const { achievements, loading } = useSelector((state: RootState) => state.achievements);
+
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
+
+  useEffect(() => {
+    dispatch(fetchAchievements());
+  }, [dispatch]);
 
   const handleDelete = async (id?: number) => {
     if (!id) return;
     try {
-      setLoadingDelete(id);
-      await deleteAchievement(id);
-      setAchievements((prev) => prev.filter((a) => a.id !== id));
+      await dispatch(deleteAchievementById(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete achievement:", error);
-    } finally {
-      setLoadingDelete(null);
     }
   };
 
   const handleDone = async (updatedAchievement?: Achievement) => {
-    if (updatedAchievement) {
-      const exists = achievements.find((a) => a.id === updatedAchievement.id);
-      if (exists) {
-        setAchievements((prev) =>
-          prev.map((a) => (a.id === updatedAchievement.id ? updatedAchievement : a))
-        );
-      } else {
-        setAchievements((prev) => [...prev, updatedAchievement]);
-      }
+    if (!updatedAchievement) {
+      setEditingAchievement(null);
+      setShowModal(false);
+      return;
     }
-    setEditingAchievement(null);
-    setShowModal(false);
+
+    try {
+      if (updatedAchievement.id) {
+        // Update existing achievement
+        await dispatch(editAchievement({ id: updatedAchievement.id, data: updatedAchievement })).unwrap();
+      } else {
+        // Add new achievement
+        await dispatch(addAchievement(updatedAchievement)).unwrap();
+      }
+    } catch (error) {
+      console.error("Failed to save achievement:", error);
+    } finally {
+      setEditingAchievement(null);
+      setShowModal(false);
+    }
   };
 
   return (
     <>
       <CVCard title="Achievements">
-        {achievements.length === 0 ? (
+        {loading ? (
+          <Loader loading={loading} message="Loading achievements..." />
+        ) : achievements.length === 0 ? (
           <p className="text-gray-400 italic font-sans text-sm">
             No achievements added yet
           </p>
@@ -60,7 +79,6 @@ const AchievementsSection = ({ cv }: Props) => {
                 key={achievement.id || index}
                 className="relative rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                {/* Top-right actions */}
                 <div className="absolute top-3 right-3 flex gap-3 text-sm">
                   <span
                     className="text-redMain font-medium cursor-pointer hover:underline"
@@ -75,11 +93,10 @@ const AchievementsSection = ({ cv }: Props) => {
                     className="text-gray-400 hover:text-redMain cursor-pointer"
                     onClick={() => handleDelete(achievement.id)}
                   >
-                    {loadingDelete === achievement.id ? "⏳" : <FaTrash size={12} />}
+                    <FaTrash size={12} />
                   </span>
                 </div>
 
-                {/* Achievement details */}
                 <p className="mt-4 text-sm text-subHeadingGray">{achievement.value}</p>
               </div>
             ))}

@@ -1,39 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { CVCard } from "../../utils/CVCard";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../store/store";
 import { FaTrash } from "react-icons/fa";
-import type { User, CareerObjective } from "../../types/cv/cv";
-import CareerObjectiveFormDetails from "../forms/CareerObjective";
-import {
-  submitCareerObjective,
-  updateCareerObjective,
-  deleteCareerObjective,
-} from "../../api/submitCareerObjective";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
+import { CVCard } from "../../utils/CVCard";
 import Loader from "../common/Loader";
+import CareerObjectiveFormDetails from "../forms/CareerObjective";
+
+import {
+  fetchCareerObjectives,
+  addCareerObjective,
+  updateCareerObjectiveById,
+  deleteCareerObjectiveById,
+} from "../../features/carerobjectives/carerObjectivesSlice";
+import type { CareerObjective, User } from "../../types/cv/cv";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 interface Props {
   cv: User;
 }
 
 const CareerObjectiveSection = ({ cv }: Props) => {
-  const [careerObjectives, setCareerObjectives] = useState<CareerObjective[]>(
-    cv.career_objectives?.filter((obj) => obj.career_objective.trim() !== "") || []
+  const dispatch = useDispatch<AppDispatch>();
+  const { CareerObjectives, loading } = useSelector(
+    (state: RootState) => state.carerObjectives
   );
+
   const [activeModalIndex, setActiveModalIndex] = useState<number | null>(null);
   const [loadingDeleteIndex, setLoadingDeleteIndex] = useState<number | null>(null);
-
   const { loading: loaderActive, withLoader } = useTimedLoader(1500);
 
+  // Load career objectives from API or use preloaded ones from cv
+  useEffect(() => {
+    if (!CareerObjectives.length && cv.id) {
+      dispatch(fetchCareerObjectives());
+    }
+  }, [dispatch, CareerObjectives.length, cv.id]);
+
   const handleDelete = async (index: number) => {
-    const objToDelete = careerObjectives[index];
+    const objToDelete = CareerObjectives[index];
     if (!objToDelete?.id) return;
 
     await withLoader(async () => {
       try {
         setLoadingDeleteIndex(index);
-        await deleteCareerObjective(objToDelete.id);
-        setCareerObjectives((prev) => prev.filter((_, i) => i !== index));
+        await dispatch(deleteCareerObjectiveById(objToDelete.id)).unwrap();
       } catch (error) {
         console.error("Failed to delete career objective:", error);
       } finally {
@@ -45,22 +56,18 @@ const CareerObjectiveSection = ({ cv }: Props) => {
   const handleDone = async (updated: CareerObjective, index?: number) => {
     await withLoader(async () => {
       try {
-        let savedObj: CareerObjective;
-
-        if (index !== undefined) {
-          savedObj = await updateCareerObjective(updated.id!, {
-            career_objective: updated.career_objective,
-          });
-          setCareerObjectives((prev) =>
-            prev.map((item, i) => (i === index ? savedObj : item))
-          );
+        if (index !== undefined && updated.id) {
+          await dispatch(
+            updateCareerObjectiveById({
+              id: updated.id,
+              data: { career_objective: updated.career_objective },
+            })
+          ).unwrap();
         } else {
-          savedObj = await submitCareerObjective({
-            career_objective: updated.career_objective,
-          });
-          setCareerObjectives((prev) => [...prev, savedObj]);
+          await dispatch(
+            addCareerObjective({ career_objective: updated.career_objective })
+          ).unwrap();
         }
-
         setActiveModalIndex(null);
       } catch (error) {
         console.error("Failed to save career objective:", error);
@@ -71,15 +78,17 @@ const CareerObjectiveSection = ({ cv }: Props) => {
   return (
     <>
       <CVCard title="Career Objectives">
-        {careerObjectives.length === 0 ? (
+        {loading && <Loader loading={true} message="Loading career objectives..." />}
+
+        {!loading && CareerObjectives.length === 0 ? (
           <p className="text-gray-400 italic font-sans">
             No career objectives added yet
           </p>
         ) : (
           <div className="space-y-4 font-sans text-subHeadingGray">
-            {careerObjectives.map((obj, index) => (
+            {CareerObjectives.map((obj, index) => (
               <div
-                key={obj.id}
+                key={obj.id || index}
                 className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
                 <div className="absolute top-4 right-4 flex gap-3">
@@ -97,7 +106,6 @@ const CareerObjectiveSection = ({ cv }: Props) => {
                     {loadingDeleteIndex === index ? "⏳" : <FaTrash />}
                   </button>
                 </div>
-
                 <p className="mt-2">{obj.career_objective}</p>
               </div>
             ))}
@@ -105,8 +113,8 @@ const CareerObjectiveSection = ({ cv }: Props) => {
         )}
       </CVCard>
 
-      {/* Modal for editing career objective */}
-      {activeModalIndex !== null && careerObjectives[activeModalIndex] && (
+      {/* Edit Modal */}
+      {activeModalIndex !== null && CareerObjectives[activeModalIndex] && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
@@ -121,7 +129,7 @@ const CareerObjectiveSection = ({ cv }: Props) => {
             </h2>
 
             <CareerObjectiveFormDetails
-              editingObjective={careerObjectives[activeModalIndex]}
+              editingObjective={CareerObjectives[activeModalIndex]}
               editingIndex={activeModalIndex}
               onDone={(updated) => handleDone(updated, activeModalIndex)}
             />

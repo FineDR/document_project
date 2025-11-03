@@ -6,12 +6,13 @@ import Button from "../formElements/Button";
 import ExperienceInput from "./subform/ExperienceInput";
 import { workExperiencesSchema } from "../forms/cvValidationSchema";
 import type { z } from "zod";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
-import { submitWorkExperience, updateWorkExperience } from "../../api/workExperiences";
+import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import { addWorkExperience, updateWorkExperienceById } from "../../features/experiences/workExperiencesSlice";
 import type { WorkExperience } from "../../types/cv/cv";
-import Loader from "../common/Loader"; // reusable loader
-import { useTimedLoader } from "../../hooks/useTimedLoader"; // ensures minimum display time
 
 type FormFields = z.infer<typeof workExperiencesSchema>;
 
@@ -21,9 +22,10 @@ interface Props {
 }
 
 const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-  const [successMessage, setSuccessMessage] = useState("");
   const { loading, withLoader } = useTimedLoader(1200); // minimum loader time
+  const [successMessage, setSuccessMessage] = useState("");
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
 
@@ -50,6 +52,7 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
     name: "experiences",
   });
 
+  // Populate form if editing
   useEffect(() => {
     if (editingExperience) {
       setValue("experiences", [
@@ -65,124 +68,116 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
     }
   }, [editingExperience, setValue]);
 
+  // Auto-clear success message
   useEffect(() => {
-  if (successMessage) {
-    const timer = setTimeout(() => setSuccessMessage(""), 5000);
-    return () => clearTimeout(timer);
-  }
-}, [successMessage]);
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   if (!user) return null;
 
- const onSubmit: SubmitHandler<FormFields> = async (data) => {
-  await withLoader(async () => {
-    try {
-      // Prepare message for the user
-      const message = editingExperience
-        ? "✅ Work experience updated successfully."
-        : "✅ Work experience saved successfully.";
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    await withLoader(async () => {
+      try {
+        const exp = data.experiences[0];
 
-      // Take the first experience (editing one)
-      const exp = data.experiences[0];
+        const payload = {
+          job_title: exp.job_title,
+          company: exp.company,
+          location: exp.location || "",
+          start_date: exp.start_date || "",
+          end_date: exp.end_date || "",
+          responsibilities: exp.responsibilities.map((r) => ({ value: r.value })),
+        };
 
-      // Build payload
-      const payload = {
-        job_title: exp.job_title,
-        company: exp.company,
-        location: exp.location || "",
-        start_date: exp.start_date || "",
-        end_date: exp.end_date || "",
-        responsibilities: exp.responsibilities.map((r) => ({ value: r.value })),
-      };
+        let updatedExp: WorkExperience | undefined;
+        const message = editingExperience
+          ? "✅ Work experience updated successfully."
+          : "✅ Work experience saved successfully.";
 
-      // Call appropriate API
-      const apiCall = editingExperience
-        ? updateWorkExperience(editingExperience.id, payload as WorkExperience)
-        : submitWorkExperience(payload as WorkExperience);
+        if (editingExperience?.id) {
+          updatedExp = await dispatch(updateWorkExperienceById({ id: editingExperience.id, data: payload })).unwrap();
+        } else {
+          updatedExp = await dispatch(addWorkExperience(payload)).unwrap();
+        }
 
-      const response = await apiCall;
+        reset({
+          experiences: [
+            {
+              job_title: "",
+              company: "",
+              location: "",
+              start_date: "",
+              end_date: "",
+              responsibilities: [{ value: "" }],
+            },
+          ],
+        });
 
-      // Reset form to default/empty values
-      reset({
-        experiences: [
-          {
-            job_title: "",
-            company: "",
-            location: "",
-            start_date: "",
-            end_date: "",
-            responsibilities: [{ value: "" }],
-          },
-        ],
-      });
-
-      // Show success notification card to the user
-      setSuccessMessage(message);
-
-      // Pass updated experience to parent or callback
-      onDone?.(response);
-    } catch (error) {
-      console.error("Error submitting work experience:", error);
-    }
-  });
-};
+        setSuccessMessage(message);
+        onDone?.(updatedExp);
+      } catch (error) {
+        console.error("Error submitting work experience:", error);
+      }
+    });
+  };
 
   return (
     <div className="p-4 border rounded-lg bg-whiteBg">
-      <h2 className="text-center  text-2xl font-semibold mb-6 mt-4">
+      <h2 className="text-center text-2xl font-semibold mb-6 mt-4">
         {editingExperience ? "Edit Work Experience" : "Add Work Experience"}
       </h2>
 
-      <div className="relative">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 m-8">
-          {experienceFields.map((exp, index) => (
-            <ExperienceInput
-              key={exp.id}
-              expIndex={index}
-              control={control}
-              register={register}
-              errors={errors}
-              removeExperience={removeExperience}
-              disabled={loading}
-            />
-          ))}
-
-          {!editingExperience && (
-            <Button
-              type="button"
-              onClick={() =>
-                appendExperience({
-                  job_title: "",
-                  company: "",
-                  location: "",
-                  start_date: "",
-                  end_date: "",
-                  responsibilities: [{ value: "" }],
-                })
-              }
-              label="+ Add Work Experience"
-              disabled={loading}
-            />
-          )}
-
-          <Button
-            type="submit"
-            label={editingExperience ? "Update" : "Submit"}
-            onClick={handleOnclick}
-            className={`mx-4 ${active ? hoverStyle : ""}`}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 m-8">
+        {experienceFields.map((exp, index) => (
+          <ExperienceInput
+            key={exp.id}
+            expIndex={index}
+            control={control}
+            register={register}
+            errors={errors}
+            removeExperience={removeExperience}
             disabled={loading}
           />
+        ))}
 
-          {/* Reusable loader */}
-          <Loader loading={loading} message={editingExperience ? "Updating experience..." : "Saving experience..."} />
-        </form>
-      </div>
-        {successMessage && (
+        {!editingExperience && (
+          <Button
+            type="button"
+            onClick={() =>
+              appendExperience({
+                job_title: "",
+                company: "",
+                location: "",
+                start_date: "",
+                end_date: "",
+                responsibilities: [{ value: "" }],
+              })
+            }
+            label="+ Add Work Experience"
+            disabled={loading}
+            className="mx-8"
+          />
+        )}
+
+        <Button
+          type="submit"
+          label={editingExperience ? "Update" : "Submit"}
+          onClick={handleOnclick}
+          className={`${active ? hoverStyle : ""}`}
+          disabled={loading}
+        />
+
+        <Loader loading={loading} message={editingExperience ? "Updating experience..." : "Saving experience..."} />
+      </form>
+
+      {successMessage && (
         <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700">
           {successMessage}
         </div>
       )}
-
     </div>
   );
 };

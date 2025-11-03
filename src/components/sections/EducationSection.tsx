@@ -1,51 +1,70 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CVCard } from "../../utils/CVCard";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaTimes } from "react-icons/fa";
 import type { User, Education } from "../../types/cv/cv";
 import EducationFormDetails from "../forms/EducationFormDetails";
-import { deleteEducation } from "../../api/submitEducation";
+import Loader from "../common/Loader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import {
+  fetchEducations,
+  addEducation,
+  editEducation,
+  removeEducation,
+} from "../../features/educations/educationsSlice";
 
 interface Props {
   cv: User;
 }
 
 const EducationSection = ({ cv }: Props) => {
-  const [educations, setEducations] = useState<Education[]>(cv.educations || []);
+  const dispatch = useDispatch<AppDispatch>();
+  const { educations, loading } = useSelector((state: RootState) => state.educations);
+
   const [showModal, setShowModal] = useState(false);
   const [editingEducation, setEditingEducation] = useState<Education | null>(null);
-  const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
 
-  const handleDelete = async (id?: number) => {
-    if (!id) return;
+  useEffect(() => {
+    dispatch(fetchEducations());
+  }, [dispatch]);
+
+  const handleEdit = (edu: Education) => {
+    setEditingEducation(edu);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id: number) => {
     try {
-      setLoadingDelete(id);
-      await deleteEducation(id);
-      setEducations((prev) => prev.filter((edu) => edu.id !== id));
+      await dispatch(removeEducation(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete education:", error);
-    } finally {
-      setLoadingDelete(null);
     }
   };
 
-  const handleDone = (updatedEducation?: Education) => {
-    if (!updatedEducation || !updatedEducation.id) {
-      setShowModal(false);
-      setEditingEducation(null);
-      return;
-    }
-
-    setEducations((prev) => {
-      const exists = prev.find((edu) => edu.id === updatedEducation.id);
-      return exists
-        ? prev.map((edu) => (edu.id === updatedEducation.id ? updatedEducation : edu))
-        : [...prev, updatedEducation];
-    });
-
+  const handleCloseForm = () => {
     setShowModal(false);
     setEditingEducation(null);
   };
+
+const handleDone = (updatedEducation?: Education) => {
+  if (!updatedEducation || !updatedEducation.id) {
+    setShowModal(false);
+    setEditingEducation(null);
+    return;
+  }
+
+  dispatch(
+    updatedEducation.id
+      ? editEducation({ id: updatedEducation.id, data: updatedEducation })
+      : addEducation(updatedEducation)
+  ).unwrap().catch((err) => console.error("Failed to save education:", err));
+
+  setShowModal(false);
+  setEditingEducation(null);
+};
+
 
   return (
     <>
@@ -56,30 +75,28 @@ const EducationSection = ({ cv }: Props) => {
           setShowModal(true);
         }}
       >
-        {educations.length > 0 ? (
+        {loading ? (
+          <Loader loading={loading} message="Loading education..." />
+        ) : educations.length > 0 ? (
           <div className="space-y-4 font-sans text-subHeadingGray">
             {educations.map((education, index) => (
               <div
                 key={education.id || index}
                 className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
               >
-                {/* Top-right buttons: Edit & Delete */}
+                {/* Top-right buttons */}
                 <div className="absolute top-4 right-4 flex gap-3 text-sm">
                   <button
                     className="text-redMain font-medium hover:underline"
-                    onClick={() => {
-                      setEditingEducation(education);
-                      setShowModal(true);
-                    }}
+                    onClick={() => handleEdit(education)}
                   >
                     Edit
                   </button>
                   <button
                     className="text-gray-400 hover:text-redMain"
                     onClick={() => handleDelete(education.id)}
-                    disabled={loadingDelete === education.id}
                   >
-                    {loadingDelete === education.id ? "⏳" : <FaTrash />}
+                    <FaTrash />
                   </button>
                 </div>
 
@@ -92,7 +109,6 @@ const EducationSection = ({ cv }: Props) => {
                   <p className="text-sm italic mt-1">Grade: {education.grade}</p>
                 )}
 
-                {/* Dates */}
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                     Start: {education.start_date}
@@ -105,24 +121,21 @@ const EducationSection = ({ cv }: Props) => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-400 italic font-sans text-center py-2">
+          <p className="text-gray-400 italic font-sans text-start py-2">
             No education details available.
           </p>
         )}
       </CVCard>
 
-      {/* Modal for adding/editing education */}
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-lg"
-              onClick={() => {
-                setShowModal(false);
-                setEditingEducation(null);
-              }}
+              onClick={handleCloseForm}
             >
-              ✕
+              <FaTimes />
             </button>
 
             <EducationFormDetails

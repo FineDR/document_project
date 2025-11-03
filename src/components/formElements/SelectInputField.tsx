@@ -7,12 +7,12 @@ type Option = {
 
 type SelectInputFieldProps<T extends FieldValues> = {
   label: string;
-  name: Path<T>; // ensures type-safe nested keys
+  name: Path<T>; // type-safe nested keys
   register: UseFormRegister<T>;
   options: Option[];
   error?: FieldError;
   className?: string;
-  disabled?: boolean; // added disabled prop
+  disabled?: boolean; // optional disabled
 };
 
 const SelectInputField = <T extends FieldValues>({
@@ -22,20 +22,27 @@ const SelectInputField = <T extends FieldValues>({
   options,
   error,
   className,
-  disabled = false, // default to false
+  disabled = false,
 }: SelectInputFieldProps<T>) => {
   return (
-    <div className={`flex flex-col mb-4 ${className ?? ""}`}>
-      <label className="font-medium mb-1" htmlFor={name.toString()}>
+    <div className={`flex flex-col mb-4 w-full ${className ?? ""}`}>
+      <label
+        htmlFor={name.toString()}
+        className="mb-1 text-sm font-medium text-subheading dark:text-subheading"
+      >
         {label}
       </label>
       <select
         id={name.toString()}
         {...register(name)}
-        className="border p-2 rounded bg-whiteBg"
+        disabled={disabled}
+        className={`border rounded px-3 py-2 text-text dark:text-text bg-background dark:bg-background
+          focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+          ${error ? "border-redMain focus:ring-redMain" : "border-gray-300 dark:border-gray-600"}
+          ${disabled ? "cursor-not-allowed opacity-50" : ""}
+          transition-colors duration-200
+        `}
         defaultValue=""
-        disabled={disabled} // apply disabled
-        style={{ backgroundColor: disabled ? "#f3f3f3" : "white" }} // visual cue
       >
         <option value="" disabled>
           Select {label}
@@ -47,7 +54,7 @@ const SelectInputField = <T extends FieldValues>({
         ))}
       </select>
       {error && (
-        <p className="text-red-600 text-sm mt-1" role="alert">
+        <p className="mt-1 text-sm text-redMain" role="alert">
           {error.message}
         </p>
       )}

@@ -6,21 +6,30 @@ import type { z } from "zod";
 import InputField from "../formElements/InputField";
 import Button from "../formElements/Button";
 import { referencesSchema } from "../forms/cvValidationSchema";
-import { submitReferences, updateReference } from "../../api/references";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
 import Loader from "../common/Loader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import type { Reference } from "../../types/cv/cv";
+
+import {
+  addReference,
+  editReference,
+  deleteReferenceById,
+} from "../../features/references/referencesSlice";
+
+import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 type FormFields = z.infer<typeof referencesSchema>;
 
 interface Props {
-  editingReference?: any;
+  editingReference?: Reference;
   editingIndex?: number | null;
   onDone?: () => void;
 }
 
 const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props) => {
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const { loading, withLoader } = useTimedLoader(3000);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -79,7 +88,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
       const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
       const payload = {
-        ...data,
+        ...data.references[0],
         full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
         email: user.email,
       };
@@ -88,22 +97,35 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
         let message = "";
 
         if (editingReference && editingIndex !== null) {
-          await updateReference(editingReference.id, payload.references[0]);
+          // Update reference via Redux
+          await dispatch(editReference({ id: editingReference.id, data: payload })).unwrap();
           message = "✅ Reference updated successfully.";
         } else {
-          await submitReferences(payload);
-          message = "✅ References submitted successfully.";
+          // Add new reference via Redux
+          await dispatch(addReference(payload)).unwrap();
+          message = "✅ Reference added successfully.";
         }
 
         reset({ references: [{ name: "", position: "", email: "", phone: "" }] });
         setSuccessMessage(message);
         onDone?.();
       } catch (error) {
-        console.error("Error submitting references:", error);
+        console.error("Error submitting reference:", error);
       } finally {
         clearInterval(interval);
       }
     });
+  };
+
+  const handleRemove = async (index: number, refId?: number) => {
+    remove(index);
+    if (refId) {
+      try {
+        await dispatch(deleteReferenceById(refId)).unwrap();
+      } catch (err) {
+        console.error("Failed to delete reference:", err);
+      }
+    }
   };
 
   return (
@@ -118,7 +140,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {fields.map((field, index) => (
-          <div key={field.id} className="p-4  space-y-4 relative">
+          <div key={field.id} className="p-4 space-y-4 relative">
             <InputField
               type="text"
               label="Referee Name *"
@@ -127,8 +149,8 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.name` as const)}
               error={errors.references?.[index]?.name?.message}
               disabled={loading}
-              helperText="Tip: Full name of your reference."
             />
+            <p className="text-gray-400 text-xs italic mt-1">Tip: Full name of your reference.</p>
             <InputField
               type="text"
               label="Position *"
@@ -137,8 +159,8 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.position` as const)}
               error={errors.references?.[index]?.position?.message}
               disabled={loading}
-              helperText="Tip: Job title or position of your reference."
             />
+            <p className="text-gray-400 text-xs italic mt-1">Tip: Job title or position of your reference.</p>
             <InputField
               type="email"
               label="Email *"
@@ -147,8 +169,8 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.email` as const)}
               error={errors.references?.[index]?.email?.message}
               disabled={loading}
-              helperText="Tip: Professional email address."
             />
+            <p className="text-gray-400 text-xs italic mt-1">Tip: Professional email address.</p>
             <InputField
               type="text"
               label="Phone Number *"
@@ -157,14 +179,14 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
               register={register(`references.${index}.phone` as const)}
               error={errors.references?.[index]?.phone?.message}
               disabled={loading}
-              helperText="Tip: Contact number including country code."
+              helperText=""
             />
-
+            <p className="text-gray-400 text-xs italic mt-1">Tip: Contact number including country code.</p>
             {fields.length > 1 && !editingReference && (
               <Button
                 type="button"
                 label="Remove"
-                onClick={() => remove(index)}
+                onClick={() => handleRemove(index, (field as any).id)}
                 disabled={loading}
                 className="bg-red-500 text-white hover:bg-red-600 absolute bottom-2 right-2"
               />
@@ -172,14 +194,14 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
           </div>
         ))}
 
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-4 flex-wrap mx-4">
           {!editingReference && (
             <Button
               type="button"
               label="+ Add Reference"
               onClick={() => append({ name: "", position: "", email: "", phone: "" })}
               disabled={loading}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="text-white"
             />
           )}
           <Button
@@ -187,7 +209,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
             label={editingReference ? "Update" : "Submit"}
             disabled={loading}
             onClick={() => {}}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className="text-white "
           />
         </div>
 

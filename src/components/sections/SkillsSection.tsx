@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
-import type { User, SkillSet } from "../../types/cv/cv";
+import type { User, SkillSet, Skill } from "../../types/cv/cv";
 import SkillsForm from "../forms/SkillsForm";
-import { deleteSkill } from "../../api/submitSkills";
+import {
+  addSkill,
+  updateSkillById,
+  deleteSkillById,
+} from "../../features/skills/skillsSlice";
 
 interface Props {
   cv: User;
 }
 
 const SkillsSection = ({ cv }: Props) => {
+  const dispatch = useDispatch();
   const skillSet = cv.skill_sets?.[0];
   const [skillsData, setSkillsData] = useState<SkillSet | null>(skillSet || null);
   const [showForm, setShowForm] = useState(false);
@@ -32,7 +38,7 @@ const SkillsSection = ({ cv }: Props) => {
     if (!skillsData) return;
     try {
       setLoadingDelete(skillId);
-      await deleteSkill(skillId);
+      await dispatch(deleteSkillById(skillId) as any).unwrap();
       setSkillsData((prev) => {
         if (!prev) return prev;
         return {
@@ -59,7 +65,29 @@ const SkillsSection = ({ cv }: Props) => {
     setEditingSkillType(null);
   };
 
-  const handleUpdateSkills = (updatedSkillSet: SkillSet) => {
+  const handleUpdateSkills = async (updatedSkillSet: SkillSet) => {
+    if (!updatedSkillSet) return;
+
+    // Update technical skills
+    for (const skill of updatedSkillSet.technical_skills || []) {
+      if (skill.id) {
+        await dispatch(updateSkillById({ id: skill.id, data: skill }) as any).unwrap();
+      } else {
+        const newSkill = await dispatch(addSkill(skill) as any).unwrap();
+        skill.id = newSkill.id; // Assign new id
+      }
+    }
+
+    // Update soft skills
+    for (const skill of updatedSkillSet.soft_skills || []) {
+      if (skill.id) {
+        await dispatch(updateSkillById({ id: skill.id, data: skill }) as any).unwrap();
+      } else {
+        const newSkill = await dispatch(addSkill(skill) as any).unwrap();
+        skill.id = newSkill.id;
+      }
+    }
+
     setSkillsData(updatedSkillSet);
     handleCloseForm();
   };
@@ -88,7 +116,7 @@ const SkillsSection = ({ cv }: Props) => {
               </div>
               <div className="flex flex-wrap gap-3">
                 {technicalSkills.length > 0 ? (
-                  technicalSkills.map((skill) => (
+                  technicalSkills.map((skill: Skill) => (
                     <span
                       key={skill.id}
                       className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
@@ -96,7 +124,7 @@ const SkillsSection = ({ cv }: Props) => {
                       {skill.value}
                       {skill.id && (
                         <button
-                          onClick={() => handleDelete("technical", skill.id)}
+                          onClick={() => handleDelete("technical", skill.id!)}
                           disabled={loadingDelete === skill.id}
                           className="text-gray-400 hover:text-redMain text-sm"
                         >
@@ -128,7 +156,7 @@ const SkillsSection = ({ cv }: Props) => {
               </div>
               <div className="flex flex-wrap gap-3">
                 {softSkills.length > 0 ? (
-                  softSkills.map((skill) => (
+                  softSkills.map((skill: Skill) => (
                     <span
                       key={skill.id}
                       className="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
@@ -136,7 +164,7 @@ const SkillsSection = ({ cv }: Props) => {
                       {skill.value}
                       {skill.id && (
                         <button
-                          onClick={() => handleDelete("soft", skill.id)}
+                          onClick={() => handleDelete("soft", skill.id!)}
                           disabled={loadingDelete === skill.id}
                           className="text-gray-400 hover:text-redMain text-sm"
                         >

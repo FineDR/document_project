@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Reference } from "../../types/cv/cv";
 import ReferencesFormDetails from "../forms/ReferencesFormDetails";
-import { deleteReference } from "../../api/references";
+import {
+  addReference,
+  editReference,
+  deleteReferenceById,
+} from "../../features/references/referencesSlice";
 
 interface Props {
   cv: User;
 }
 
 const ReferencesSection = ({ cv }: Props) => {
+  const dispatch = useDispatch();
   const [references, setReferences] = useState<Reference[]>(cv.references || []);
   const [showModal, setShowModal] = useState(false);
   const [editingReference, setEditingReference] = useState<Reference | null>(null);
@@ -20,7 +26,7 @@ const ReferencesSection = ({ cv }: Props) => {
     if (!id) return;
     try {
       setLoadingDelete(id);
-      await deleteReference(id);
+      await dispatch(deleteReferenceById(id) as any).unwrap();
       setReferences((prev) => prev.filter((ref) => ref.id !== id));
     } catch (error) {
       console.error("Failed to delete reference:", error);
@@ -34,22 +40,31 @@ const ReferencesSection = ({ cv }: Props) => {
     setShowModal(true);
   };
 
-  const handleDone = (updatedReference?: Reference) => {
-    if (!updatedReference || !updatedReference.id) {
+  const handleDone = async (updatedReference?: Reference) => {
+    if (!updatedReference) {
       setEditingReference(null);
       setShowModal(false);
       return;
     }
 
-    const exists = references.find((r) => r.id === updatedReference.id);
-    setReferences((prev) =>
-      exists
-        ? prev.map((r) => (r.id === updatedReference.id ? updatedReference : r))
-        : [...prev, updatedReference]
-    );
-
-    setEditingReference(null);
-    setShowModal(false);
+    try {
+      if (updatedReference.id) {
+        const editedRef = await dispatch(
+          editReference({ id: updatedReference.id, data: updatedReference }) as any
+        ).unwrap();
+        setReferences((prev) =>
+          prev.map((r) => (r.id === editedRef.id ? editedRef : r))
+        );
+      } else {
+        const newRef = await dispatch(addReference(updatedReference) as any).unwrap();
+        setReferences((prev) => [...prev, newRef]);
+      }
+    } catch (error) {
+      console.error("Failed to save reference:", error);
+    } finally {
+      setEditingReference(null);
+      setShowModal(false);
+    }
   };
 
   return (
@@ -106,7 +121,7 @@ const ReferencesSection = ({ cv }: Props) => {
       </CVCard>
 
       {/* Modal for editing reference */}
-      {showModal && editingReference && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <span
@@ -119,12 +134,8 @@ const ReferencesSection = ({ cv }: Props) => {
               ✕
             </span>
 
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-              Edit Reference
-            </h2>
-
             <ReferencesFormDetails
-              editingReference={editingReference}
+              editingReference={editingReference || undefined}
               onDone={handleDone}
             />
           </div>

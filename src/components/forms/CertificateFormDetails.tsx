@@ -173,14 +173,14 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
             label="+ Add Certificate"
             onClick={() => append({ name: "", issuer: "", date: "" })}
             disabled={loading}
-            className="bg-redMain text-white hover:bg-redMain/80"
+            className="text-white mx-4"
           />
           <Button
             type="submit"
             onClick={() => { }}
-            label={editingCert ? "Update" : "Save"}
+            label={editingCert ? "Update" : "Submit"}
             disabled={loading}
-            className="bg-redMain text-white hover:bg-redMain/80"
+            className="text-white"
           />
           {onClose && (
             <Button

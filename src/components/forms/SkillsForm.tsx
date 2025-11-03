@@ -5,14 +5,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import { FaX } from "react-icons/fa6";
 import Button from "../formElements/Button";
+import InputField from "../formElements/InputField";
 import { skillsSchema } from "./cvValidationSchema";
-import { submitSkills, updateSkill, deleteSkill, type SkillsPayload } from "../../api/submitSkills";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../../store/store";
+import type { RootState, AppDispatch } from "../../store/store";
 import type { SkillSet, Skill } from "../../types/cv/cv";
 import Loader from "../common/Loader";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
-import { updateSkills as updateSkillsInStore } from "../../store/cvSlice";
+
+import {
+  fetchSkills,
+  addSkill,
+  updateSkillById,
+  deleteSkillById,
+} from "../../features/skills/skillsSlice";
 
 export type SkillsFormFields = z.infer<typeof skillsSchema>;
 
@@ -23,9 +28,10 @@ interface SkillsFormProps {
 }
 
 const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) => {
-  const { loading, withLoader } = useTimedLoader(5000);
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { skills, loading } = useSelector((state: RootState) => state.skills);
+
   const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -64,14 +70,13 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
     index: number,
     skillId?: number
   ) => {
-    // Remove from field array
     if (type === "technical") technicalFieldsArray.remove(index);
     else softFieldsArray.remove(index);
 
-    // If skill exists in backend, delete it there too
     if (skillId) {
       try {
-        await deleteSkill(skillId);
+        await dispatch(deleteSkillById(skillId)).unwrap();
+
         const updatedSkillSet: SkillSet = {
           ...skillSet!,
           technical_skills:
@@ -84,7 +89,6 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
               : skillSet!.soft_skills,
         };
         onUpdate?.(updatedSkillSet);
-        dispatch(updateSkillsInStore({ skillSet: updatedSkillSet }));
       } catch (err) {
         console.error("Failed to delete skill:", err);
       }
@@ -93,47 +97,49 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
 
   const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
     if (!user) return;
-    await withLoader(async () => {
-      const startTime = Date.now();
-      setElapsedTime(0);
-      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
-      try {
-        const full_name = [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" ");
-        const payload: SkillsPayload = {
-          technicalSkills: data.technicalSkills.map((s) => ({ value: s.value, id: (s as any).id })),
-          softSkills: data.softSkills.map((s) => ({ value: s.value, id: (s as any).id })),
-          email: user.email,
-          full_name,
-        };
+    const startTime = Date.now();
+    setElapsedTime(0);
+    const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
-        const savedData = skillSet?.id ? await updateSkill(skillSet.id, payload) : await submitSkills(payload);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const saveSkill = async (skill: any) => {
+        if (skill.id) {
+          return await dispatch(updateSkillById({ id: skill.id, data: skill })).unwrap();
+        } else {
+          return await dispatch(addSkill(skill)).unwrap();
+        }
+      };
 
-        const updatedSkillSet: SkillSet = {
-          id: skillSet?.id ?? savedData.id,
-          technical_skills: savedData.technicalSkills ?? skillSet?.technical_skills ?? [],
-          soft_skills: savedData.softSkills ?? skillSet?.soft_skills ?? [],
-          full_name,
-          email: user.email,
-          user: user.id,
-        };
+      const updatedTechnical = await Promise.all(
+        data.technicalSkills.map((s) => saveSkill({ value: s.value, id: (s as any).id })))
+      ;
+      const updatedSoft = await Promise.all(
+        data.softSkills.map((s) => saveSkill({ value: s.value, id: (s as any).id })))
+      ;
 
-        reset({
-          technicalSkills: updatedSkillSet.technical_skills.map((s) => ({ value: s.value, id: s.id })),
-          softSkills: updatedSkillSet.soft_skills.map((s) => ({ value: s.value, id: s.id })),
-        });
+      const updatedSkillSet: SkillSet = {
+        id: skillSet?.id ?? Date.now(),
+        technical_skills: updatedTechnical,
+        soft_skills: updatedSoft,
+        full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
+        email: user.email,
+        user: user.id,
+      };
 
-        onUpdate?.(updatedSkillSet);
-        dispatch(updateSkillsInStore({ skillSet: updatedSkillSet }));
-        setSuccessMessage(skillSet ? "✅ Skills updated successfully." : "✅ Skills saved successfully.");
-        onClose();
-      } catch (error) {
-        console.error("Error submitting skills:", error);
-      } finally {
-        clearInterval(interval);
-      }
-    });
+      reset({
+        technicalSkills: updatedSkillSet.technical_skills.map((s) => ({ value: s.value, id: s.id })),
+        softSkills: updatedSkillSet.soft_skills.map((s) => ({ value: s.value, id: s.id })),
+      });
+
+      onUpdate?.(updatedSkillSet);
+      setSuccessMessage(skillSet ? "✅ Skills updated successfully." : "✅ Skills saved successfully.");
+      onClose();
+    } catch (error) {
+      console.error("Error submitting skills:", error);
+    } finally {
+      clearInterval(interval);
+    }
   };
 
   return (
@@ -149,10 +155,11 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
           <h3 className="font-semibold mb-2">Technical Skills</h3>
           {technicalFieldsArray.fields.map((field, index) => (
             <div key={field.id} className="relative mb-4">
-              <input
-                {...register(`technicalSkills.${index}.value`)}
+              <InputField
+                name={`technicalSkills.${index}.value`}
+                type="text"
+                register={register(`technicalSkills.${index}.value`)}
                 placeholder="e.g., React, Node.js"
-                className="border p-2 rounded w-full pr-8"
                 disabled={loading}
               />
               {technicalFieldsArray.fields.length > 1 && (
@@ -168,7 +175,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
                   <FaX />
                 </button>
               )}
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-400 italic text-xs mt-1">
                 Enter a technical skill or technology you are proficient in.
               </p>
             </div>
@@ -186,10 +193,11 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
           <h3 className="font-semibold mb-2">Soft Skills</h3>
           {softFieldsArray.fields.map((field, index) => (
             <div key={field.id} className="relative mb-4">
-              <input
-                {...register(`softSkills.${index}.value`)}
+              <InputField
+                name={`softSkills.${index}.value`}
+                type="text"
+                register={register(`softSkills.${index}.value`)}
                 placeholder="e.g., Communication"
-                className="border p-2 rounded w-full pr-8"
                 disabled={loading}
               />
               {softFieldsArray.fields.length > 1 && (
@@ -205,7 +213,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
                   <FaX />
                 </button>
               )}
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-400 italic text-xs mt-1">
                 Enter a soft skill like teamwork, communication, or leadership.
               </p>
             </div>
@@ -220,9 +228,9 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
 
         <Button
           type="submit"
-          onClick={()=>{}}
           label={skillSet ? "Update Skills" : "Save Skills"}
           disabled={loading}
+          onClick={() => {}}
         />
 
         <Loader

@@ -13,8 +13,8 @@ export interface InputFieldProps {
   visible?: boolean;
   autoFocus?: boolean;
   helperText?: string;
-  value?: string; // ✅ controlled value
-  onChange?: (val: string) => void; // ✅ callback to update parent
+  value?: string; // controlled value
+  onChange?: (val: string) => void; // callback to update parent
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -29,8 +29,8 @@ const InputField: React.FC<InputFieldProps> = ({
   visible = true,
   autoFocus = false,
   helperText,
-  value,      // controlled
-  onChange,   // controlled
+  value,
+  onChange,
 }) => {
   if (!visible) return null;
 
@@ -44,30 +44,35 @@ const InputField: React.FC<InputFieldProps> = ({
         disabled={disabled}
         autoFocus={autoFocus}
         {...register}
-        value={value || ""}   // ✅ controlled input
-        onChange={(e) => {
-          register.onChange(e);        // update react-hook-form
-          if (onChange) onChange(e.target.value); // update parent state (live preview)
-        }}
-        className={`peer block w-full appearance-none rounded-md border border-gray-300 px-3 pt-5 pb-2 text-base text-gray-900 placeholder-transparent focus:outline-none focus:ring-2 ${
-          error ? "border-red-500 focus:ring-red-500" : "focus:ring-blue-500"
-        } ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-whiteBg"}`}
+        className={`peer block w-full appearance-none rounded-md border px-3 pt-5 pb-2 text-base placeholder-transparent
+    ${error ? "border-redMain focus:ring-redMain" : "border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400"}
+    ${disabled ? "bg-gray-100 cursor-not-allowed dark:bg-gray-700" : "bg-background dark:bg-background"}
+    text-text dark:text-text
+    focus:outline-none focus:ring-2 transition-colors duration-200
+  `}
       />
+
 
       <label
         htmlFor={name}
-        className={`absolute left-3 top-0 -translate-y-1/2 bg-whiteBg px-1 text-sm text-gray-500 transition-all duration-200
-          peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
-          peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-sm peer-focus:text-blue-600
-          pointer-events-none`}
+        className={`absolute left-3 top-0 -translate-y-1/2 px-1 text-sm transition-all duration-200
+          bg-background dark:bg-background
+          text-subheading dark:text-subheading
+          peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 
+          peer-placeholder-shown:text-base
+          peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-sm 
+          peer-focus:text-redMain
+          pointer-events-none
+        `}
       >
         {label || placeholder}
-        {required && <span className="text-red-500">*</span>}
+        {required && <span className="text-redMain">*</span>}
       </label>
 
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-sm text-redMain">{error}</p>}
+
       {!error && helperText && (
-        <p className="mt-1 text-sm text-center text-gray-500">{helperText}</p>
+        <p className="mt-1 text-sm text-text text-center dark:text-text">{helperText}</p>
       )}
     </div>
   );

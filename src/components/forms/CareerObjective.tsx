@@ -120,20 +120,20 @@ const CareerObjectiveFormDetails = ({ editingObjective, editingIndex, onDone }: 
               } disabled:opacity-50`}
             />
           </label>
-          <p className="text-gray-500 text-xs mt-1">
+          <p className="text-gray-400 italic text-xs mt-1">
             Tip: Keep it under 2–3 sentences. Highlight your main skill and career goal.
           </p>
           {errors.career_objective && (
-            <p className="text-red-500 text-sm mt-1">{errors.career_objective.message}</p>
+            <p className="text-gray-500 text-xs italic mt-1">{errors.career_objective.message}</p>
           )}
         </div>
 
         <Button
           type="submit"
           onClick={()=>{}}
-          label={isLoading ? "Saving..." : editingObjective ? "Update" : "Save"}
+          label={isLoading ? "Saving..." : editingObjective ? "Update" : "Submit"}
           disabled={isLoading}
-          className="bg-redMain text-white px-6 py-2 rounded hover:bg-redMain/80 disabled:opacity-50"
+          className="text-white "
         />
 
         <Loader

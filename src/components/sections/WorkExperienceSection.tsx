@@ -1,16 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, WorkExperience } from "../../types/cv/cv";
 import WorkExperienceForm from "../forms/WorkExperience";
-import { deleteWorkExperience } from "../../api/workExperiences";
+import {
+  addWorkExperience,
+  updateWorkExperienceById,
+  deleteWorkExperienceById,
+} from "../../features/experiences/workExperiencesSlice";
+import type { AppDispatch } from "../../store/store";
 
 interface Props {
   cv: User;
 }
 
 const WorkExperienceSection = ({ cv }: Props) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>(
     cv.work_experiences || []
   );
@@ -22,7 +29,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
   const handleDelete = async (id: number) => {
     try {
       setLoadingDelete(id);
-      await deleteWorkExperience(id);
+      await dispatch(deleteWorkExperienceById(id) as any).unwrap();
       setWorkExperiences((prev) => prev.filter((exp) => exp.id !== id));
     } catch (error) {
       console.error("Failed to delete work experience:", error);
@@ -31,21 +38,27 @@ const WorkExperienceSection = ({ cv }: Props) => {
     }
   };
 
-  const handleDone = (updatedExperience: WorkExperience) => {
-    const exists = workExperiences.find(
-      (exp) => exp.id === updatedExperience.id
-    );
-    if (exists) {
-      setWorkExperiences((prev) =>
-        prev.map((exp) =>
-          exp.id === updatedExperience.id ? updatedExperience : exp
-        )
-      );
-    } else {
-      setWorkExperiences((prev) => [...prev, updatedExperience]);
+  const handleDone = async (updatedExperience: WorkExperience) => {
+    try {
+      if (updatedExperience.id) {
+        // Existing experience → update
+        const updated = await dispatch(
+          updateWorkExperienceById({ id: updatedExperience.id, data: updatedExperience })
+        ).unwrap();
+        setWorkExperiences((prev) =>
+          prev.map((exp) => (exp.id === updated.id ? updated : exp))
+        );
+      } else {
+        // New experience → add
+        const created = await dispatch(addWorkExperience(updatedExperience) as any).unwrap();
+        setWorkExperiences((prev) => [...prev, created]);
+      }
+    } catch (error) {
+      console.error("Failed to save work experience:", error);
+    } finally {
+      setShowModal(false);
+      setEditingExperience(null);
     }
-    setShowModal(false);
-    setEditingExperience(null);
   };
 
   return (
@@ -71,7 +84,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
                   </button>
                   <button
                     className="text-gray-400 hover:text-redMain"
-                    onClick={() => handleDelete(exp.id)}
+                    onClick={() => handleDelete(exp.id!)}
                     disabled={loadingDelete === exp.id}
                   >
                     {loadingDelete === exp.id ? "⏳" : <FaTrash size={14} />}
@@ -111,7 +124,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-6">
+          <div className="text-start py-6">
             <p className="text-gray-400 italic font-sans text-sm">
               No work experience added yet
             </p>
@@ -120,7 +133,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
       </CVCard>
 
       {/* Modal for editing work experience */}
-      {showModal && editingExperience && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
             <button
@@ -133,7 +146,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
               ✕
             </button>
             <WorkExperienceForm
-              editingExperience={editingExperience}
+              editingExperience={editingExperience || undefined}
               onDone={handleDone}
             />
           </div>

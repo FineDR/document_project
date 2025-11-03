@@ -6,12 +6,14 @@ import InputField from "../formElements/InputField";
 import SelectInputField from "../formElements/SelectInputField";
 import Button from "../formElements/Button";
 import { languagesSchema } from "../forms/cvValidationSchema";
-import { submitLanguages, updateLanguage } from "../../api/languages";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
-import type { z } from "zod";
-import { useTimedLoader } from "../../hooks/useTimedLoader";
 import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import type { z } from "zod";
+
+import { addLanguage, updateLanguageById, deleteLanguageById } from "../../features/languages/languagesSlice";
 
 type FormFields = z.infer<typeof languagesSchema>;
 
@@ -27,7 +29,13 @@ const proficiencyOptions = [
   { label: "Native", value: "Native" },
 ];
 
-const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
+const LanguagesFormDetails: React.FC<Props> = ({ editingLanguage, onDone }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { loading, withLoader } = useTimedLoader(3000);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [elapsedTime, setElapsedTime] = useState(0);
+
   const {
     register,
     handleSubmit,
@@ -44,11 +52,6 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
     name: "languages",
   });
 
-  const user = useSelector((state: RootState) => state.auth.user);
-  const [successMessage, setSuccessMessage] = useState("");
-  const { loading, withLoader } = useTimedLoader(3000);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
   // Reset form for editing or new entry
   useEffect(() => {
     if (editingLanguage) {
@@ -64,23 +67,32 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
     await withLoader(async () => {
       const startTime = Date.now();
       setElapsedTime(0);
-      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
-
-      const payload = {
-        ...data,
-        full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
-        email: user.email,
-      };
+      const interval = setInterval(
+        () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
+        100
+      );
 
       try {
         let message = "";
+
         if (editingLanguage) {
-          await updateLanguage(editingLanguage.id, payload.languages[0]);
+          await dispatch(
+            updateLanguageById({ id: editingLanguage.id, data: data.languages[0] })
+          ).unwrap();
           message = "✅ Language updated successfully.";
         } else {
-          await submitLanguages(payload);
-          message = "✅ Languages submitted successfully.";
+          await dispatch(
+            addLanguage({
+              ...data.languages[0],
+              full_name: [user.first_name, user.middle_name, user.last_name]
+                .filter(Boolean)
+                .join(" "),
+              email: user.email,
+            })
+          ).unwrap();
+          message = "✅ Language submitted successfully.";
         }
+
         reset({ languages: [{ language: "", proficiency: "" }] });
         setSuccessMessage(message);
         onDone?.();
@@ -114,7 +126,7 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
               error={errors.languages?.[index]?.language?.message}
               disabled={loading}
             />
-            <p className="text-gray-500 text-xs">
+            <p className="text-gray-400 text-xs italic mt-1">
               Enter the name of the language you are proficient in.
             </p>
 
@@ -126,7 +138,7 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
               error={errors.languages?.[index]?.proficiency}
               disabled={loading}
             />
-            <p className="text-gray-500 text-xs">
+            <p className="text-gray-400 text-xs italic mt-1">
               Choose your proficiency level in this language.
             </p>
 
@@ -149,15 +161,15 @@ const LanguagesFormDetails = ({ editingLanguage, onDone }: Props) => {
               label="+ Add Language"
               onClick={() => append({ language: "", proficiency: "" })}
               disabled={loading}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="mx-4"
             />
           )}
           <Button
             type="submit"
-            onClick={()=>{}}
+            onClick={() => {}}
             label={editingLanguage ? "Update" : "Submit"}
             disabled={loading}
-            className="bg-red-600 text-white hover:bg-red-700"
+            className=""
           />
         </div>
 

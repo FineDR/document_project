@@ -1,25 +1,25 @@
-// src/App.tsx
 import { Routes, Route, useLocation } from "react-router-dom";
 import { MobileNavBar, NavBar } from "./components/navigation/Navbar";
-import TopNav from "./components/navigation/TopNav";
+import TopNav, { SignIn } from "./components/navigation/TopNav";
 import Footer from "./components/sections/Footer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
 
 import { routes, documentRoutes, myDocumentsRoutes, type pageRouteConfig } from "./routes/pageRouteConfig";
 import { useSelector } from "react-redux";
 import type { RootState } from "./store/store";
 import OfflineWrapper from "./components/Offline/OfflineWrapper";
+import { refreshAccessToken } from "./api/refreshToken";
 
-// Simple Head component to replace react-helmet
+import { RiArrowDropDownFill } from "react-icons/ri";
+
 const Head = ({ title, description }: { title: string; description?: string }) => {
   useEffect(() => {
     document.title = title;
     if (description) {
       const meta = document.querySelector('meta[name="description"]');
-      if (meta) {
-        meta.setAttribute("content", description);
-      } else {
+      if (meta) meta.setAttribute("content", description);
+      else {
         const newMeta = document.createElement("meta");
         newMeta.name = "description";
         newMeta.content = description;
@@ -27,7 +27,6 @@ const Head = ({ title, description }: { title: string; description?: string }) =
       }
     }
   }, [title, description]);
-
   return null;
 };
 
@@ -44,18 +43,53 @@ function App() {
     return true;
   });
 
-  // Apply theme class to <html>
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("light", "dark", "professional");
     root.classList.add(theme);
   }, [theme]);
 
+  const [signInOpen, setSignInOpen] = useState(false);
+  const closeSignIn = () => setSignInOpen(false);
+
+  const [topNavOpen, setTopNavOpen] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const newToken = await refreshAccessToken();
+      if (!newToken) setSignInOpen(true);
+    })();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* NAVBARS */}
       <div className="fixed top-0 z-50 w-full">
-        <TopNav />
+        {/* Desktop TopNav */}
+        <div className="hidden md:flex">
+          <TopNav />
+        </div>
+
+        {/* Floating small icon on top-left */}
+        <div
+          className="md:hidden fixed top-0 left-0 z-50 cursor-pointer"
+          onClick={() => setTopNavOpen(!topNavOpen)}
+        >
+          <RiArrowDropDownFill
+            size={24}
+            className={`text-redMain transition-transform duration-300 mx-8 ${topNavOpen ? "rotate-180" : ""
+              }`}
+          />
+        </div>
+
+        {/* Mobile TopNav overlay */}
+        <div
+          className={`md:hidden fixed top-0 left-0 w-full bg-background/95 dark:bg-bg/95 backdrop-blur-md shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${topNavOpen ? "translate-y-0" : "-translate-y-full"
+            }`}
+        >
+          <TopNav />
+        </div>
+
         <div className="bg-redBg/30 dark:bg-grayBg/30 backdrop-blur-md">
           <MobileNavBar />
           <NavBar />
@@ -87,6 +121,9 @@ function App() {
 
       {/* FOOTER */}
       {location.pathname !== "/create/cv" && <Footer />}
+
+      {/* SignIn Modal */}
+      {signInOpen && <SignIn onClose={closeSignIn} />}
     </div>
   );
 }

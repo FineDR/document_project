@@ -79,7 +79,7 @@ export const MobileNavBar = () => {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <nav className="md:hidden shadow-md px-4 py-3 bg-background text-text">
+    <nav className="md:hidden px-4 py-3 bg-background text-text">
       <div className="flex justify-between items-center">
         <div className="text-xl font-bold text-primary">
           <Logo />

@@ -105,9 +105,9 @@ const CVPage = () => {
   return (
     <main className="p-6 container mx-auto min-h-screen mt-14 space-y-8">
       <section className="bg-whiteBg shadow-md rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6">
-      
+
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center text-2xl font-bold">
+          <div className="w-16 h-16 rounded-full bg-redMain text-white flex items-center justify-center text-2xl font-bold">
             {user?.first_name?.charAt(0) ?? ""}
             {user?.last_name?.charAt(0) ?? ""}
           </div>
@@ -128,8 +128,8 @@ const CVPage = () => {
           type="button"
           disabled={isLoggingOut}
           className={`${isLoggingOut
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-red-500 hover:bg-red-600"
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-red-500 hover:bg-red-600"
             } text-white px-5 py-2 rounded-lg shadow-md flex items-center gap-2`}
           label="Logout"
         >
@@ -139,9 +139,9 @@ const CVPage = () => {
       </section>
 
 
-            <div className="flex justify-end mx-4">
-              <a href="/create/cv" className="text-redMain">Add Profile Details</a>
-            </div>
+      <div className="flex justify-end mx-4">
+        <a href="/create/cv" className="text-redMain dark:text-white">Add Profile Details</a>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <PersonalInfoSection cv={cvData!} />
         <ProjectsSection cv={cvData!} />

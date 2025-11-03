@@ -2,7 +2,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 // import cvReducer from "./cvSlice";
 import adminUsersReducer from "./adminUsersSlice";
-import projectReducer from "./report/reportSlice";
 import achievementReducer from "../features/achievements/achievementsSlice";
 import certificatesReducer from "../features/certificates/certificatesSlice";
 import experienceReducer from "../features/experiences/workExperiencesSlice";
@@ -50,7 +49,6 @@ export const store = configureStore({
     // cv: cvReducer,
     adminUsers: adminUsersReducer,
     jobs: jobReducer, // <-- added jobs slice here
-    project: projectReducer,
     achievements: achievementReducer,
     certificates: certificatesReducer,
     experiences: experienceReducer,

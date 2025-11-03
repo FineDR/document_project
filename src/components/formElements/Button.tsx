@@ -21,17 +21,21 @@ const Button: React.FC<ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElemen
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`bg-red-600 text-white hover:bg-red-700 ${className}`}
+      className={`
+        bg-redMain 
+        text-white 
+        hover:bg-redMain/90 
+        disabled:opacity-60 
+        disabled:cursor-not-allowed 
+        rounded-md 
+        py-2 
+        px-4 
+        font-button 
+        transition-colors 
+        duration-200
+        ${className}
+      `}
       aria-disabled={disabled}
-      style={{
-        padding: "0.5rem 1rem",
-        borderRadius: "4px",
-        color: "#fff",
-        border: "none",
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.6 : 1,
-
-      }}
       {...rest}
     >
       {label}

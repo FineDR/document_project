@@ -11,15 +11,18 @@ import type { z } from "zod";
 import Button from "../formElements/Button";
 import ProjectInput from "../forms/subform/ProjectInput";
 import { projectSchema } from "../forms/cvValidationSchema";
-import {
-  submitProjectDetails,
-  updateProject,
-  deleteProject,
-} from "../../api/submitProjectDetails";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
 import Loader from "../common/Loader";
 import { useTimedLoader } from "../../hooks/useTimedLoader";
+
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/store";
+import type { Project } from "../../types/cv/cv";
+
+import {
+  addProject,
+  updateProjectById,
+  deleteProjectById,
+} from "../../features/projects/projectsSlice";
 
 type FormFields = z.infer<typeof projectSchema>;
 
@@ -29,6 +32,7 @@ interface Props {
 }
 
 const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const { loading, withLoader } = useTimedLoader(1000);
   const [successMessage, setSuccessMessage] = useState("");
@@ -46,11 +50,8 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   });
 
   const { control, handleSubmit, reset } = methods;
-  const {
-    fields: projectFields,
-    append: appendProject,
-    remove: removeProject,
-  } = useFieldArray({ control, name: "projects" });
+  const { fields: projectFields, append: appendProject, remove: removeProject } =
+    useFieldArray({ control, name: "projects" });
 
   const handleOnClick = () => setActive(!active);
 
@@ -72,31 +73,35 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
     await withLoader(async () => {
       const startTime = Date.now();
       setElapsedTime(0);
-      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
-
-      const payload = { ...data, email: user.email };
+      const interval = setInterval(
+        () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
+        100
+      );
 
       try {
         let message = "";
 
         if (existingProjects && existingProjects.length > 0) {
+          // Update each project via Redux
           const updatedProjects = await Promise.all(
-            data.projects.map((proj, idx) =>
-              updateProject((existingProjects as any)[idx].id, proj)
-            )
+            data.projects.map((proj, idx) => {
+              const projectId = (existingProjects as any)[idx].id;
+              return dispatch(updateProjectById({ id: projectId, data: proj })).unwrap();
+            })
           );
           message = "✅ Projects updated successfully.";
-          updatedProjects.forEach((proj) => onDone?.(proj));
           reset({ projects: updatedProjects });
+          updatedProjects.forEach((proj) => onDone?.(proj));
         } else {
-          const response = await submitProjectDetails(payload);
+          // Add new projects via Redux
+          const addedProjects = await Promise.all(
+            data.projects.map((proj) =>
+              dispatch(addProject({ ...proj, email: user.email })).unwrap()
+            )
+          );
           message = "✅ Projects submitted successfully.";
-          reset({
-            projects: response.projects || [
-              { title: "", description: "", link: "", technologies: [{ value: "" }] },
-            ],
-          });
-          onDone?.();
+          reset({ projects: addedProjects });
+          addedProjects.forEach((proj) => onDone?.(proj));
         }
 
         setSuccessMessage(message);
@@ -108,11 +113,11 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
     });
   };
 
-  const handleDelete = async (projectId?: string) => {
+  const handleDelete = async (projectId?: number) => {
     if (!projectId) return;
     await withLoader(async () => {
       try {
-        await deleteProject(projectId);
+        await dispatch(deleteProjectById(projectId)).unwrap();
         const updatedProjects = (projectFields as any).filter(
           (proj: any) => proj.id !== projectId
         );
@@ -132,17 +137,14 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
         </h2>
 
         <p className="text-gray-600 text-sm mb-6 text-center">
-          Add your projects clearly — include title, description, technologies used, and links if any. Required fields are marked with *.
+          Add your projects clearly — include title, description, technologies used,
+          and links if any. Required fields are marked with *.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {projectFields.map((project, index) => (
             <div key={(project as any).id ?? index} className="p-4 mb-6 relative">
-              <ProjectInput
-                projectIndex={index}
-                disabled={loading}
-                showHelperText
-              />
+              <ProjectInput projectIndex={index} disabled={loading} showHelperText />
 
               {projectFields.length > 1 && !existingProjects && (
                 <Button
@@ -166,7 +168,7 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
             </div>
           ))}
 
-          <div className="flex flex-wrap gap-4 justify-start">
+          <div className="flex flex-wrap gap-4 justify-start mx-2">
             {!existingProjects && (
               <Button
                 type="button"
@@ -180,7 +182,7 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
                   })
                 }
                 disabled={loading}
-                className="bg-red-600 text-white hover:bg-red-700"
+                className="text-white mx-8"
               />
             )}
 
@@ -189,7 +191,7 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
               label={existingProjects ? "Update" : "Submit"}
               onClick={handleOnClick}
               disabled={loading}
-              className={`${active ? hoverStyle : ""} bg-red-600 text-white hover:bg-red-700`}
+              className={`${active ? hoverStyle : ""} text-white`}
             />
           </div>
 

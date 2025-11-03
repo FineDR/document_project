@@ -18,7 +18,7 @@ const Home = () => {
 
 
   return (
-    <div className="relative min-h-[80vh] sm:min-h-screen mt-14 w-full">
+    <div className="relative min-h-[80vh] sm:min-h-screen mt-12 w-full">
       {/* Background image */}
       <img
         src={image}

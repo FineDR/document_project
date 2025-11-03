@@ -1,10 +1,8 @@
-import {
-  useFieldArray,
-  type UseFormRegister,
-  type Control,
-  type FieldErrors,
-} from "react-hook-form";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import { useFieldArray, type UseFormRegister, type Control, type FieldErrors } from "react-hook-form";
 import { FaX } from "react-icons/fa6";
+import InputField from "../../formElements/InputField";
 
 interface Responsibility {
   value: string;
@@ -49,172 +47,121 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
     name: `experiences.${expIndex}.responsibilities` as const,
   });
 
-  const experienceErrors = errors.experiences?.[expIndex];
+  const experienceErrors = errors.experiences?.[expIndex] as any;
 
   return (
-    <div className="p-6 mb-6 space-y-6">
+    <div className="p-4 mb-6 space-y-5">
       <h3 className="font-semibold text-lg sm:text-xl mb-4">
         Work Experience #{expIndex + 1}
       </h3>
 
       {/* Job Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700">Job Title *</label>
-        <div className="sm:flex-1">
-          <input
-            type="text"
-            placeholder="e.g., Software Engineer"
-            {...register(`experiences.${expIndex}.job_title`)}
-            disabled={disabled}
-            className="w-full border rounded-md p-2 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-          />
-          {experienceErrors?.job_title?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {experienceErrors?.job_title?.message}
-            </p>
-          )}
-          <p className="text-gray-500 text-sm">
-            Enter your role, e.g., Frontend Developer or Project Manager
-          </p>
-        </div>
-      </div>
+      <InputField
+        name={`experiences.${expIndex}.job_title`}
+        type="text"
+        placeholder="Frontend Developer"
+        register={register(`experiences.${expIndex}.job_title`)}
+        error={experienceErrors?.job_title?.message}
+        disabled={disabled}
+      />
+      <p className="text-gray-400 text-xs italic mt-1">
+        Enter your role, e.g., Frontend Developer or Project Manager
+      </p>
 
       {/* Company */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700">Company *</label>
-        <div className="sm:flex-1">
-          <input
-            type="text"
-            placeholder="e.g., Google, Microsoft"
-            {...register(`experiences.${expIndex}.company`)}
-            disabled={disabled}
-            className="w-full border rounded-md p-2 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-          />
-          {experienceErrors?.company?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {experienceErrors?.company?.message}
-            </p>
-          )}
-          <p className="text-gray-500 text-sm">
-            The name of the organization you worked for
-          </p>
-        </div>
-      </div>
+      <InputField
+        name={`experiences.${expIndex}.company`}
+        type="text"
+        placeholder="Company name"
+        register={register(`experiences.${expIndex}.company`)}
+        error={experienceErrors?.company?.message}
+        disabled={disabled}
+      />
+      <p className="text-gray-400 text-xs italic mt-1">
+        The name of the organization you worked for
+      </p>
 
       {/* Location */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700">Location *</label>
-        <div className="sm:flex-1">
-          <input
-            type="text"
-            placeholder="e.g., New York, Remote"
-            {...register(`experiences.${expIndex}.location`)}
-            disabled={disabled}
-            className="w-full border rounded-md p-2 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-          />
-          {experienceErrors?.location?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {experienceErrors?.location?.message}
-            </p>
-          )}
-          <p className="text-gray-500 text-sm">City, state, or “Remote”</p>
-        </div>
-      </div>
+      <InputField
+        name={`experiences.${expIndex}.location`}
+        type="text"
+        placeholder="City, state, or Remote"
+        register={register(`experiences.${expIndex}.location`)}
+        error={experienceErrors?.location?.message}
+        disabled={disabled}
+      />
+      <p className="text-gray-400 text-xs italic mt-1">
+        City, state, or “Remote”
+      </p>
 
-      {/* Start and End Dates */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700">Start Date *</label>
-        <div className="sm:flex-1">
-          <input
-            type="date"
-            {...register(`experiences.${expIndex}.start_date`)}
-            disabled={disabled}
-            className="w-full border rounded-md p-2 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-          />
-          {experienceErrors?.start_date?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {experienceErrors?.start_date?.message}
-            </p>
-          )}
-          <p className="text-gray-500 text-sm">
-            Select the month and year you started
-          </p>
-        </div>
-      </div>
+      {/* Start Date */}
+      <InputField
+        name={`experiences.${expIndex}.start_date`}
+        type="date"
+        register={register(`experiences.${expIndex}.start_date`)}
+        error={experienceErrors?.start_date?.message}
+        disabled={disabled}
+      />
+      <p className="text-gray-400 text-xs italic mt-1">
+        Select the month and year you started
+      </p>
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700">End Date *</label>
-        <div className="sm:flex-1">
-          <input
-            type="date"
-            {...register(`experiences.${expIndex}.end_date`)}
-            disabled={disabled}
-            className="w-full border rounded-md p-2 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-          />
-          {experienceErrors?.end_date?.message && (
-            <p className="text-red-500 text-sm mt-1">
-              {experienceErrors?.end_date?.message}
-            </p>
-          )}
-          <p className="text-gray-500 text-sm">
-            Select the month and year you ended or leave empty if current
-          </p>
-        </div>
-      </div>
+      {/* End Date */}
+      <InputField
+        name={`experiences.${expIndex}.end_date`}
+        type="date"
+        register={register(`experiences.${expIndex}.end_date`)}
+        error={experienceErrors?.end_date?.message}
+        disabled={disabled}
+      />
+      <p className="text-gray-400 text-xs italic mt-1">
+        Select the month and year you ended or leave empty if current
+      </p>
 
       {/* Responsibilities */}
-      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-        <label className="sm:w-1/4 font-medium text-gray-700 mt-2">
-          Responsibilities
-        </label>
-        <div className="sm:flex-1 space-y-3">
-          {responsibilityFields.map((responsibility, respIndex) => (
-            <div key={responsibility.id} className="relative">
-              <input
-                type="text"
-                placeholder="e.g., Designed UI, optimized APIs..."
-                {...register(
-                  `experiences.${expIndex}.responsibilities.${respIndex}.value`
-                )}
-                disabled={disabled}
-                className="w-full border rounded-md p-2 pr-8 disabled:opacity-50 focus:ring-2 focus:ring-red-400"
-              />
-              <button
-                type="button"
-                onClick={() => removeResponsibility(respIndex)}
-                disabled={disabled}
-                className="absolute top-1/2 -translate-y-1/2 right-2 text-red-600 hover:text-red-800"
-                title="Remove responsibility"
-              >
-                <FaX />
-              </button>
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => appendResponsibility({ value: "" })}
-            className="text-blue-600 hover:underline disabled:opacity-50"
-            disabled={disabled}
-          >
-            + Add Responsibility
-          </button>
-
-          {experienceErrors?.responsibilities && (
-            <p className="text-red-500 text-sm mt-1">
-              {(experienceErrors?.responsibilities as any)?.message}
+      <div className="space-y-3">
+        {responsibilityFields.map((resp, respIndex) => (
+          <div key={resp.id} className="relative">
+            <InputField
+              name={`experiences.${expIndex}.responsibilities.${respIndex}.value`}
+              type="text"
+              placeholder="Describe responsibility"
+              register={register(`experiences.${expIndex}.responsibilities.${respIndex}.value`)}
+              error={experienceErrors?.responsibilities?.[respIndex]?.value?.message}
+              disabled={disabled}
+            />
+            <p className="text-gray-400 text-xs italic mt-1">
+              Add a key responsibility for this position
             </p>
-          )}
-        </div>
+            <button
+              type="button"
+              onClick={() => removeResponsibility(respIndex)}
+              disabled={disabled}
+              className="absolute top-1/2 -translate-y-1/2 right-2 text-red-600 hover:text-red-800"
+              title="Remove responsibility"
+            >
+              <FaX />
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() => appendResponsibility({ value: "" })}
+          className="text-green-600 hover:underline disabled:opacity-50"
+          disabled={disabled}
+        >
+          + Add Responsibility
+        </button>
       </div>
 
-      {/* Remove Experience Button */}
-      <div className="flex justify-end">
+      {/* Remove Experience */}
+      <div className="flex justify-end mt-4">
         <button
           type="button"
           onClick={() => removeExperience(expIndex)}
-          className="text-red-600 hover:text-red-800 font-medium text-sm"
           disabled={disabled}
+          className="text-red-600 hover:text-red-800 font-medium text-sm"
         >
           Remove Experience
         </button>
