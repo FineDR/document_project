@@ -124,11 +124,9 @@ const WorkExperienceSection = ({ cv }: Props) => {
             ))}
           </div>
         ) : (
-          <div className="text-start py-6">
-            <p className="text-gray-400 italic font-sans text-sm">
+            <p className="text-gray-400 italic font-sans">
               No work experience added yet
             </p>
-          </div>
         )}
       </CVCard>
 
