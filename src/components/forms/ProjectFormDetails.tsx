@@ -69,49 +69,67 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
 
   if (!user) return <p className="text-red-500">Not logged in</p>;
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    await withLoader(async () => {
-      const startTime = Date.now();
-      setElapsedTime(0);
-      const interval = setInterval(
-        () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
-        100
-      );
+const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  console.log("Submitting projects payload:", JSON.stringify(data, null, 2));
+  await withLoader(async () => {
+    const startTime = Date.now();
+    setElapsedTime(0);
+    const interval = setInterval(
+      () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
+      100
+    );
 
-      try {
-        let message = "";
+    try {
+      let message = "";
 
-        if (existingProjects && existingProjects.length > 0) {
-          // Update each project via Redux
-          const updatedProjects = await Promise.all(
-            data.projects.map((proj, idx) => {
-              const projectId = (existingProjects as any)[idx].id;
-              return dispatch(updateProjectById({ id: projectId, data: proj })).unwrap();
-            })
-          );
-          message = "✅ Projects updated successfully.";
-          reset({ projects: updatedProjects });
-          updatedProjects.forEach((proj) => onDone?.(proj));
-        } else {
-          // Add new projects via Redux
-          const addedProjects = await Promise.all(
-            data.projects.map((proj) =>
-              dispatch(addProject({ ...proj, email: user.email })).unwrap()
-            )
-          );
-          message = "✅ Projects submitted successfully.";
-          reset({ projects: addedProjects });
-          addedProjects.forEach((proj) => onDone?.(proj));
-        }
+      if (existingProjects && existingProjects.length > 0) {
+        // Update each project
+        const updatedProjects = await Promise.all(
+          data.projects.map((proj, idx) => {
+            const projectId = (existingProjects as any)[idx].id;
 
-        setSuccessMessage(message);
-      } catch (error) {
-        console.error("Error submitting projects:", error);
-      } finally {
-        clearInterval(interval);
+            // Only send fields backend expects
+            const payload = {
+              title: proj.title,
+              description: proj.description,
+              link: proj.link,
+              technologies: proj.technologies.map((t) => ({ value: t.value })),
+            };
+
+            return dispatch(updateProjectById({ id: projectId, data: payload })).unwrap();
+          })
+        );
+
+        message = "✅ Projects updated successfully.";
+        reset({ projects: updatedProjects });
+        updatedProjects.forEach((proj) => onDone?.(proj));
+      } else {
+        // Add new projects
+        const formattedProjects = data.projects.map((proj) => ({
+          title: proj.title,
+          description: proj.description,
+          link: proj.link,
+          technologies: proj.technologies.map((t) => ({ value: t.value })),
+        }));
+
+        const addedProjects = await Promise.all(
+          formattedProjects.map((proj) => dispatch(addProject({ projects: [proj] })).unwrap())
+        );
+
+        message = "✅ Projects submitted successfully.";
+        reset({ projects: addedProjects });
+        addedProjects.forEach((proj) => onDone?.(proj));
       }
-    });
-  };
+
+      setSuccessMessage(message);
+    } catch (error) {
+      console.error("Error submitting projects:", error);
+    } finally {
+      clearInterval(interval);
+    }
+  });
+};
+
 
   const handleDelete = async (projectId?: number) => {
     if (!projectId) return;

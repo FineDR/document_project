@@ -149,7 +149,6 @@ const TopNav = () => {
 };
 
 
-export default TopNav;
 
 
 // ✅ SignIn with icon close
@@ -189,7 +188,7 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
         googleId: user.sub,
       };
 
-      console.log("Google SignUp Payload:", payload);
+      // console.log("Google SignUp Payload:", payload);
       const resultAction = await dispatch(
         googleAuthUser({ token })
       );
@@ -212,8 +211,8 @@ export const SignIn = ({ onClose }: { onClose: () => void }) => {
     setFieldErrors({});
     try {
       const resultAction = await dispatch(loginUser(data));
-      const result = unwrapResult(resultAction);
-      console.log("Login success:", result);
+      // const result = unwrapResult(resultAction);
+      // console.log("Login success:", result);
 
       setShowSuccess(true);
       setTimeout(() => {
@@ -534,3 +533,5 @@ export const SignUp = ({ onClose }: { onClose: () => void }) => {
     </div>
   );
 };
+
+export default TopNav;

@@ -11,12 +11,14 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "../../store/store";
 import type { SkillSet, Skill } from "../../types/cv/cv";
 import Loader from "../common/Loader";
+import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 import {
   fetchSkills,
-  addSkill,
-  updateSkillById,
   deleteSkillById,
+  // new actions:
+  createSkillSet,
+  updateSkillSet,
 } from "../../features/skills/skillsSlice";
 
 export type SkillsFormFields = z.infer<typeof skillsSchema>;
@@ -70,9 +72,12 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
     index: number,
     skillId?: number
   ) => {
+    // remove from UI form state immediately
     if (type === "technical") technicalFieldsArray.remove(index);
     else softFieldsArray.remove(index);
 
+    // If this skill already exists on backend, delete it via skill endpoint
+    // We kept deleteSkillById thunk as-is for individual deletions
     if (skillId) {
       try {
         await dispatch(deleteSkillById(skillId)).unwrap();
@@ -95,38 +100,64 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
     }
   };
 
+  const buildPayload = (data: SkillsFormFields) => {
+    // backend expects camelCase fields technicalSkills and softSkills each as array of { value: "..." }
+    const technicalSkills = data.technicalSkills
+      .map((s) => ({ value: s.value?.trim() }))
+      .filter((s) => s.value && s.value.length > 0);
+
+    const softSkills = data.softSkills
+      .map((s) => ({ value: s.value?.trim() }))
+      .filter((s) => s.value && s.value.length > 0);
+
+    return { technicalSkills, softSkills };
+  };
+
   const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
+    // keep console debugging (helpful)
+    // console.log("Submitting skills payload:", JSON.stringify(data, null, 2));
     if (!user) return;
+
+    const payload = buildPayload(data);
+
+    // prevent empty submission
+    if (payload.technicalSkills.length === 0 && payload.softSkills.length === 0) {
+      setSuccessMessage("Please add at least one skill before saving.");
+      return;
+    }
 
     const startTime = Date.now();
     setElapsedTime(0);
     const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
     try {
-      const saveSkill = async (skill: any) => {
-        if (skill.id) {
-          return await dispatch(updateSkillById({ id: skill.id, data: skill })).unwrap();
-        } else {
-          return await dispatch(addSkill(skill)).unwrap();
-        }
-      };
+      let result: any;
 
-      const updatedTechnical = await Promise.all(
-        data.technicalSkills.map((s) => saveSkill({ value: s.value, id: (s as any).id })))
-      ;
-      const updatedSoft = await Promise.all(
-        data.softSkills.map((s) => saveSkill({ value: s.value, id: (s as any).id })))
-      ;
+      if (skillSet && skillSet.id) {
+        // update existing skill set
+        result = await dispatch(updateSkillSet({ id: skillSet.id, data: payload })).unwrap();
+      } else {
+        // create new skill set
+        result = await dispatch(createSkillSet(payload)).unwrap();
+      }
 
+      // result should be the updated/created SkillSet returned by backend
       const updatedSkillSet: SkillSet = {
-        id: skillSet?.id ?? Date.now(),
-        technical_skills: updatedTechnical,
-        soft_skills: updatedSoft,
-        full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
-        email: user.email,
-        user: user.id,
+        id: result.id,
+        technical_skills: (result.technicalSkills || result.technical_skills || []).map((t: any) => ({
+          id: t.id,
+          value: t.value,
+        })),
+        soft_skills: (result.softSkills || result.soft_skills || []).map((s: any) => ({
+          id: s.id,
+          value: s.value,
+        })),
+        full_name: result.full_name ?? [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
+        email: result.email ?? user.email,
+        user: result.user ?? user.id,
       };
 
+      // reset form to the values returned by backend (so ids are preserved)
       reset({
         technicalSkills: updatedSkillSet.technical_skills.map((s) => ({ value: s.value, id: s.id })),
         softSkills: updatedSkillSet.soft_skills.map((s) => ({ value: s.value, id: s.id })),
@@ -134,9 +165,10 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
 
       onUpdate?.(updatedSkillSet);
       setSuccessMessage(skillSet ? "✅ Skills updated successfully." : "✅ Skills saved successfully.");
-      onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting skills:", error);
+      const message = typeof error === "string" ? error : error?.message || "Failed to save skills.";
+      setSuccessMessage(`❌ ${message}`);
     } finally {
       clearInterval(interval);
     }
@@ -228,7 +260,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
 
         <Button
           type="submit"
-          label={skillSet ? "Update Skills" : "Save Skills"}
+          label={skillSet ? "Submit Skills" : "Save Skills"}
           disabled={loading}
           onClick={() => {}}
         />

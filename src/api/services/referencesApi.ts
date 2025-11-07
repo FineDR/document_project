@@ -5,7 +5,7 @@ export const getReferences=()=>axiosClient.get(REFERENCES_ENDPOINTS.list);
 
 export const getReference=(id:number)=>axiosClient.get(REFERENCES_ENDPOINTS.detail(id));
 
-export const createReference=(data:any)=>axiosClient.post(REFERENCES_ENDPOINTS.list,data);
+export const createReference=(data:{references:any[]})=>axiosClient.post(REFERENCES_ENDPOINTS.list,data);
 
 export const updateReference=(id:number,data:any)=>axiosClient.put(REFERENCES_ENDPOINTS.detail(id),data);
 

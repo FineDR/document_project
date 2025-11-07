@@ -11,3 +11,19 @@ export const createSkill=(data:any)=>axiosClient.post(SKILLS_ENDPOINTS.list,data
 export const updateSkill=(id:number,data:any)=>axiosClient.put(SKILLS_ENDPOINTS.detail(id),data);
 
 export const deleteSkill=(id:number)=>axiosClient.delete(SKILLS_ENDPOINTS.detail(id));
+export const createSkillSetApi = (data: { 
+  technicalSkills: { value: string }[]; 
+  softSkills: { value: string }[] 
+}) => {
+  return axiosClient.post(SKILLS_ENDPOINTS.list, data);
+};
+
+export const updateSkillSetApi = (
+  id: number,
+  data: { 
+    technicalSkills: { value: string }[]; 
+    softSkills: { value: string }[] 
+  }
+) => {
+  return axiosClient.put(SKILLS_ENDPOINTS.detail(id), data);
+};

@@ -1,12 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
 import {
     getCertificate,
     getCertificates,
     createCertificate,
     updateCertificate,
     deleteCertificate
-
 } from '../../api/services/certificateApi';
 import { type Certificate } from '../../types/cv/cv';
 
@@ -23,7 +21,8 @@ const initialState: CertificatesState = {
     loading: false,
     status: 'idle',
     error: null
-}
+};
+
 export const fetchCertificates = createAsyncThunk<Certificate[]>(
     "certificates/fetchAll",
     async (_, { rejectWithValue }) => {
@@ -34,7 +33,7 @@ export const fetchCertificates = createAsyncThunk<Certificate[]>(
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch certificates');
         }
     }
-)
+);
 
 export const fetchCertificate = createAsyncThunk<Certificate, number>(
     "certificates/fetchById",
@@ -46,13 +45,11 @@ export const fetchCertificate = createAsyncThunk<Certificate, number>(
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch certificate');
         }
     }
-
-)
+);
 
 export const addCertificate = createAsyncThunk<Certificate, any>(
     "certificates/add",
     async (data, { rejectWithValue }) => {
-        console.log("Adding certificate with data:", data);
         try {
             const response = await createCertificate(data);
             return response.data;
@@ -60,7 +57,8 @@ export const addCertificate = createAsyncThunk<Certificate, any>(
             return rejectWithValue(error.response?.data?.message || 'Failed to create certificate');
         }
     }
-)
+);
+
 export const updateCertificat = createAsyncThunk<Certificate, { id: number; data: any }>(
     "certificates/update",
     async ({ id, data }, { rejectWithValue }) => {
@@ -98,6 +96,7 @@ export const certificatesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // FETCH ALL
             .addCase(fetchCertificates.pending, (state) => {
                 state.status = 'loading';
                 state.loading = true;
@@ -106,13 +105,15 @@ export const certificatesSlice = createSlice({
             .addCase(fetchCertificates.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.loading = false;
-                state.certificates = action.payload;
+                state.certificates = Array.isArray(action.payload) ? action.payload : [];
             })
             .addCase(fetchCertificates.rejected, (state, action) => {
                 state.status = 'failed';
                 state.loading = false;
                 state.error = action.payload as string;
             })
+
+            // FETCH SINGLE
             .addCase(fetchCertificate.pending, (state) => {
                 state.status = 'loading';
                 state.loading = true;
@@ -128,6 +129,8 @@ export const certificatesSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
+
+            // ADD
             .addCase(addCertificate.pending, (state) => {
                 state.status = 'loading';
                 state.loading = true;
@@ -136,6 +139,7 @@ export const certificatesSlice = createSlice({
             .addCase(addCertificate.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.loading = false;
+                if (!Array.isArray(state.certificates)) state.certificates = [];
                 state.certificates.push(action.payload);
             })
             .addCase(addCertificate.rejected, (state, action) => {
@@ -143,6 +147,8 @@ export const certificatesSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
+
+            // UPDATE
             .addCase(updateCertificat.pending, (state) => {
                 state.status = 'loading';
                 state.loading = true;
@@ -151,9 +157,12 @@ export const certificatesSlice = createSlice({
             .addCase(updateCertificat.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.loading = false;
+                if (!Array.isArray(state.certificates)) state.certificates = [];
                 const index = state.certificates.findIndex(cert => cert.id === action.payload.id);
                 if (index !== -1) {
                     state.certificates[index] = action.payload;
+                } else {
+                    state.certificates.push(action.payload); // optional fallback
                 }
             })
             .addCase(updateCertificat.rejected, (state, action) => {
@@ -161,6 +170,8 @@ export const certificatesSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
+
+            // DELETE
             .addCase(deleteCertificat.pending, (state) => {
                 state.status = 'loading';
                 state.loading = true;
@@ -169,17 +180,14 @@ export const certificatesSlice = createSlice({
             .addCase(deleteCertificat.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.loading = false;
+                if (!Array.isArray(state.certificates)) state.certificates = [];
                 state.certificates = state.certificates.filter(cert => cert.id !== action.payload);
             })
             .addCase(deleteCertificat.rejected, (state, action) => {
                 state.status = 'failed';
                 state.loading = false;
                 state.error = action.payload as string;
-            })
-
-
-
-            ;
+            });
     }
 });
 

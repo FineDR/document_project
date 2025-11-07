@@ -129,17 +129,23 @@ const ProjectsSection = ({ cv }: Props) => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <span
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
+          <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-all duration-300 border border-gray-200 dark:border-gray-700">
+
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg transition-colors duration-200"
               onClick={() => {
                 setShowModal(false);
                 setEditingProject(null);
               }}
+              aria-label="Close Modal"
             >
               ✕
-            </span>
+            </button>
 
+
+
+            {/* Form */}
             <ProjectFormDetails
               existingProjects={editingProject ? [editingProject] : []}
               onDone={handleDone}
@@ -147,6 +153,7 @@ const ProjectsSection = ({ cv }: Props) => {
           </div>
         </div>
       )}
+
     </>
   );
 };

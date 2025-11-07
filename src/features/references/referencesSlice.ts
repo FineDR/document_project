@@ -27,16 +27,18 @@ const initialState: ReferencesState = {
 }
 
 export const fetchReferences = createAsyncThunk<Reference[]>(
-    "references/fetchAll",
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await getReferences();
-            return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch references');
-        }
+  "references/fetchAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getReferences(); // no argument here
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch references"
+      );
     }
-)
+  }
+);
 
 export const fetchReference = createAsyncThunk<Reference, number>(
     "references/fetchById",

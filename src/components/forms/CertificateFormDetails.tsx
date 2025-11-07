@@ -56,9 +56,8 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
       certificates: data.certificates.map(cert => ({
         name: cert.name,
         issuer: cert.issuer,
-        date: cert.date,
-        profile: user.profile?.id,
-      })),
+        date: cert.date        // must be YYYY-MM-DD
+      }))
     };
 
     await withLoader(async () => {

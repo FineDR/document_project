@@ -13,21 +13,23 @@ import {
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>; // add this prop to refresh CV data after changes
 }
 
-const ReferencesSection = ({ cv }: Props) => {
+const ReferencesSection = ({ cv, refetchCV }: Props) => {
   const dispatch = useDispatch();
-  const [references, setReferences] = useState<Reference[]>(cv.references || []);
   const [showModal, setShowModal] = useState(false);
   const [editingReference, setEditingReference] = useState<Reference | null>(null);
   const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
+
+  const references = cv.references || []; // use CV data as source of truth
 
   const handleDelete = async (id?: number) => {
     if (!id) return;
     try {
       setLoadingDelete(id);
       await dispatch(deleteReferenceById(id) as any).unwrap();
-      setReferences((prev) => prev.filter((ref) => ref.id !== id));
+      await refetchCV(); // refresh CV data
     } catch (error) {
       console.error("Failed to delete reference:", error);
     } finally {
@@ -49,16 +51,13 @@ const ReferencesSection = ({ cv }: Props) => {
 
     try {
       if (updatedReference.id) {
-        const editedRef = await dispatch(
+        await dispatch(
           editReference({ id: updatedReference.id, data: updatedReference }) as any
         ).unwrap();
-        setReferences((prev) =>
-          prev.map((r) => (r.id === editedRef.id ? editedRef : r))
-        );
       } else {
-        const newRef = await dispatch(addReference(updatedReference) as any).unwrap();
-        setReferences((prev) => [...prev, newRef]);
+        await dispatch(addReference(updatedReference) as any).unwrap();
       }
+      await refetchCV(); // refresh CV data
     } catch (error) {
       console.error("Failed to save reference:", error);
     } finally {
@@ -123,24 +122,31 @@ const ReferencesSection = ({ cv }: Props) => {
       {/* Modal for editing reference */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <span
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
+          <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-colors duration-300">
+
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg"
               onClick={() => {
                 setShowModal(false);
                 setEditingReference(null);
               }}
+              aria-label="Close Modal"
             >
               ✕
-            </span>
+            </button>
 
-            <ReferencesFormDetails
-              editingReference={editingReference || undefined}
-              onDone={handleDone}
-            />
+            {/* Form */}
+            <div className="space-y-4">
+              <ReferencesFormDetails
+                editingReference={editingReference || undefined}
+                onDone={handleDone}
+              />
+            </div>
           </div>
         </div>
       )}
+
     </>
   );
 };

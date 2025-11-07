@@ -14,7 +14,7 @@ import SkillsSection from "../components/sections/SkillsSection";
 import ProjectsSection from "../components/sections/ProjectsSection";
 import Button from "../components/formElements/Button";
 import { ClipLoader } from "react-spinners";
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { useCurrentUserCV } from "../hooks/useCurrentUserCV";
 import { SignIn } from "../components/navigation/TopNav";
 
@@ -30,7 +30,7 @@ const CVPage = () => {
   const { data: cvData, loading, error } = useCurrentUserCV();
 
   const closeSignIn = () => setSignInIsOpen(false);
-
+  console.log("cvdata", cvData);
   // Handle token errors -> reopen sign-in modal
   useEffect(() => {
     if (error && typeof error === "object" && "detail" in error) {
@@ -151,8 +151,12 @@ const CVPage = () => {
         <CertificationsSection cv={cvData!} />
         <AchievementsSection cv={cvData!} />
         <LanguagesSection cv={cvData!} />
-        <ReferencesSection cv={cvData!} />
-        <CareerObjectiveSection cv={cvData!} />
+        <ReferencesSection cv={cvData!} refetchCV={function (): Promise<void> {
+          throw new Error("Function not implemented.");
+        } } />
+        <CareerObjectiveSection cv={cvData!} refetchCV={function (): Promise<void> {
+          throw new Error("Function not implemented.");
+        } } />
       </div>
     </main>
   );

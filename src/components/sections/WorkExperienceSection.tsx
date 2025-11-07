@@ -131,25 +131,34 @@ const WorkExperienceSection = ({ cv }: Props) => {
       </CVCard>
 
       {/* Modal for editing work experience */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-lg"
-              onClick={() => {
-                setShowModal(false);
-                setEditingExperience(null);
-              }}
-            >
-              ✕
-            </button>
-            <WorkExperienceForm
-              editingExperience={editingExperience || undefined}
-              onDone={handleDone}
-            />
-          </div>
-        </div>
-      )}
+     {showModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-all duration-300 border border-gray-200 dark:border-gray-700">
+      
+      {/* Close Button */}
+      <button
+        className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg transition-colors duration-200"
+        onClick={() => {
+          setShowModal(false);
+          setEditingExperience(null);
+        }}
+        aria-label="Close Modal"
+      >
+        ✕
+      </button>
+
+      {/* Form Content */}
+      <div className="space-y-4">
+       
+        <WorkExperienceForm
+          editingExperience={editingExperience || undefined}
+          onDone={handleDone}
+        />
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };

@@ -77,7 +77,7 @@ export const googleAuthUser = createAsyncThunk<
 
             localStorage.setItem("token", data.access);
             localStorage.setItem("refreshToken", data.refresh);
-
+            // console.log("access token:", data.access);
             return data; // { user, access, refresh, is_new_user }
         } catch (err: any) {
             return rejectWithValue(err.response?.data?.message || "Google Auth failed");

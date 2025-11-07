@@ -63,46 +63,46 @@ const LanguagesFormDetails: React.FC<Props> = ({ editingLanguage, onDone }) => {
 
   if (!user) return <p className="text-red-500">Not logged in</p>;
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    await withLoader(async () => {
-      const startTime = Date.now();
-      setElapsedTime(0);
-      const interval = setInterval(
-        () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
-        100
-      );
+const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  if (!user) return;
 
-      try {
-        let message = "";
+  await withLoader(async () => {
+    const startTime = Date.now();
+    setElapsedTime(0);
+    const interval = setInterval(
+      () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
+      100
+    );
 
-        if (editingLanguage) {
-          await dispatch(
-            updateLanguageById({ id: editingLanguage.id, data: data.languages[0] })
-          ).unwrap();
-          message = "✅ Language updated successfully.";
-        } else {
-          await dispatch(
-            addLanguage({
-              ...data.languages[0],
-              full_name: [user.first_name, user.middle_name, user.last_name]
-                .filter(Boolean)
-                .join(" "),
-              email: user.email,
-            })
-          ).unwrap();
-          message = "✅ Language submitted successfully.";
-        }
+    try {
+      let message = "";
 
-        reset({ languages: [{ language: "", proficiency: "" }] });
-        setSuccessMessage(message);
-        onDone?.();
-      } catch (error) {
-        console.error("Error submitting languages:", error);
-      } finally {
-        clearInterval(interval);
+      if (editingLanguage) {
+        // Update the single editing language
+        await dispatch(
+          updateLanguageById({ id: editingLanguage.id, data: data.languages[0] })
+        ).unwrap();
+        message = "✅ Language updated successfully.";
+      } else {
+        // Submit all languages at once
+        await Promise.all(
+          data.languages.map((lang) =>
+            dispatch(addLanguage(lang)).unwrap()
+          )
+        );
+        message = "✅ Languages submitted successfully.";
       }
-    });
-  };
+
+      reset({ languages: [{ language: "", proficiency: "" }] });
+      setSuccessMessage(message);
+      onDone?.();
+    } catch (error) {
+      console.error("Error submitting languages:", error);
+    } finally {
+      clearInterval(interval);
+    }
+  });
+};
 
   return (
     <section className="w-full mx-auto p-6 bg-whiteBg border rounded-md shadow-sm">

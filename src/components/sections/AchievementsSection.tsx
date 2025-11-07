@@ -1,74 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Achievement } from "../../types/cv/cv";
 import AchievementFormDetails from "../forms/AchievementFormDetails";
-import Loader from "../common/Loader";
-
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState, AppDispatch } from "../../store/store";
-import {
-  fetchAchievements,
-  addAchievement,
-  editAchievement,
-  deleteAchievementById,
-
-} from "../../features/achievements/achievementsSlice";
 
 interface Props {
   cv: User;
 }
 
 const AchievementsSection = ({ cv }: Props) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { achievements, loading } = useSelector((state: RootState) => state.achievements);
+  // Use achievements directly from cv data
+  const achievements: Achievement[] = cv.achievement_profile?.achievements || [];
 
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchAchievements());
-  }, [dispatch]);
-
-  const handleDelete = async (id?: number) => {
+  const handleDelete = (id?: number) => {
     if (!id) return;
-    try {
-      await dispatch(deleteAchievementById(id)).unwrap();
-    } catch (error) {
-      console.error("Failed to delete achievement:", error);
-    }
+    // Placeholder for delete API call if needed
+    console.log("Delete achievement with id:", id);
   };
 
-  const handleDone = async (updatedAchievement?: Achievement) => {
-    if (!updatedAchievement) {
-      setEditingAchievement(null);
-      setShowModal(false);
-      return;
-    }
+  const handleDone = (updatedAchievement?: Achievement) => {
+    // Close modal and reset editing state
+    setEditingAchievement(null);
+    setShowModal(false);
 
-    try {
-      if (updatedAchievement.id) {
-        // Update existing achievement
-        await dispatch(editAchievement({ id: updatedAchievement.id, data: updatedAchievement })).unwrap();
-      } else {
-        // Add new achievement
-        await dispatch(addAchievement(updatedAchievement)).unwrap();
-      }
-    } catch (error) {
-      console.error("Failed to save achievement:", error);
-    } finally {
-      setEditingAchievement(null);
-      setShowModal(false);
-    }
+    // Optionally update local state or call API to save
+    console.log("Achievement saved/updated:", updatedAchievement);
   };
 
   return (
     <>
       <CVCard title="Achievements">
-        {loading ? (
-          <Loader loading={loading} message="Loading achievements..." />
-        ) : achievements.length === 0 ? (
+        {achievements.length === 0 ? (
           <p className="text-gray-400 italic font-sans text-sm">
             No achievements added yet
           </p>

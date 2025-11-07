@@ -6,7 +6,6 @@ import { FaTrash } from "react-icons/fa";
 import type { User, Language } from "../../types/cv/cv";
 import LanguagesFormDetails from "../forms/LanguagesForm";
 import {
-  fetchLanguages,
   addLanguage,
   updateLanguageById,
   deleteLanguageById,
@@ -119,24 +118,26 @@ const LanguagesSection = ({ cv }: Props) => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <span
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
+          <div className="bg-background rounded-xl shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto transition-colors duration-300">
+
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg"
               onClick={() => setShowModal(false)}
+              aria-label="Close Modal"
             >
               ✕
-            </span>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-              {editingLanguage ? "Edit Language" : "Add Language"}
-            </h2>
-
-            <LanguagesFormDetails
-              editingLanguage={editingLanguage || undefined}
-              onDone={handleDone}
-            />
+            </button>
+            <div className="space-y-4">
+              <LanguagesFormDetails
+                editingLanguage={editingLanguage || undefined}
+                onDone={handleDone}
+              />
+            </div>
           </div>
         </div>
       )}
+
     </>
   );
 };

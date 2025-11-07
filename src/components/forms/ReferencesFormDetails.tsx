@@ -88,9 +88,11 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
       const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
       const payload = {
-        ...data.references[0],
-        full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
-        email: user.email,
+        references: data.references.map((ref) => ({
+          ...ref,
+          full_name: [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" "),
+          email: user.email,
+        })),
       };
 
       try {
@@ -208,7 +210,7 @@ const ReferencesFormDetails = ({ editingReference, editingIndex, onDone }: Props
             type="submit"
             label={editingReference ? "Update" : "Submit"}
             disabled={loading}
-            onClick={() => {}}
+            onClick={() => { }}
             className="text-white "
           />
         </div>

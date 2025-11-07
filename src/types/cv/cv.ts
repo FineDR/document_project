@@ -1,4 +1,6 @@
 export interface User {
+  soft_skills: any;
+  technical_skills: any;
   id: number;
   email: string;
   first_name: string;
@@ -18,6 +20,7 @@ export interface User {
   work_experiences: WorkExperience[];
   references: Reference[];
   achievement_profile: AchievementProfile;
+  enhanced_data?: User; 
 }
 
 export interface CareerObjective {
