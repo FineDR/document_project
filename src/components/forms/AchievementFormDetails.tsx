@@ -12,7 +12,7 @@ import Loader from "../common/Loader";
 
 import { achievementsSchema } from "../forms/cvValidationSchema";
 import { useTimedLoader } from "../../hooks/useTimedLoader";
-import type { Achievement } from "../../types/cv/cv";
+import type { Achievement } from "../../types/cv/types";
 import z from "zod";
 
 import { addAchievement, editAchievement } from "../../features/achievements/achievementsSlice";
@@ -66,49 +66,54 @@ const AchievementFormDetails = ({ editingAchievement, onDone }: Props) => {
   }, [successMsg]);
 
   if (!user) return <p className="text-red-500 text-center">Not logged in</p>;
+const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  if (!user) return;
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    if (!user) return;
+  await withLoader(async () => {
+    const startTime = Date.now();
+    setElapsedTime(0);
+    setSuccessMsg("");
+    setErrorMsg("");
 
-    await withLoader(async () => {
-      const startTime = Date.now();
-      setElapsedTime(0);
-      setSuccessMsg("");
-      setErrorMsg("");
+    const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
-      const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
+    // FIX: map form data to match the Achievement type
+    const payload: Achievement = {
+      value: data.achievement.map(a => a.value).join("; "), // combine multiple achievements into one string
+      profile: user.id,
+      id: editingAchievement ? editingAchievement.id : 0, // dummy id for new achievement
+    };
 
-      const payload = { achievements: data.achievement, full_name, email: user.email };
+    try {
+      let updatedAchievement: Achievement | undefined;
+      let message = "";
 
-      try {
-        let updatedAchievement: Achievement | undefined;
-        let message = "";
-
-        if (editingAchievement?.id) {
-          const resultAction = await dispatch(editAchievement({ id: editingAchievement.id, data: payload }));
-          if (editAchievement.fulfilled.match(resultAction)) {
-            updatedAchievement = resultAction.payload;
-            message = "Achievement updated successfully ✅";
-          } else throw new Error("Update failed");
-        } else {
-          const resultAction = await dispatch(addAchievement(payload));
-          if (addAchievement.fulfilled.match(resultAction)) {
-            updatedAchievement = resultAction.payload;
-            message = "Achievement saved successfully ✅";
-          } else throw new Error("Save failed");
-        }
-
-        reset({ achievement: [{ value: "" }] });
-        setSuccessMsg(message);
-        onDone?.(updatedAchievement);
-      } catch (error) {
-        console.error("Error saving achievement:", error);
-        setErrorMsg("Failed to save achievement ❌");
-      } finally {
-        clearInterval(interval);
+      if (editingAchievement?.id) {
+        const resultAction = await dispatch(editAchievement({ id: editingAchievement.id, data: payload }));
+        if (editAchievement.fulfilled.match(resultAction)) {
+          updatedAchievement = resultAction.payload;
+          message = "Achievement updated successfully ✅";
+        } else throw new Error("Update failed");
+      } else {
+        const resultAction = await dispatch(addAchievement(payload));
+        if (addAchievement.fulfilled.match(resultAction)) {
+          updatedAchievement = resultAction.payload;
+          message = "Achievement saved successfully ✅";
+        } else throw new Error("Save failed");
       }
-    });
-  };
+
+      reset({ achievement: [{ value: "" }] });
+      setSuccessMsg(message);
+      onDone?.(updatedAchievement);
+    } catch (error) {
+      console.error("Error saving achievement:", error);
+      setErrorMsg("Failed to save achievement ❌");
+    } finally {
+      clearInterval(interval);
+    }
+  });
+};
+
 
   return (
     <div className="p-6 border rounded-md bg-whiteBg shadow-md w-full mx-auto">

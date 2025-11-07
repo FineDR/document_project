@@ -88,3 +88,9 @@ export interface Letter {
   lang: "en" | "sw";              // language of the letter
   alignContact: "start" | "end";  // alignment for contact info (left/right)
 }
+
+export interface Achievement {
+  id: number;
+  value: string;
+  profile: number;
+}

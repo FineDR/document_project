@@ -88,6 +88,8 @@ export const sampleCVData: User = {
   first_name: "Finesawa",
   middle_name: "M",
   last_name: "Lekwa",
+  soft_skills: undefined,
+  technical_skills: undefined
 };
 
 export default sampleCVData;
