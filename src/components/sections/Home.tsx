@@ -30,7 +30,7 @@ const Home = () => {
       <div className="absolute inset-0 bg-redBg bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-90 z-10" />
 
       {/* Decorations (fewer on mobile) */}
-      <div className="absolute inset-0 z-20">
+      <div className="absolute inset-0 z-20 ">
         <MdOutlineWaterDrop className="absolute bottom-3 right-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
         <MdOutlineWaterDrop className="absolute bottom-3 left-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
         <MdOutlineWaterDrop className="absolute top-3 right-3 text-red-300 text-2xl sm:text-4xl opacity-70" />

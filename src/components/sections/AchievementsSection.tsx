@@ -4,23 +4,41 @@ import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Achievement } from "../../types/cv/cv";
 import AchievementFormDetails from "../forms/AchievementFormDetails";
+import { deleteAchievementById } from "../../features/achievements/achievementsSlice";
+import { useDispatch } from "react-redux";
+import { type AppDispatch } from "../../store/store";
 
 interface Props {
   cv: User;
 }
 
 const AchievementsSection = ({ cv }: Props) => {
+  const dispatch = useDispatch<AppDispatch>();
   // Use achievements directly from cv data
   const achievements: Achievement[] = cv.achievement_profile?.achievements || [];
 
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleDelete = (id?: number) => {
-    if (!id) return;
-    // Placeholder for delete API call if needed
-    console.log("Delete achievement with id:", id);
-  };
+const handleDelete = async (id?: number) => {
+  if (!id) return;
+
+  try {
+    const confirmed = window.confirm("Are you sure you want to delete this achievement?");
+    if (!confirmed) return;
+
+    const resultAction = await dispatch(deleteAchievementById(id));
+
+    if (deleteAchievementById.fulfilled.match(resultAction)) {
+      console.log("Achievement deleted successfully:", id);
+      // Optionally, show toast or update local state
+    } else {
+      console.error("Failed to delete achievement:", resultAction.payload);
+    }
+  } catch (error) {
+    console.error("Error deleting achievement:", error);
+  }
+};
 
   const handleDone = (updatedAchievement?: Achievement) => {
     // Close modal and reset editing state
@@ -72,26 +90,32 @@ const AchievementsSection = ({ cv }: Props) => {
 
       {/* Modal for editing achievement */}
       {showModal && editingAchievement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-whiteBg rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto">
-            <span
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer font-bold text-lg"
-              onClick={() => setShowModal(false)}
-            >
-              ✕
-            </span>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-background rounded-xl shadow-lg w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-colors duration-300">
+      {/* Close Button */}
+      <button
+        type="button"
+        className="absolute top-4 right-4 text-subheading hover:text-text font-bold text-lg transition-colors duration-200"
+        onClick={() => setShowModal(false)}
+        aria-label="Close Modal"
+      >
+        ✕
+      </button>
 
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-              Edit Achievement
-            </h2>
+      {/* Header */}
+      <h2 className="text-2xl font-semibold text-subheading mb-4 text-center">
+        Edit Achievement
+      </h2>
 
-            <AchievementFormDetails
-              editingAchievement={editingAchievement}
-              onDone={handleDone}
-            />
-          </div>
-        </div>
-      )}
+      {/* Form */}
+      <AchievementFormDetails
+        editingAchievement={editingAchievement}
+        onDone={handleDone}
+      />
+    </div>
+  </div>
+)}
+
     </>
   );
 };
