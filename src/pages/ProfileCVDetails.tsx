@@ -16,7 +16,6 @@ import Button from "../components/formElements/Button";
 import { ClipLoader } from "react-spinners";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { useCurrentUserCV } from "../hooks/useCurrentUserCV";
-import { SignIn } from "../components/navigation/TopNav";
 
 const CVPage = () => {
   const navigate = useNavigate();
@@ -58,7 +57,6 @@ const CVPage = () => {
 
   // Show SignIn modal if no user
   if (!user || signInIsOpen) {
-    return <SignIn onClose={closeSignIn} />;
   }
 
   // Show loader while fetching CV
@@ -113,7 +111,7 @@ const CVPage = () => {
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-              {[user.first_name, user.middle_name, user.last_name]
+              {[user?.first_name, user?.middle_name, user?.last_name]
                 .filter(Boolean)
                 .join(" ")}
             </h2>

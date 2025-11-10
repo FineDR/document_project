@@ -15,6 +15,8 @@ import MyCv from "../pages/MyCv";
 import CreateDocument from "../pages/CreateDocument";
 import CVEditor from "../pages/CVEditor";
 import PDFReports from "../pages/PDFReports";
+import SignUpPage from "../components/auth/SignUp";
+import { SignInPage } from "../components/auth/SignIn";
 
 export interface pageRouteConfig<P = {}> {
   forNav?: boolean;
@@ -69,6 +71,7 @@ export const routes: pageRouteConfig[] = [
       description: "Get help and support for using Smart Docs features and tools."
     }
   },
+
   {
     forNav: false,
     path: "/verify-email",
@@ -102,6 +105,7 @@ export const routes: pageRouteConfig[] = [
     forNav: true,
     path: "/documents/templates",
     element: CVTemplates,
+    signedIn:true,
     name: "Templates",
     layout: true,
     dropdown: [
@@ -213,6 +217,29 @@ export const routes: pageRouteConfig[] = [
       description: "Create new documents professionally and efficiently."
     }
   },
+    {
+  forNav: true,
+  path: "/signin",
+  element: SignInPage, // works fine now
+  name: "Sign In",
+  layout: true,
+  seo: {
+    title: "Smart Docs - Sign In",
+    description: "Get help and support for using Smart Docs features and tools."
+  }
+},
+{
+  forNav: true,
+  path: "/signup",
+  element: SignUpPage,
+  name: "Sign Up",
+  layout: true,
+  seo: {
+    title: "Smart Docs - Sign Up",
+    description: "Create a Smart Docs account to manage your documents."
+  }
+},
+
 ];
 
 export const documentRoutes: pageRouteConfig[] = [

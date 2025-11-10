@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { MobileNavBar, NavBar } from "./components/navigation/Navbar";
-import TopNav, { SignIn } from "./components/navigation/TopNav";
 import Footer from "./components/sections/Footer";
 import { useEffect, useState } from "react";
 import "./index.css";
@@ -12,6 +11,8 @@ import OfflineWrapper from "./components/Offline/OfflineWrapper";
 import { refreshAccessToken } from "./api/refreshToken";
 
 import { RiArrowDropDownFill } from "react-icons/ri";
+import TopNav from "./components/navigation/TopNav";
+
 
 const Head = ({ title, description }: { title: string; description?: string }) => {
   useEffect(() => {
@@ -123,7 +124,6 @@ function App() {
       {location.pathname !== "/create/cv" && <Footer />}
 
       {/* SignIn Modal */}
-      {signInOpen && <SignIn onClose={closeSignIn} />}
     </div>
   );
 }
