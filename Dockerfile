@@ -1,28 +1,24 @@
-# step 1 : build the react app
+# Stage 1: Build React App
 FROM node:20-alpine AS build
-# set the working dir
+
 WORKDIR /app
-
-# copying the package files and installing 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
-
-# copying all files and build 
-
 COPY . .
 RUN npm run build
 
-#telling that you using the nginx
-
+# Stage 2: Serve with NGINX
 FROM nginx:alpine
 
-#removing the default website
-
+# Remove default nginx content
 RUN rm -rf /usr/share/nginx/html/*
-#copying from build/dist to the /usr/share/html/
-COPY --from=build /app/dist /usr/share/nginx/html
-#expose 80
-EXPOSE 80
 
-#to start nginx
-CMD [ "nginx","-g","daemon off;" ]
+# Copy React build
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy NGINX configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80 443
+
+CMD ["nginx", "-g", "daemon off;"]
