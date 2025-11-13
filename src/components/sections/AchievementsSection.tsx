@@ -46,7 +46,7 @@ const handleDelete = async (id?: number) => {
     setShowModal(false);
 
     // Optionally update local state or call API to save
-    console.log("Achievement saved/updated:", updatedAchievement);
+    // console.log("Achievement saved/updated:", updatedAchievement);
   };
 
   return (

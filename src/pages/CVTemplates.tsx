@@ -21,7 +21,8 @@ const CVTemplates = () => {
   const [payments, setPayments] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const [selectedTemplate, setSelectedTemplate] = useState<React.ComponentType | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<React.ComponentType<{ isPreview?: boolean }> | null>(null);
+
   const [selectedTemplateName, setSelectedTemplateName] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -108,20 +109,21 @@ const CVTemplates = () => {
         <AnimatePresence>
           {isModalOpen && selectedTemplate && (
             <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 sm:p-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setModalOpen(false)}
             >
               <motion.div
-                className="relative grid grid-cols-[70%_30%] gap-4 w-[90%] max-w-[1200px] h-[90%] bg-whiteBg rounded-xl shadow-lg p-6 overflow-hidden light-theme"
+                className="relative grid grid-cols-1 sm:grid-cols-[70%_30%] gap-4 w-full sm:w-[90%] max-w-[1200px] h-full sm:h-[90%] bg-whiteBg rounded-xl shadow-lg p-4 sm:p-6 overflow-hidden light-theme"
                 onClick={(e) => e.stopPropagation()}
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
               >
 
+                {/* Close Button */}
                 <button
                   className="absolute top-4 right-4 z-50 text-gray-500 hover:text-gray-700"
                   onClick={() => setModalOpen(false)}
@@ -129,11 +131,12 @@ const CVTemplates = () => {
                   <AiOutlineClose size={24} className="text-redMain" />
                 </button>
 
-                <div className="overflow-auto p-4 rounded-lg shadow-inner bg-whiteBg">
-                  {React.createElement(selectedTemplate)}
-                </div>
+                {/* Template Preview */}
+                {selectedTemplate && React.createElement(selectedTemplate, { isPreview: true })}
 
-                <div className="overflow-auto bg-gray-50 rounded-xl p-6 flex flex-col justify-between">
+
+                {/* Template Details & Action */}
+                <div className="overflow-auto bg-gray-50 rounded-xl p-4 sm:p-6 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-lg text-gray-800 mb-3">Template Details</h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
@@ -155,7 +158,6 @@ const CVTemplates = () => {
                       label="Use Template"
                       className="!bg-green-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-green-700 mt-6 transition"
                     />
-
                   ) : (
                     <Button
                       onClick={() => handleDownload(selectedTemplateName ?? "Basic")}
@@ -164,13 +166,13 @@ const CVTemplates = () => {
                       label="Download Your CV"
                       className="!bg-blue-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-blue-700 mt-6 transition"
                     />
-
                   )}
                 </div>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
+
 
         {/* Payment Component */}
         <AnimatePresence>

@@ -91,6 +91,7 @@ export const certificationsSchema = z.object({
 export const projectSchema = z.object({
   projects: z.array(
     z.object({
+      id: z.number().optional(), 
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
       link: z.string().url("Must be a valid URL"),

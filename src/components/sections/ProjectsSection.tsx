@@ -40,26 +40,14 @@ const ProjectsSection = ({ cv }: Props) => {
     setShowModal(true);
   };
 
-  const handleDone = async (updatedProject: Project) => {
-    try {
-      if (updatedProject.id) {
-        await dispatch(
-          updateProjectById({ id: updatedProject.id, data: updatedProject }) as any
-        ).unwrap();
-        setProjects((prev) =>
-          prev.map((proj) => (proj.id === updatedProject.id ? updatedProject : proj))
-        );
-      } else {
-        const newProject = await dispatch(addProject(updatedProject) as any).unwrap();
-        setProjects((prev) => [...prev, newProject]);
-      }
-    } catch (error) {
-      console.error("Failed to save project:", error as any);
-    } finally {
-      setShowModal(false);
-      setEditingProject(null);
-    }
-  };
+const handleDone = (updatedProject: Project) => {
+  setProjects((prev) =>
+    prev.some(p => p.id === updatedProject.id) ? prev : [...prev, updatedProject]
+  );
+  setShowModal(false);
+  setEditingProject(null);
+};
+
 
   return (
     <>
@@ -150,6 +138,7 @@ const ProjectsSection = ({ cv }: Props) => {
               existingProjects={editingProject ? [editingProject] : []}
               onDone={handleDone}
             />
+
           </div>
         </div>
       )}

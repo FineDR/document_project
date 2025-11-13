@@ -6,7 +6,7 @@ export const login = (data: any) => axiosClient.post(AUTH_ENDPOINTS.login, data)
 
 export const register = (data: any) => axiosClient.post(AUTH_ENDPOINTS.register, data);
 
-export const logout = () => {
+export const logout = (p0: { refresh: string; }) => {
   const refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) return Promise.resolve(); // skip logout if token missing
 

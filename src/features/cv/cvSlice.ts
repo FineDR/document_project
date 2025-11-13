@@ -29,7 +29,7 @@ export const fetchCv = createAsyncThunk<User>(
   async (_, { rejectWithValue }) => {
     try {
       const response = await users(); // ✅ await the Axios call
-      console.log("Fetched CV data:", response.data);
+      // console.log("Fetched CV data:", response.data);
       return response.data.enhanced_data || response.data; // use flattened CV
     } catch (error: any) {
       return rejectWithValue(error.message);

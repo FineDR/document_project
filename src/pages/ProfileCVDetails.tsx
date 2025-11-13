@@ -29,7 +29,7 @@ const CVPage = () => {
   const { data: cvData, loading, error } = useCurrentUserCV();
 
   const closeSignIn = () => setSignInIsOpen(false);
-  console.log("cvdata", cvData);
+  // console.log("cvdata", cvData);
   // Handle token errors -> reopen sign-in modal
   useEffect(() => {
     if (error && typeof error === "object" && "detail" in error) {
@@ -151,10 +151,10 @@ const CVPage = () => {
         <LanguagesSection cv={cvData!} />
         <ReferencesSection cv={cvData!} refetchCV={function (): Promise<void> {
           throw new Error("Function not implemented.");
-        } } />
+        }} />
         <CareerObjectiveSection cv={cvData!} refetchCV={function (): Promise<void> {
           throw new Error("Function not implemented.");
-        } } />
+        }} />
       </div>
     </main>
   );

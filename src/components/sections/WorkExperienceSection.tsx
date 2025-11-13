@@ -111,53 +111,54 @@ const WorkExperienceSection = ({ cv }: Props) => {
 
                 {/* Responsibilities */}
                 {exp.responsibilities && exp.responsibilities.length > 0 && (
-                  <ul className="list-disc list-inside space-y-2 pl-5 text-sm">
+                  <ul className="list-none pl-0 space-y-2 sm:space-y-3 text-sm sm:text-base">
                     {exp.responsibilities.map((res) => (
-                      <li key={res.id} className="flex items-start gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-1"></div>
+                      <li key={res.id} className="flex items-start gap-2 sm:gap-3">
+                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full mt-1 sm:mt-1.5 flex-shrink-0"></div>
                         <span>{res.value}</span>
                       </li>
                     ))}
                   </ul>
+
                 )}
               </div>
             ))}
           </div>
         ) : (
-            <p className="text-gray-400 italic font-sans">
-              No work experience added yet
-            </p>
+          <p className="text-gray-400 italic font-sans">
+            No work experience added yet
+          </p>
         )}
       </CVCard>
 
       {/* Modal for editing work experience */}
-     {showModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-all duration-300 border border-gray-200 dark:border-gray-700">
-      
-      {/* Close Button */}
-      <button
-        className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg transition-colors duration-200"
-        onClick={() => {
-          setShowModal(false);
-          setEditingExperience(null);
-        }}
-        aria-label="Close Modal"
-      >
-        ✕
-      </button>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-all duration-300 border border-gray-200 dark:border-gray-700">
 
-      {/* Form Content */}
-      <div className="space-y-4">
-       
-        <WorkExperienceForm
-          editingExperience={editingExperience || undefined}
-          onDone={handleDone}
-        />
-      </div>
-    </div>
-  </div>
-)}
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg transition-colors duration-200"
+              onClick={() => {
+                setShowModal(false);
+                setEditingExperience(null);
+              }}
+              aria-label="Close Modal"
+            >
+              ✕
+            </button>
+
+            {/* Form Content */}
+            <div className="space-y-4">
+
+              <WorkExperienceForm
+                editingExperience={editingExperience || undefined}
+                onDone={handleDone}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
     </>
   );

@@ -27,3 +27,11 @@ export const updateSkillSetApi = (
 ) => {
   return axiosClient.put(SKILLS_ENDPOINTS.detail(id), data);
 };
+
+// 🧠 Technical Skills
+export const deleteTechnicalSkill = (id: number) =>
+  axiosClient.delete(SKILLS_ENDPOINTS.technicalDetail(id));
+
+// 💬 Soft Skills
+export const deleteSoftSkill = (id: number) =>
+  axiosClient.delete(SKILLS_ENDPOINTS.softDetail(id));

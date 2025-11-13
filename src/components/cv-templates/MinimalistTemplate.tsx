@@ -6,6 +6,8 @@ interface MinimalistTemplateProps {
 }
 
 const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
+
+  
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short" });
 

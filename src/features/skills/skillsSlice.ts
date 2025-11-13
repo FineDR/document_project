@@ -7,7 +7,9 @@ import {
     updateSkill,
     deleteSkill,
     updateSkillSetApi,
-    createSkillSetApi
+    createSkillSetApi,
+    deleteTechnicalSkill,
+    deleteSoftSkill,
 } from '../../api/services/skillsApi';
 
 // NEW: skill-set API helpers
@@ -116,6 +118,29 @@ export const updateSkillSet = createAsyncThunk<any, { id: number; data: { techni
     }
 );
 
+export const deleteTechnicalSkillById = createAsyncThunk<number, number>(
+    "skills/deleteTechnicalSkillById",
+    async (id, { rejectWithValue }) => {
+        try {
+            await deleteTechnicalSkill(id);
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete technical skill');
+        }
+    }
+);
+
+export const deleteSoftSkillById = createAsyncThunk<number, number>(
+    "skills/deleteSoftSkillById",
+    async (id, { rejectWithValue }) => {
+        try {
+            await deleteSoftSkill(id);
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete soft skill');
+        }
+    }
+);
 const skillsSlice = createSlice({
     name: 'skills',
     initialState,
@@ -256,9 +281,34 @@ const skillsSlice = createSlice({
                 state.status = 'failed';
                 state.error = (action.payload as any) || 'Failed to update skill set';
                 state.loading = false;
+            }).addCase(deleteTechnicalSkillById.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+                state.loading = true;
+            })
+            .addCase(deleteTechnicalSkillById.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload as string;
+                state.loading = false;
+            })
+
+            .addCase(deleteTechnicalSkillById.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.skills = state.skills.map((skillSet: any) => {
+                    if (skillSet.technical_skills) {
+                        return {
+                            ...skillSet,
+                            technical_skills: skillSet.technical_skills.filter(
+                                (s: any) => s.id !== action.payload
+                            ),
+                        };
+                    }
+                    return skillSet;
+                });
             });
     }
-});
+})
+
 
 export const { setSelected, clearSelected } = skillsSlice.actions;
 

@@ -29,9 +29,15 @@ export const CAREER_OBJECTIVE_ENDPOINTS = {
 };
 
 export const SKILLS_ENDPOINTS = {
+  // SkillSet endpoints
   list: "api/skills/",
   detail: (id: number) => `api/skills/${id}/`,
+
+  // Individual skill endpoints
+  technicalDetail: (id: number) => `api/skills/technical/${id}/`,
+  softDetail: (id: number) => `api/skills/soft/${id}/`,
 };
+
 
 export const EDUCATION_ENDPOINTS = {
   list: "api/education/",

@@ -115,7 +115,7 @@ const EducationSection = ({ cv, refetchCV }: Props) => {
                     Edit
                   </span>
                   <span
-                    className="text-subheading hover:text-primary cursor-pointer"
+                    className="text-gray-400 hover:text-primary cursor-pointer"
                     onClick={() => handleDelete(education.id)}
                   >
                     {loadingDelete === education.id ? "⏳" : <FaTrash />}

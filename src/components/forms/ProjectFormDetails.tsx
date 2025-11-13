@@ -70,7 +70,8 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   if (!user) return <p className="text-red-500">Not logged in</p>;
 
 const onSubmit: SubmitHandler<FormFields> = async (data) => {
-  console.log("Submitting projects payload:", JSON.stringify(data, null, 2));
+  // console.log("Submitting projects payload:", JSON.stringify(data, null, 2));
+
   await withLoader(async () => {
     const startTime = Date.now();
     setElapsedTime(0);
@@ -82,44 +83,69 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
       let message = "";
 
-      if (existingProjects && existingProjects.length > 0) {
-        // Update each project
-        const updatedProjects = await Promise.all(
-          data.projects.map((proj, idx) => {
-            const projectId = (existingProjects as any)[idx].id;
+      // 1️⃣ Filter valid projects (title required)
+      const validProjects = data.projects.filter(p => p.title.trim() !== "");
 
-            // Only send fields backend expects
-            const payload = {
-              title: proj.title,
-              description: proj.description,
-              link: proj.link,
-              technologies: proj.technologies.map((t) => ({ value: t.value })),
-            };
+      // 2️⃣ Split into updates vs new
+      type ProjectWithId = { id: number; title: string; description: string; link: string; technologies: { value: string }[] };
+      type ProjectWithoutId = Omit<ProjectWithId, "id">;
 
-            return dispatch(updateProjectById({ id: projectId, data: payload })).unwrap();
-          })
-        );
+      const projectsToUpdate = validProjects.filter(
+        (p): p is ProjectWithId => typeof (p as any).id === "number"
+      );
 
-        message = "✅ Projects updated successfully.";
-        reset({ projects: updatedProjects });
-        updatedProjects.forEach((proj) => onDone?.(proj));
-      } else {
-        // Add new projects
-        const formattedProjects = data.projects.map((proj) => ({
+      const projectsToAdd = validProjects.filter(
+        (p): p is ProjectWithoutId => !(p as any).id
+      );
+
+      const finalProjects: ProjectWithId[] = [];
+
+      // 3️⃣ Update existing projects
+      for (const proj of projectsToUpdate) {
+        const payload = {
           title: proj.title,
           description: proj.description,
           link: proj.link,
-          technologies: proj.technologies.map((t) => ({ value: t.value })),
-        }));
+          technologies: proj.technologies.filter(t => t.value.trim() !== ""),
+        };
 
-        const addedProjects = await Promise.all(
-          formattedProjects.map((proj) => dispatch(addProject({ projects: [proj] })).unwrap())
-        );
+        // Assert id exists
+        const updatedProject = await dispatch(
+          updateProjectById({ id: proj.id!, data: payload })
+        ).unwrap();
 
-        message = "✅ Projects submitted successfully.";
-        reset({ projects: addedProjects });
-        addedProjects.forEach((proj) => onDone?.(proj));
+        finalProjects.push({
+          ...updatedProject,
+          technologies: updatedProject.technologies || [],
+        });
       }
+
+      // 4️⃣ Add new projects
+      for (const proj of projectsToAdd) {
+        const payload = {
+          title: proj.title,
+          description: proj.description,
+          link: proj.link,
+          technologies: proj.technologies.filter(t => t.value.trim() !== ""),
+        };
+
+        const newProject = await dispatch(addProject(payload)).unwrap();
+
+        finalProjects.push({
+          ...newProject,
+          technologies: newProject.technologies || [],
+        });
+      }
+
+      // 5️⃣ Reset form with backend IDs preserved
+      reset({ projects: finalProjects });
+
+      finalProjects.forEach(proj => onDone?.(proj));
+
+      message =
+        finalProjects.length === validProjects.length
+          ? "✅ Projects submitted successfully."
+          : "✅ Projects updated/added successfully.";
 
       setSuccessMessage(message);
     } catch (error) {
@@ -129,6 +155,11 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
     }
   });
 };
+
+
+
+
+
 
 
   const handleDelete = async (projectId?: number) => {

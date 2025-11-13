@@ -8,7 +8,8 @@ import SkillsForm from "../forms/SkillsForm";
 import {
   addSkill,
   updateSkillById,
-  deleteSkillById,
+  deleteTechnicalSkillById,
+  deleteSoftSkillById,
 } from "../../features/skills/skillsSlice";
 
 interface Props {
@@ -38,7 +39,9 @@ const SkillsSection = ({ cv }: Props) => {
     if (!skillsData) return;
     try {
       setLoadingDelete(skillId);
-      await dispatch(deleteSkillById(skillId) as any).unwrap();
+      await dispatch(deleteTechnicalSkillById(skillId) as any).unwrap();
+      await dispatch(deleteSoftSkillById(skillId) as any).unwrap();
+
       setSkillsData((prev) => {
         if (!prev) return prev;
         return {
@@ -185,30 +188,30 @@ const SkillsSection = ({ cv }: Props) => {
       </CVCard>
 
       {/* Modal for editing skills */}
-    {showForm && editingSkillType && skillsData && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-colors duration-300">
+      {showForm && editingSkillType && skillsData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-xl shadow-xl w-full max-w-3xl p-6 relative max-h-[90vh] overflow-y-auto transition-colors duration-300">
 
-      {/* Close Button */}
-      <button
-        className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg"
-        onClick={handleCloseForm}
-        aria-label="Close Modal"
-      >
-        ✕
-      </button>
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-subheading hover:text-primary font-bold text-lg"
+              onClick={handleCloseForm}
+              aria-label="Close Modal"
+            >
+              ✕
+            </button>
 
-     
 
-      {/* Form Component */}
-      <SkillsForm
-        skillSet={skillsData}
-        onClose={handleCloseForm}
-        onUpdate={handleUpdateSkills}
-      />
-    </div>
-  </div>
-)}
+
+            {/* Form Component */}
+            <SkillsForm
+              skillSet={skillsData}
+              onClose={handleCloseForm}
+              onUpdate={handleUpdateSkills}
+            />
+          </div>
+        </div>
+      )}
 
     </>
   );

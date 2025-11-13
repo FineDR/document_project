@@ -99,7 +99,7 @@ const CareerObjectiveSection = ({ cv, refetchCV }: Props) => {
                     Edit
                   </span>
                   <span
-                    className="text-subheading hover:text-primary cursor-pointer"
+                    className="text-gray-400 hover:text-primary cursor-pointer"
                     onClick={() => handleDelete(obj.id)}
                   >
                     {loadingDelete === obj.id ? "⏳" : <FaTrash />}

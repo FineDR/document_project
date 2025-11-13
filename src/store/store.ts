@@ -54,7 +54,6 @@ export const store = configureStore({
     experiences: experienceReducer,
     skills: skillsReducer,
     languages: languageReducer,
-    auths: authentReducer,
     letters: letterReducer,
     personalDetails: personalReducer,
     projects: projectsReducer,

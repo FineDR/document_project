@@ -83,14 +83,15 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
       try {
         const exp = data.experiences[0];
 
-        const payload = {
+        const payload = data.experiences.map(exp => ({
           job_title: exp.job_title,
           company: exp.company,
           location: exp.location || "",
           start_date: exp.start_date || "",
           end_date: exp.end_date || "",
-          responsibilities: exp.responsibilities.map((r) => ({ value: r.value })),
-        };
+          responsibilities: exp.responsibilities.map(r => ({ value: r.value })),
+        }));
+
 
         let updatedExp: WorkExperience | undefined;
         const message = editingExperience
@@ -98,7 +99,7 @@ const WorkExperienceForm: React.FC<Props> = ({ editingExperience, onDone }) => {
           : "✅ Work experience saved successfully.";
 
         if (editingExperience?.id) {
-          updatedExp = await dispatch(updateWorkExperienceById({ id: editingExperience.id, data: payload })).unwrap();
+          updatedExp = await dispatch(updateWorkExperienceById({ id: editingExperience.id, data: payload[0] })).unwrap();
         } else {
           updatedExp = await dispatch(addWorkExperience(payload)).unwrap();
         }

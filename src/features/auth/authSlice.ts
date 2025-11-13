@@ -124,17 +124,21 @@ export const logoutUser = createAsyncThunk<void>(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      await logout();
+      const refresh = localStorage.getItem("refreshToken");
+      if (refresh) {
+        await logout({ refresh }); // pass refresh token to API
+      }
     } catch (error: any) {
-      // log error, but still proceed
       console.error(error.response?.data?.detail || error.message);
       return rejectWithValue(error.response?.data?.detail || "Logout failed");
     } finally {
+      // Always clear local tokens
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
     }
   }
 );
+
 
 
 
@@ -173,8 +177,9 @@ export const authSlice = createSlice({
                 state.refresh = action.payload.refresh;
 
                 // Optionally persist in localStorage
-                localStorage.setItem('token', state.access!);
-                localStorage.setItem('refreshToken', state.refresh!);
+                state.user = action.payload.user;
+                state.access = action.payload.access;
+                state.refresh = action.payload.refresh;
             })
 
             .addCase(loginUser.rejected, (state, action) => {

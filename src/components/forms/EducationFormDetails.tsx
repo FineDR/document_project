@@ -62,15 +62,15 @@ const EducationFormDetails: React.FC<Props> = ({ editingEducation, onDone }) => 
       const interval = setInterval(() => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)), 100);
 
       try {
-        const payload = data.education[0];
+        const payload = data.education;
         let updatedEdu: Education | undefined;
         let message = "";
 
         if (editingEducation?.id) {
-          updatedEdu = await dispatch(editEducation({ id: editingEducation.id, data: payload })).unwrap();
+          updatedEdu = await dispatch(editEducation({ id: editingEducation.id, data: payload[0] })).unwrap();
           message = "✅ Education updated successfully.";
         } else {
-          updatedEdu = await dispatch(addEducation({ education: [payload] })).unwrap();
+          updatedEdu = await dispatch(addEducation({ education: payload })).unwrap();
           message = "✅ Education submitted successfully.";
         }
 
