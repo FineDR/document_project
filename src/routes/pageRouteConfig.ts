@@ -229,7 +229,7 @@ export const routes: pageRouteConfig[] = [
   }
 },
 {
-  forNav: true,
+  forNav: false,
   path: "/signup",
   element: SignUpPage,
   name: "Sign Up",

@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { MobileNavBar, NavBar } from "./components/navigation/Navbar";
 import Footer from "./components/sections/Footer";
 import { useEffect, useState } from "react";
+import Loader from "./components/Loader";
 import "./index.css";
 
 import { routes, documentRoutes, myDocumentsRoutes, type pageRouteConfig } from "./routes/pageRouteConfig";
@@ -34,6 +35,8 @@ const Head = ({ title, description }: { title: string; description?: string }) =
 function App() {
   const allRoutes: pageRouteConfig[] = [...routes, ...documentRoutes, ...myDocumentsRoutes];
   const theme = useSelector((state: RootState) => state.ui.theme);
+  const [loading, setLoading] = useState(true);
+
   const location = useLocation();
 
   const user = useSelector((state: RootState) => state.auth.user);
@@ -43,6 +46,7 @@ function App() {
     if (route.path === "/panel") return isAdmin;
     return true;
   });
+  // Show global loader while app initializes
 
   useEffect(() => {
     const root = document.documentElement;
@@ -55,12 +59,22 @@ function App() {
 
   const [topNavOpen, setTopNavOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
+useEffect(() => {
+  (async () => {
+    try {
       const newToken = await refreshAccessToken();
       if (!newToken) setSignInOpen(true);
-    })();
-  }, []);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (err) {
+      console.error("Token refresh failed", err);
+    } finally {
+      setLoading(false); // ✅ Stop loader
+    }
+  })();
+}, []);
+
+
+  if (loading) return <Loader message="Launching SmartDocs..." />;
 
   return (
     <div className="flex flex-col min-h-screen">

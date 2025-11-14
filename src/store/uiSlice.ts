@@ -5,7 +5,7 @@ interface UIState {
   theme: 'light' | 'dark' | 'professional';
 }
 
-const initialState: UIState = { theme: 'light' };
+const initialState: UIState = { theme: 'dark' };
 
 const uiSlice = createSlice({
   name: 'ui',

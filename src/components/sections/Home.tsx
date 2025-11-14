@@ -2,11 +2,23 @@ import { NavLink, useLocation } from "react-router-dom";
 import image from "../../assets/imagehome.jpg";
 import { MdOutlineWaterDrop } from "react-icons/md";
 import { FaFileAlt, FaEnvelope } from "react-icons/fa";
+import { motion } from "framer-motion";
+
   export const documentTypes = [
     { name: "CV", icon: <FaFileAlt className="text-lg sm:text-xl" />, description: "Professional curriculum vitae" },
     { name: "Official Letter", icon: <FaEnvelope className="text-lg sm:text-xl" />, description: "Professional official letter template" }
   ];
 const Home = () => {
+    const floatAnimation = {
+    y: ["0%", "-15%", "0%", "15%", "0%"], // vertical float
+    x: ["0%", "10%", "0%", "-10%", "0%"], // optional horizontal drift
+    transition: {
+      duration: 6,
+      repeat: Infinity,
+      repeatType: "mirror",
+      ease: "easeInOut",
+    },
+  };
   const location = useLocation();
   const baseBtnClass =
     "px-4 py-2 sm:px-6 rounded-md text-sm md:text-base font-medium transition-all duration-300 ease-in-out flex items-center justify-center";
@@ -30,18 +42,50 @@ const Home = () => {
       <div className="absolute inset-0 bg-redBg bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-90 z-10" />
 
       {/* Decorations (fewer on mobile) */}
-      <div className="absolute inset-0 z-20 ">
-        <MdOutlineWaterDrop className="absolute bottom-3 right-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
-        <MdOutlineWaterDrop className="absolute bottom-3 left-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
-        <MdOutlineWaterDrop className="absolute top-3 right-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
-        <MdOutlineWaterDrop className="absolute top-3 left-3 text-red-300 text-2xl sm:text-4xl opacity-70" />
+    <div className="absolute inset-0 z-20 pointer-events-none">
+  {[
+    { bottom: "bottom-3", right: "right-3", size: "text-2xl sm:text-4xl", opacity: "opacity-70" },
+    { bottom: "bottom-3", right: "left-3", size: "text-2xl sm:text-4xl", opacity: "opacity-70" },
+    { bottom: "top-3", right: "right-3", size: "text-2xl sm:text-4xl", opacity: "opacity-70" },
+    { bottom: "top-3", right: "left-3", size: "text-2xl sm:text-4xl", opacity: "opacity-70" },
+  ].map((drop, i) => (
+    <motion.div
+      key={i}
+      className={`absolute ${drop.bottom} ${drop.right}`}
+      animate={{ y: ["0%", "-15%", "0%", "15%", "0%"] }}
+      transition={{
+        duration: 6 + i, // slightly offset for each drop
+        repeat: Infinity,
+        repeatType: "mirror",
+        ease: "easeInOut",
+      }}
+    >
+      <MdOutlineWaterDrop className={`text-red-300 ${drop.size} ${drop.opacity}`} />
+    </motion.div>
+  ))}
 
-        {/* Extra decorations only visible on sm+ */}
-        <div className="hidden sm:block">
-          <MdOutlineWaterDrop className="absolute top-1/2 right-1/4 text-red-300 text-3xl opacity-60" />
-          <MdOutlineWaterDrop className="absolute top-1/3 left-1/3 text-red-300 text-3xl opacity-60" />
-        </div>
-      </div>
+  {/* Extra drops for sm+ */}
+  <div className="hidden sm:block">
+    {[
+      { top: "top-1/2", left: "right-1/4", size: "text-3xl", opacity: "opacity-60" },
+      { top: "top-1/3", left: "left-1/3", size: "text-3xl", opacity: "opacity-60" },
+    ].map((drop, i) => (
+      <motion.div
+        key={`sm-${i}`}
+        className={`absolute ${drop.top} ${drop.left}`}
+        animate={{ y: ["0%", "-10%", "0%", "10%", "0%"] }}
+        transition={{
+          duration: 8 + i,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        }}
+      >
+        <MdOutlineWaterDrop className={`text-red-300 ${drop.size} ${drop.opacity}`} />
+      </motion.div>
+    ))}
+  </div>
+</div>
 
       {/* Main content */}
       <section className="relative z-30 flex flex-col justify-center items-center min-h-[80vh] sm:min-h-screen text-center px-4 sm:px-6 md:px-8 py-6 sm:py-10">
