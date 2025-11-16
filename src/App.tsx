@@ -35,7 +35,7 @@ const Head = ({ title, description }: { title: string; description?: string }) =
 function App() {
   const allRoutes: pageRouteConfig[] = [...routes, ...documentRoutes, ...myDocumentsRoutes];
   const theme = useSelector((state: RootState) => state.ui.theme);
-  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const location = useLocation();
 
@@ -68,13 +68,13 @@ useEffect(() => {
     } catch (err) {
       console.error("Token refresh failed", err);
     } finally {
-      setLoading(false); // ✅ Stop loader
+      setInitialLoad(false); // ✅ Stop loader
     }
   })();
 }, []);
 
 
-  if (loading) return <Loader message="Launching SmartDocs..." />;
+  if (initialLoad) return <Loader message="Loading SmartDocs..." />;
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -61,7 +61,7 @@ test-results.xml
 docker-compose.override.yml
 docker-data/
 .docker/
-
+nginx.conf
 # Optional: Ignore compiled static assets (if built externally)
 public/static/
 
