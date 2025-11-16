@@ -74,7 +74,7 @@ useEffect(() => {
 }, []);
 
 
-  if (initialLoad) return <Loader message="Loading SmartDocs..." />;
+  if (initialLoad) return <Loader message="LoadingV SmartDocs..." />;
 
   return (
     <div className="flex flex-col min-h-screen">
