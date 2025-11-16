@@ -20,11 +20,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: ./document_project
         run: npm ci
 
       - name: Build frontend
-        working-directory: ./document_project
         run: npm run build
 
       - name: Log in to Docker Hub
@@ -34,7 +32,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t multi-frontend-document_project ./document_project
+        run: docker build -t multi-frontend-document_project .
 
       - name: Push Docker image
         run: |
