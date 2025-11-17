@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../store/store";
-    interface AdvancedTemplateProps {
+interface AdvancedTemplateProps {
   isPreview?: boolean; // optional prop
 }
 const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
@@ -38,41 +38,41 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
           {/* --- Header / Name & Role --- */}
           <div className="flex flex-col items-center mb-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
-                            {/* Profile Image */}
-                            {user?.personal_details?.profile_image && (
-                                <img
-                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
-                                    alt="Profile"
-                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
-                                    style={{ borderRadius: 0 }} // no rounding
-                                />
-                            )}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
+              {/* Profile Image */}
+              {user?.personal_details?.profile_image && (
+                <img
+                  src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
+                  alt="Profile"
+                  className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
+                  style={{ borderRadius: 0 }} // no rounding
+                />
+              )}
 
-                            {/* Name and Contact */}
-                            <div className="flex flex-col justify-center text-center sm:text-left">
-                                {/* Full Name */}
-                                <h1
-                                    className="text-3xl font-bold uppercase text-blue-800 mb-1"
-                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
-                                >
-                                    {user?.profile?.full_name || "Full Name"}
-                                </h1>
+              {/* Name and Contact */}
+              <div className="flex flex-col justify-center text-center sm:text-left">
+                {/* Full Name */}
+                <h1
+                  className="text-3xl font-bold uppercase text-blue-800 mb-1"
+                  style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                >
+                  {user?.profile?.full_name || "Full Name"}
+                </h1>
 
-                                {/* Contact Info */}
-                                <div
-                                    className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
-                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
-                                >
-                                    {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
-                                    {user?.email && <span>| {user.email}</span>}
-                                    {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
-                                    {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
-                                    {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* Contact Info */}
+                <div
+                  className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
+                  style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                >
+                  {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
+                  {user?.email && <span>| {user.email}</span>}
+                  {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
+                  {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
+                  {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* --- Two Column Layout --- */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -82,7 +82,7 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
               {/* Profile Summary */}
               <div className="bg-blue-50 p-4 rounded-lg shadow-md">
-                <h2 className="text-lg font-semibold text-blue-800 mb-2 border-b border-blue-300 pb-1">Profile Summary</h2>
+                <h2 className="text-lg font-semibold text-blue-800 uppercase mb-2 border-b border-blue-300 pb-1">Profile Summary</h2>
                 <p className="text-gray-700 text-sm text-justify">{user?.personal_details?.profile_summary}</p>
               </div>
 
@@ -104,6 +104,7 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                 </div>
               </div>
 
+
               {/* Languages */}
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Languages</h2>
@@ -114,6 +115,43 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                     </span>
                   ))}
                 </div>
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">
+                  Certifications
+                </h2>
+
+                {user?.profile?.certificates?.length > 0 ? (
+                  <div className="space-y-2">
+                    {user?.profile?.certificates?.map((cert) => (
+                      <div
+                        key={cert?.id}
+                        className="p-3 bg-gray-50 rounded-lg shadow-sm border-l-4 border-yellow-400"
+                      >
+                        <h3 className="font-semibold text-gray-900">{cert?.name}</h3>
+                        <div className="text-gray-600 text-sm">{cert?.issuer}</div>
+                        <div className="text-gray-500 text-xs italic">{cert?.date}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">No certifications added yet.</p>
+                )}
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">
+                  Achievements
+                </h2>
+
+                {user?.achievement_profile?.achievements?.length > 0 ? (
+                  <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
+                    {user?.achievement_profile?.achievements?.map((ac) => (
+                      <li key={ac?.id}>{ac?.value}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 text-sm">No achievements added yet.</p>
+                )}
               </div>
 
             </div>
@@ -174,7 +212,13 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Technical Skills</h3>
                         <div className="flex flex-wrap gap-2">
                           {skills?.technical_skills?.map((tech) => (
-                            <span key={tech?.id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">{tech?.value}</span>
+                            <span
+                              key={tech?.id}
+                              className="bg-blue-100 border border-blue-300 text-blue-700 px-2 py-1 rounded-full text-xs"
+                            >
+                              {tech?.value}
+                            </span>
+
                           ))}
                         </div>
                       </div>
@@ -184,7 +228,13 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Soft Skills</h3>
                         <div className="flex flex-wrap gap-2">
                           {skills?.soft_skills?.map((soft) => (
-                            <span key={soft?.id} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">{soft?.value}</span>
+                            <span
+                              key={soft?.id}
+                              className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs"
+                            >
+                              {soft?.value}
+                            </span>
+
                           ))}
                         </div>
                       </div>
@@ -193,28 +243,41 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                 ))}
               </div>
 
+
+              {/* --- References --- */}
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">
+                  References
+                </h2>
+
+                {user?.references?.length > 0 ? (
+                  <div className="space-y-2">
+                    {user?.references?.map((ref) => (
+                      <div
+                        key={ref?.id}
+                        className="p-3 bg-gray-50 rounded-lg shadow-sm border-l-4 border-purple-400"
+                      >
+                        <h3 className="font-semibold text-gray-900">{ref?.name}</h3>
+
+                        <div className="text-gray-600 text-sm">{ref?.position}</div>
+                        <div className="text-gray-600 text-sm">{ref?.email}</div>
+                        <div className="text-gray-600 text-sm">{ref?.phone}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">No references added yet.</p>
+                )}
+              </div>
+
             </div>
 
           </div>
+
+
 
           {/* --- References --- */}
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">References</h2>
-            <div className="grid sm:grid-cols-2 gap-2">
-              {user?.references?.length > 0 ? (
-                user?.references?.map((ref) => (
-                  <div key={ref?.id} className="bg-gray-50 p-3 rounded-lg shadow-sm border-l-4 border-purple-400">
-                    <div className="font-medium text-gray-800">{ref?.name}</div>
-                    <div className="text-gray-600 text-sm">{ref?.position}</div>
-                    <div className="text-gray-600 text-sm">{ref?.email}</div>
-                    <div className="text-gray-600 text-sm">{ref?.phone}</div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm col-span-2">No references added yet.</p>
-              )}
-            </div>
-          </div>
+
 
         </div>
       ) : (

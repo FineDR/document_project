@@ -36,41 +36,41 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
           {/* --- Header / Name --- */}
           <div className="flex flex-col items-center mb-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
-                            {/* Profile Image */}
-                            {user?.personal_details?.profile_image && (
-                                <img
-                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
-                                    alt="Profile"
-                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
-                                    style={{ borderRadius: 0 }} // no rounding
-                                />
-                            )}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-2xl mx-auto">
+              {/* Profile Image */}
+              {user?.personal_details?.profile_image && (
+                <img
+                  src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
+                  alt="Profile"
+                  className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
+                  style={{ borderRadius: 0 }} // no rounding
+                />
+              )}
 
-                            {/* Name and Contact */}
-                            <div className="flex flex-col justify-center text-center sm:text-left">
-                                {/* Full Name */}
-                                <h1
-                                    className="text-3xl font-bold uppercase text-blue-800 mb-1"
-                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
-                                >
-                                    {user?.profile?.full_name || "Full Name"}
-                                </h1>
+              {/* Name and Contact */}
+              <div className="flex flex-col justify-center text-center sm:text-left">
+                {/* Full Name */}
+                <h1
+                  className="text-3xl font-bold uppercase text-blue-800 mb-1"
+                  style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                >
+                  {user?.profile?.full_name || "Full Name"}
+                </h1>
 
-                                {/* Contact Info */}
-                                <div
-                                    className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
-                                    style={{ fontFamily: "'Times New Roman', Times, serif" }}
-                                >
-                                    {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
-                                    {user?.email && <span>| {user.email}</span>}
-                                    {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
-                                    {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
-                                    {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* Contact Info */}
+                <div
+                  className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
+                  style={{ fontFamily: "'Times New Roman', Times, serif" }}
+                >
+                  {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
+                  {user?.email && <span>| {user.email}</span>}
+                  {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
+                  {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
+                  {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
 
 
           {/* --- Profile Summary --- */}
@@ -178,6 +178,41 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               ))}
             </div>
           </div>
+
+          {/* --- Certifications --- */}
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Certifications</h2>
+            {user?.profile?.certificates?.length ? (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {user?.profile?.certificates?.map((cert) => (
+                  <div key={cert?.id} className="p-4 bg-gray-50 rounded-lg shadow-sm">
+                    <div className="font-medium text-gray-800">{cert?.name || "N/A"}</div>
+                    <div className="text-sm text-gray-500">{cert?.issuer || "N/A"}</div>
+                    <div className="text-sm text-gray-400">{cert?.date || "N/A"}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No certifications found.</p>
+            )}
+          </div>
+
+          {/* --- Achievements --- */}
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Achievements</h2>
+            {user?.achievement_profile?.achievements?.length > 0 ? (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {user?.achievement_profile?.achievements?.map((ac) => (
+                  <div key={ac?.id} className="p-4 bg-gray-50 rounded-lg shadow-sm text-gray-700 text-sm">
+                    {ac?.value || "N/A"}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No achievements added yet.</p>
+            )}
+          </div>
+
 
           {/* --- Languages --- */}
           <div className="space-y-2">

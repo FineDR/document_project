@@ -254,9 +254,9 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                             Achievements
                         </h2>
 
-                        {user.achievement_profile.achievements.length > 0 ? (
+                        {user?.achievement_profile?.achievements?.length > 0 ? (
                             <ul className="list-disc list-inside space-y-1">
-                                {user?.achievement_profile?.achievements.map((ac) => (
+                                {user?.achievement_profile?.achievements?.map((ac) => (
                                     <li key={ac?.id} className="text-gray-700">
                                         {ac?.value}
                                     </li>
