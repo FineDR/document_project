@@ -42,7 +42,7 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                             {/* Profile Image */}
                             {user?.personal_details?.profile_image && (
                                 <img
-                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user.personal_details.profile_image}`}
+                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
                                     alt="Profile"
                                     className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
                                     style={{ borderRadius: 0 }} // no rounding
@@ -64,11 +64,11 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                     className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
                                     style={{ fontFamily: "'Times New Roman', Times, serif" }}
                                 >
-                                    {user?.personal_details?.phone && <span>{user.personal_details.phone}</span>}
+                                    {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
                                     {user?.email && <span>| {user.email}</span>}
-                                    {user?.personal_details?.address && <span>| {user.personal_details.address}</span>}
-                                    {user?.personal_details?.github && <span>| {user.personal_details.github}</span>}
-                                    {user?.personal_details?.linkedin && <span>| {user.personal_details.linkedin}</span>}
+                                    {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
+                                    {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
+                                    {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
                                 </div>
                             </div>
                         </div>
@@ -83,21 +83,21 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               {/* Profile Summary */}
               <div className="bg-blue-50 p-4 rounded-lg shadow-md">
                 <h2 className="text-lg font-semibold text-blue-800 mb-2 border-b border-blue-300 pb-1">Profile Summary</h2>
-                <p className="text-gray-700 text-sm text-justify">{user.personal_details.profile_summary}</p>
+                <p className="text-gray-700 text-sm text-justify">{user?.personal_details?.profile_summary}</p>
               </div>
 
               {/* Education */}
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Education</h2>
                 <div className="space-y-2">
-                  {user.educations.map((edu) => (
-                    <div key={edu.id} className="p-3 bg-whiteBg rounded-lg shadow-sm border-l-4 border-blue-400">
-                      <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
-                      <span className="text-gray-600">{edu.institution}</span>
+                  {user?.educations?.map((edu) => (
+                    <div key={edu?.id} className="p-3 bg-whiteBg rounded-lg shadow-sm border-l-4 border-blue-400">
+                      <h3 className="font-semibold text-gray-900">{edu?.degree}</h3>
+                      <span className="text-gray-600">{edu?.institution}</span>
                       <div className="text-gray-500 text-sm mt-1">
-                        <div>{edu.location}</div>
-                        <div>{edu.start_date} – {edu.end_date}</div>
-                        <div>Grade: {edu.grade}</div>
+                        <div>{edu?.location}</div>
+                        <div>{edu?.start_date} – {edu?.end_date}</div>
+                        <div>Grade: {edu?.grade}</div>
                       </div>
                     </div>
                   ))}
@@ -108,9 +108,9 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Languages</h2>
                 <div className="flex flex-wrap gap-3">
-                  {user.languages.map((lang) => (
+                  {user?.languages?.map((lang) => (
                     <span key={lang.id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
-                      {lang.language} ({lang.proficiency})
+                      {lang?.language} ({lang?.proficiency})
                     </span>
                   ))}
                 </div>
@@ -124,20 +124,20 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               {/* Work Experience */}
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Work Experience</h2>
-                {user.work_experiences.map((work) => (
-                  <div key={work.id} className="p-4 bg-gray-50 rounded-lg shadow-md border-l-4 border-green-400 space-y-1">
+                {user?.work_experiences?.map((work) => (
+                  <div key={work?.id} className="p-4 bg-gray-50 rounded-lg shadow-md border-l-4 border-green-400 space-y-1">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-gray-900">{work.job_title}</h3>
-                      <span className="text-gray-600 text-sm italic">{work.company}</span>
+                      <h3 className="font-semibold text-gray-900">{work?.job_title}</h3>
+                      <span className="text-gray-600 text-sm italic">{work?.company}</span>
                     </div>
                     <div className="text-gray-500 text-sm flex justify-between mt-1">
-                      <span>{work.location}</span>
-                      <span>{work.start_date} – {work.end_date || "Present"}</span>
+                      <span>{work?.location}</span>
+                      <span>{work?.start_date} – {work?.end_date || "Present"}</span>
                     </div>
-                    {work.responsibilities.length > 0 && (
+                    {work?.responsibilities?.length > 0 && (
                       <ul className="list-disc list-inside text-gray-700 text-sm mt-2 space-y-1">
                         {work.responsibilities.map((resp, i) => (
-                          <li key={i}>{resp.value}</li>
+                          <li key={i}>{resp?.value}</li>
                         ))}
                       </ul>
                     )}
@@ -148,16 +148,16 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               {/* Projects */}
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Projects</h2>
-                {user.projects.map((proj) => (
-                  <div key={proj.id} className="p-4 bg-gray-50 rounded-lg shadow-md space-y-2">
-                    <h3 className="font-semibold text-gray-900">{proj.title}</h3>
-                    <p className="text-gray-700 text-sm">{proj.description}</p>
-                    {proj.link && (
-                      <a href={proj.link} target="_blank" className="text-blue-600 underline text-sm block">{proj.link}</a>
+                {user?.projects?.map((proj) => (
+                  <div key={proj?.id} className="p-4 bg-gray-50 rounded-lg shadow-md space-y-2">
+                    <h3 className="font-semibold text-gray-900">{proj?.title}</h3>
+                    <p className="text-gray-700 text-sm">{proj?.description}</p>
+                    {proj?.link && (
+                      <a href={proj?.link} target="_blank" className="text-blue-600 underline text-sm block">{proj?.link}</a>
                     )}
                     <div className="flex flex-wrap gap-1 text-xs text-blue-700">
-                      {proj.technologies.map((tech) => (
-                        <span key={tech.id} className="bg-blue-100 px-2 py-1 rounded-full">{tech.value}</span>
+                      {proj?.technologies?.map((tech) => (
+                        <span key={tech?.id} className="bg-blue-100 px-2 py-1 rounded-full">{tech?.value}</span>
                       ))}
                     </div>
                   </div>
@@ -167,24 +167,24 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
               {/* Skills */}
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">Skills</h2>
-                {user.skill_sets.map((skills) => (
-                  <div key={skills.id} className="space-y-2">
-                    {skills.technical_skills.length > 0 && (
+                {user?.skill_sets?.map((skills) => (
+                  <div key={skills?.id} className="space-y-2">
+                    {skills?.technical_skills?.length > 0 && (
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Technical Skills</h3>
                         <div className="flex flex-wrap gap-2">
-                          {skills.technical_skills.map((tech) => (
-                            <span key={tech.id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">{tech.value}</span>
+                          {skills?.technical_skills?.map((tech) => (
+                            <span key={tech?.id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">{tech?.value}</span>
                           ))}
                         </div>
                       </div>
                     )}
-                    {skills.soft_skills.length > 0 && (
+                    {skills?.soft_skills?.length > 0 && (
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Soft Skills</h3>
                         <div className="flex flex-wrap gap-2">
-                          {skills.soft_skills.map((soft) => (
-                            <span key={soft.id} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">{soft.value}</span>
+                          {skills?.soft_skills?.map((soft) => (
+                            <span key={soft?.id} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">{soft?.value}</span>
                           ))}
                         </div>
                       </div>
@@ -201,13 +201,13 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
           <div className="space-y-2">
             <h2 className="text-lg font-semibold uppercase border-b border-blue-700 pb-1 mb-2">References</h2>
             <div className="grid sm:grid-cols-2 gap-2">
-              {user.references.length > 0 ? (
-                user.references.map((ref) => (
-                  <div key={ref.id} className="bg-gray-50 p-3 rounded-lg shadow-sm border-l-4 border-purple-400">
-                    <div className="font-medium text-gray-800">{ref.name}</div>
-                    <div className="text-gray-600 text-sm">{ref.position}</div>
-                    <div className="text-gray-600 text-sm">{ref.email}</div>
-                    <div className="text-gray-600 text-sm">{ref.phone}</div>
+              {user?.references?.length > 0 ? (
+                user?.references?.map((ref) => (
+                  <div key={ref?.id} className="bg-gray-50 p-3 rounded-lg shadow-sm border-l-4 border-purple-400">
+                    <div className="font-medium text-gray-800">{ref?.name}</div>
+                    <div className="text-gray-600 text-sm">{ref?.position}</div>
+                    <div className="text-gray-600 text-sm">{ref?.email}</div>
+                    <div className="text-gray-600 text-sm">{ref?.phone}</div>
                   </div>
                 ))
               ) : (

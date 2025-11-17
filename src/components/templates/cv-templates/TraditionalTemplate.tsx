@@ -41,7 +41,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                             {/* Profile Image */}
                             {user?.personal_details?.profile_image && (
                                 <img
-                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user.personal_details.profile_image}`}
+                                    src={`${import.meta.env.VITE_APP_API_BASE_URL}${user?.personal_details?.profile_image}`}
                                     alt="Profile"
                                     className="w-24 h-24 sm:w-32 sm:h-32 object-cover border-2 border-blue-700"
                                     style={{ borderRadius: 0 }} // no rounding
@@ -63,11 +63,11 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                     className="flex flex-wrap justify-center sm:justify-start items-center gap-x-2 gap-y-1 text-blue-700 text-sm mt-1"
                                     style={{ fontFamily: "'Times New Roman', Times, serif" }}
                                 >
-                                    {user?.personal_details?.phone && <span>{user.personal_details.phone}</span>}
+                                    {user?.personal_details?.phone && <span>{user?.personal_details?.phone}</span>}
                                     {user?.email && <span>| {user.email}</span>}
-                                    {user?.personal_details?.address && <span>| {user.personal_details.address}</span>}
-                                    {user?.personal_details?.github && <span>| {user.personal_details.github}</span>}
-                                    {user?.personal_details?.linkedin && <span>| {user.personal_details.linkedin}</span>}
+                                    {user?.personal_details?.address && <span>| {user?.personal_details?.address}</span>}
+                                    {user?.personal_details?.github && <span>| {user?.personal_details?.github}</span>}
+                                    {user?.personal_details?.linkedin && <span>| {user?.personal_details?.linkedin}</span>}
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                     <div className="flex flex-col gap-x-2 gap-y-1 text-gray-700">
                         <h2 className="text-base uppercase mt-4">Profile summary</h2>
                         <div className="border-b border-blue-600"></div>
-                        <p className="text-justify text-sm">{user.personal_details.profile_summary}</p>
+                        <p className="text-justify text-sm">{user?.personal_details?.profile_summary}</p>
                     </div>
                     <div className="flex flex-col gap-4 text-gray-700">
                         <h2 className="text-base mt-4 uppercase border-b mb-3 pb-1 border-blue-700">
@@ -86,22 +86,22 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user.educations.map((educa) => (
                             <div
-                                key={educa.id}
+                                key={educa?.id}
                                 className="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 p-4 rounded-lg shadow-sm"
                             >
                                 {/* Degree + Institution */}
                                 <div className="flex flex-col">
-                                    <h3 className="text-base font-semibold text-gray-900">{educa.degree}</h3>
-                                    <span className="text-gray-600">{educa.institution}</span>
+                                    <h3 className="text-base font-semibold text-gray-900">{educa?.degree}</h3>
+                                    <span className="text-gray-600">{educa?.institution}</span>
                                 </div>
 
                                 {/* Location + Dates */}
                                 <div className="flex flex-col sm:items-end text-gray-500 text-sm mt-2 sm:mt-0">
-                                    <span>{educa.location}</span>
+                                    <span>{educa?.location}</span>
                                     <span>
-                                        {educa.start_date} – {educa.end_date}
+                                        {educa?.start_date} – {educa?.end_date}
                                     </span>
-                                    <span className="mt-1">Grade: {educa.grade}</span>
+                                    <span className="mt-1">Grade: {educa?.grade}</span>
                                 </div>
                             </div>
                         ))}
@@ -114,23 +114,23 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user.work_experiences.map((work) => (
                             <div
-                                key={work.id}
+                                key={work?.id}
                                 className="mb-6 pb-4 border-b border-gray-200 last:border-b-0"
                             >
                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                                    <h3 className="text-base font-semibold  text-gray-900">{work.job_title}</h3>
-                                    <span className="text-gray-600 text-sm italic">{work.company}</span>
+                                    <h3 className="text-base font-semibold  text-gray-900">{work?.job_title}</h3>
+                                    <span className="text-gray-600 text-sm italic">{work?.company}</span>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:justify-between text-gray-500 text-sm mt-1">
-                                    <span>{work.location}</span>
+                                    <span>{work?.location}</span>
                                     <span>
-                                        {work.start_date} – {work.end_date || "Present"}
+                                        {work?.start_date} – {work?.end_date || "Present"}
                                     </span>
                                 </div>
-                                {work.responsibilities && work.responsibilities.length > 0 && (
+                                {work?.responsibilities && work?.responsibilities.length > 0 && (
                                     <ul className="list-disc list-inside mt-2 text-gray-700 text-sm leading-relaxed space-y-1">
-                                        {work.responsibilities.map((resp, index) => (
-                                            <li key={index}>{resp.value}</li>
+                                        {work?.responsibilities.map((resp, index) => (
+                                            <li key={index}>{resp?.value}</li>
                                         ))}
                                     </ul>
                                 )}
@@ -144,37 +144,37 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user.projects.map((project) => (
                             <div
-                                key={project.id}
+                                key={project?.id}
                                 className="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 p-4 rounded-lg shadow-sm"
                             >
-                                {/* Project title and description */}
+                                {/* Project? title and description */}
                                 <div className="flex flex-col sm:w-2/3">
-                                    <h3 className="text-lg font-semibold text-gray-900">{project.title}</h3>
-                                    <p className="text-gray-600 mt-1">{project.description}</p>
-                                    {project.link && (
+                                    <h3 className="text-lg font-semibold text-gray-900">{project?.title}</h3>
+                                    <p className="text-gray-600 mt-1">{project?.description}</p>
+                                    {project?.link && (
                                         <a
-                                            href={project.link}
+                                            href={project?.link}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 underline mt-1 text-sm"
                                         >
-                                            {project.link}
+                                            {project?.link}
                                         </a>
                                     )}
                                 </div>
 
                                 <div className="flex flex-col sm:items-end mt-2 sm:mt-0 text-gray-500 text-sm sm:w-1/3">
                                     <span className="mb-1">
-                                        Created: {project.created_at} | Updated: {project.updated_at}
+                                        Created: {project?.created_at} | Updated: {project?.updated_at}
                                     </span>
-                                    {project.technologies.length > 0 && (
+                                    {project?.technologies.length > 0 && (
                                         <div className="mt-1 flex flex-wrap gap-1">
-                                            {project.technologies.map((tech) => (
+                                            {project?.technologies.map((tech) => (
                                                 <span
-                                                    key={tech.id}
+                                                    key={tech?.id}
                                                     className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"
                                                 >
-                                                    {tech.value}
+                                                    {tech?.value}
                                                 </span>
                                             ))}
                                         </div>
@@ -198,10 +198,10 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                         <div className="flex flex-wrap gap-2">
                                             {skills.technical_skills.map((tech) => (
                                                 <span
-                                                    key={tech.id}
+                                                    key={tech?.id}
                                                     className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"
                                                 >
-                                                    {tech.value}
+                                                    {tech?.value}
                                                 </span>
                                             ))}
                                         </div>
@@ -209,16 +209,16 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                 )}
 
                                 {/* Soft Skills */}
-                                {skills.soft_skills.length > 0 && (
+                                {skills?.soft_skills?.length > 0 && (
                                     <div>
                                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Soft Skills:</h3>
                                         <div className="flex flex-wrap gap-2">
-                                            {skills.soft_skills.map((soft) => (
+                                            {skills?.soft_skills?.map((soft) => (
                                                 <span
-                                                    key={soft.id}
+                                                    key={soft?.id}
                                                     className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs"
                                                 >
-                                                    {soft.value}
+                                                    {soft?.value}
                                                 </span>
                                             ))}
                                         </div>
@@ -234,14 +234,14 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user?.profile?.certificates?.length ? (
                             <div className="flex flex-col gap-3">
-                                {user.profile.certificates.map((cert) => (
+                                {user?.profile?.certificates.map((cert) => (
                                     <div
-                                        key={cert.id}
+                                        key={cert?.id}
                                         className="flex flex-col gap-1 p-3 border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow"
                                     >
-                                        <div className="font-medium text-gray-800">{cert.name}</div>
-                                        <div className="text-sm text-gray-500">{cert.issuer}</div>
-                                        <div className="text-sm text-gray-400">{cert.date}</div>
+                                        <div className="font-medium text-gray-800">{cert?.name}</div>
+                                        <div className="text-sm text-gray-500">{cert?.issuer}</div>
+                                        <div className="text-sm text-gray-400">{cert?.date}</div>
                                     </div>
                                 ))}
                             </div>
@@ -256,9 +256,9 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user.achievement_profile.achievements.length > 0 ? (
                             <ul className="list-disc list-inside space-y-1">
-                                {user.achievement_profile.achievements.map((ac) => (
-                                    <li key={ac.id} className="text-gray-700">
-                                        {ac.value}
+                                {user?.achievement_profile?.achievements.map((ac) => (
+                                    <li key={ac?.id} className="text-gray-700">
+                                        {ac?.value}
                                     </li>
                                 ))}
                             </ul>
@@ -272,12 +272,12 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                             Languages
                         </h2>
 
-                        {user.languages.length > 0 ? (
+                        {user?.languages?.length > 0 ? (
                             <ul className="space-y-1">
-                                {user.languages.map((lang) => (
-                                    <li key={lang.id} className="flex justify-between text-gray-800">
-                                        <span>{lang.language}</span>
-                                        <span className="italic text-gray-500">{lang.proficiency}</span>
+                                {user?.languages?.map((lang) => (
+                                    <li key={lang?.id} className="flex justify-between text-gray-800">
+                                        <span>{lang?.language}</span>
+                                        <span className="italic text-gray-500">{lang?.proficiency}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -292,12 +292,12 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
                         {user.references.length > 0 ? (
                             <ul className="space-y-4">
-                                {user.references.map((ref) => (
-                                    <li key={ref.id} className="bg-gray-50 p-3 rounded-lg shadow-sm">
-                                        <div className="text-gray-800 font-medium">{ref.name}</div>
-                                        <div className="text-gray-600 text-sm">{ref.position}</div>
-                                        <div className="text-gray-600 text-sm">{ref.email}</div>
-                                        <div className="text-gray-600 text-sm">{ref.phone}</div>
+                                {user?.references?.map((ref) => (
+                                    <li key={ref?.id} className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                                        <div className="text-gray-800 font-medium">{ref?.name}</div>
+                                        <div className="text-gray-600 text-sm">{ref?.position}</div>
+                                        <div className="text-gray-600 text-sm">{ref?.email}</div>
+                                        <div className="text-gray-600 text-sm">{ref?.phone}</div>
                                     </li>
                                 ))}
                             </ul>

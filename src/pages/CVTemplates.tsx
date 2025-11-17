@@ -132,7 +132,7 @@ const CVTemplates = () => {
                 </button>
 
                 {/* Template Preview */}
-                {selectedTemplate && React.createElement(selectedTemplate, { isPreview: true })}
+                {selectedTemplate && React.createElement(selectedTemplate, { isPreview: true, })}
 
 
                 {/* Template Details & Action */}
