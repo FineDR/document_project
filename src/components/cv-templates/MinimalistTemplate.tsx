@@ -78,7 +78,7 @@ const MinimalistTemplate: React.FC<MinimalistTemplateProps> = ({ data }) => {
           <section className="mb-6">
             <h2 className="text-base font-bold text-blue-800 uppercase mb-3">Profile Summary</h2>
             <p className="text-sm leading-relaxed">
-              {data.personal_details.profile_summary}
+              {data?.personal_details?.profile_summary}
             </p>
           </section>
         )}

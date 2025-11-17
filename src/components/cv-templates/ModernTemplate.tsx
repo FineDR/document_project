@@ -81,7 +81,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data }) => {
                 Professional Summary
               </h2>
               <p className="text-gray-700 leading-relaxed text-sm">
-                {data.personal_details.profile_summary}
+                {data?.personal_details?.profile_summary}
               </p>
             </section>
           )}
