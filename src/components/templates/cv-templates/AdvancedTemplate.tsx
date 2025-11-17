@@ -240,7 +240,9 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                       </div>
                     )}
                   </div>
-                ))}
+                )
+                
+                )}
               </div>
 
 

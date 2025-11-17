@@ -75,7 +75,7 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
           {/* --- Profile Summary --- */}
           <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2 border-b border-blue-600 pb-1">Profile Summary</h2>
+            <h2 className="text-lg font-semibold text-gray-900 uppercase mb-2 border-b border-blue-600 pb-1">Profile Summary</h2>
             <p className="text-gray-700 text-sm text-justify">{user?.personal_details?.profile_summary}</p>
           </div>
 
