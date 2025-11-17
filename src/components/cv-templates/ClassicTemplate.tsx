@@ -11,6 +11,15 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ data }) => {
     return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short" });
   };
 
+
+  if (!data) {
+  return (
+    <div className="flex items-center justify-center min-h-[400px] text-gray-500 text-lg">
+      No CV data available.
+    </div>
+  );
+}
+
   return (
     <div className="max-w-4xl mx-auto bg-whiteBg shadow-lg print:shadow-none print:max-w-none font-serif">
       {/* Header */}
