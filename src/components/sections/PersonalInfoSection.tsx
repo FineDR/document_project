@@ -29,80 +29,75 @@ const PersonalInfoSection = ({ cv }: Props) => {
 
   return (
     <>
-      <CVCard title="Personal Information">
-        {!hasData ? (
-          <p className="text-gray-400 italic font-sans">No personal information added yet</p>
-        ) : (
-          <div className="space-y-6 font-sans text-subHeadingGray">
-            <div className="grid grid-cols-1 gap-6 mt-4">
-              {/* Personal Details Frame */}
-              <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
-                <button
-                  className="absolute top-4 right-4 text-redMain font-medium hover:underline dark:text-redMain"
-                  onClick={() => setShowModal(true)}
-                >
-                  Edit
-                </button>
-                <p><strong>Name:</strong> {profile?.full_name || "-"}</p>
-                <p><strong>Email:</strong> {profile?.email || "-"}</p>
-                <p><strong>Phone:</strong> {info?.phone || "-"}</p>
-                <p><strong>Address:</strong> {info?.address || "-"}</p>
-                <p><strong>Date of Birth:</strong> {info?.date_of_birth || "-"}</p>
-                <p><strong>Nationality:</strong> {info?.nationality || "-"}</p>
-              </div>
+     <CVCard title="Personal Information">
+  {!hasData ? (
+    <p className="text-gray-400 italic font-sans">No personal information added yet</p>
+  ) : (
+    <div className="space-y-6 font-sans text-subHeadingGray">
+      <div className="grid grid-cols-1 gap-6 mt-4">
+        {/* Personal Details & Links Combined */}
+        <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200">
+          <button
+            className="absolute top-4 right-4 text-redMain font-medium hover:underline dark:text-redMain"
+            onClick={() => setShowModal(true)}
+          >
+            Edit
+          </button>
 
-              {/* Links Frame */}
-              <div className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-purple-50 transition-all duration-200">
-                <button
-                  className="absolute top-4 right-4 text-redMain font-medium hover:underline dark:text-redMain"
-                  onClick={() => setShowModal(true)}
-                >
-                  Edit
-                </button>
-                <p>
-                  <strong>LinkedIn:</strong>{" "}
-                  {info?.linkedin ? (
-                    <a
-                      href={info.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-redMain hover:underline dark:text-redMain "
-                    >
-                      {formatLinkText(info.linkedin, "LinkedIn")}
-                    </a>
-                  ) : "-"}
-                </p>
-                <p>
-                  <strong>GitHub:</strong>{" "}
-                  {info?.github ? (
-                    <a
-                      href={info.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-redMain hover:underline dark:text-redMain"
-                    >
-                      {formatLinkText(info.github, "GitHub")}
-                    </a>
-                  ) : "-"}
-                </p>
-                <p>
-                  <strong>Website:</strong>{" "}
-                  {info?.website ? (
-                    <a
-                      href={info.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-redMain hover:underline dark:text-redMain"
-                    >
-                      {formatLinkText(info.website, "Website")}
-                    </a>
-                  ) : "-"}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </CVCard>
+          {profile?.full_name && <p><strong>Name:</strong> {profile.full_name}</p>}
+          {profile?.email && <p><strong>Email:</strong> {profile.email}</p>}
+          {info?.phone && <p><strong>Phone:</strong> {info.phone}</p>}
+          {info?.address && <p><strong>Address:</strong> {info.address}</p>}
+          {info?.date_of_birth && <p><strong>Date of Birth:</strong> {info.date_of_birth}</p>}
+          {info?.nationality && <p><strong>Nationality:</strong> {info.nationality}</p>}
+
+          {info?.linkedin && (
+            <p>
+              <strong>LinkedIn:</strong>{" "}
+              <a
+                href={info.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-redMain hover:underline dark:text-redMain"
+              >
+                {formatLinkText(info.linkedin, "LinkedIn")}
+              </a>
+            </p>
+          )}
+
+          {info?.github && (
+            <p>
+              <strong>GitHub:</strong>{" "}
+              <a
+                href={info.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-redMain hover:underline dark:text-redMain"
+              >
+                {formatLinkText(info.github, "GitHub")}
+              </a>
+            </p>
+          )}
+
+          {info?.website && (
+            <p>
+              <strong>Website:</strong>{" "}
+              <a
+                href={info.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-redMain hover:underline dark:text-redMain"
+              >
+                {formatLinkText(info.website, "Website")}
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )}
+</CVCard>
+
 
       {/* Modal for editing personal details */}
       {showModal && (

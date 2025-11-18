@@ -48,7 +48,10 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
 
   const { register, control, handleSubmit, reset } = useForm<SkillsFormFields>({
     resolver: zodResolver(skillsSchema),
-    defaultValues: { technicalSkills: technicalDefault, softSkills: softDefault },
+     defaultValues: {
+    technicalSkills: technicalDefault.length > 0 ? technicalDefault : [],
+    softSkills: softDefault.length > 0 ? softDefault : [],
+  },
   });
 
   const technicalFieldsArray = useFieldArray({ control, name: "technicalSkills" });
@@ -101,17 +104,17 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
   };
 
   const buildPayload = (data: SkillsFormFields) => {
-    // backend expects camelCase fields technicalSkills and softSkills each as array of { value: "..." }
-    const technicalSkills = data.technicalSkills
+    const technicalSkills = (data.technicalSkills || [])
       .map((s) => ({ value: s.value?.trim() }))
       .filter((s) => s.value && s.value.length > 0);
 
-    const softSkills = data.softSkills
+    const softSkills = (data.softSkills || [])
       .map((s) => ({ value: s.value?.trim() }))
       .filter((s) => s.value && s.value.length > 0);
 
     return { technicalSkills, softSkills };
   };
+
 
   const onSubmit: SubmitHandler<SkillsFormFields> = async (data) => {
     // keep console debugging (helpful)
@@ -262,7 +265,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
           type="submit"
           label={skillSet ? "Submit Skills" : "Save Skills"}
           disabled={loading}
-          onClick={() => {}}
+          onClick={() => { }}
         />
 
         <Loader

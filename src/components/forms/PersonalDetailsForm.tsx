@@ -160,88 +160,96 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Phone */}
           <InputField
             type="text"
-            label="Phone Number *"
+            label="Phone Number"
             placeholder="+255 123 456 789"
             name="phone"
             register={register("phone")}
             error={errors.phone?.message}
             disabled={loading}
+            required={true}
           />
 
           {/* Address */}
           <InputField
             type="text"
-            label="Address *"
+            label="Address"
             placeholder="123 Main St, City, Country"
             name="address"
             register={register("address")}
             error={errors.address?.message}
             disabled={loading}
+            required={true} 
           />
 
           {/* LinkedIn */}
           <InputField
             type="text"
-            label="LinkedIn *"
+            label="LinkedIn"
             placeholder="linkedin.com/in/username"
             name="linkedin"
             register={register("linkedin")}
             error={errors.linkedin?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* GitHub */}
           <InputField
             type="text"
-            label="GitHub *"
+            label="GitHub"
             placeholder="github.com/username"
             name="github"
             register={register("github")}
             error={errors.github?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* Website */}
           <InputField
             type="text"
-            label="Website *"
+            label="Website"
             placeholder="www.example.com"
             name="website"
             register={register("website")}
             error={errors.website?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* Date of Birth */}
           <InputField
             type="date"
-            label="Date of Birth *"
+            label="Date of Birth"
             name="date_of_birth"
             register={register("date_of_birth")}
             error={errors.date_of_birth?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* Nationality */}
           <InputField
             type="text"
-            label="Nationality *"
+            label="Nationality"
             placeholder="Tanzanian"
             name="nationality"
             register={register("nationality")}
             error={errors.nationality?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* Profile Summary */}
           <InputField
             type="text"
-            label="Profile Summary *"
+            label="Profile Summary"
             placeholder="Brief description of yourself"
             name="profile_summary"
             register={register("profile_summary")}
             error={errors.profile_summary?.message}
             disabled={loading}
+            required={false}
           />
 
           {/* Profile Image */}

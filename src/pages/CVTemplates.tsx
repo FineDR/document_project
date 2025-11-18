@@ -136,7 +136,7 @@ const CVTemplates = () => {
 
 
                 {/* Template Details & Action */}
-                <div className="overflow-auto bg-gray-50 rounded-xl p-4 sm:p-6 flex flex-col justify-between">
+                <div className="overflow-auto bg-gray-50 rounded-xl p-4 sm:p-6 h-96 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-lg text-gray-800 mb-3">Template Details</h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
@@ -156,7 +156,7 @@ const CVTemplates = () => {
                       type="submit"
                       name="Use Template"
                       label="Use Template"
-                      className="!bg-green-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-green-700 mt-6 transition"
+                      className="hover:!bg-[#F87171]  hover:!text-white"
                     />
                   ) : (
                     <Button
@@ -164,7 +164,7 @@ const CVTemplates = () => {
                       type="button"
                       name="Download Template"
                       label="Download Your CV"
-                      className="!bg-blue-600 text-white w-full px-4 py-2 rounded-lg hover:!bg-blue-700 mt-6 transition"
+                      className=" hover:!text-white hover:!bg-[#F87171]"
                     />
                   )}
                 </div>

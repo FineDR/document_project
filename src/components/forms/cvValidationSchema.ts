@@ -5,23 +5,37 @@
 import { z } from "zod";
 
 export const personalInformationSchema = z.object({
-  
   phone: z.string().min(1, "Phone is required"),
-  address: z.string().optional(),
-  linkedin: z.string().url("Invalid URL").optional(),
-  github: z.string().url("Invalid URL").optional(),
-  website: z.string().url("Invalid URL").optional(),
+  address: z.string().min(1, "Address is required"),
+
+  // LinkedIn, GitHub, Website optional na validate URL tu ikiwa imeingizwa
+  linkedin: z.string().optional().refine(
+    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
+    { message: "Invalid URL" }
+  ),
+
+  github: z.string().optional().refine(
+    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
+    { message: "Invalid URL" }
+  ),
+
+  website: z.string().optional().refine(
+    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
+    { message: "Invalid URL" }
+  ),
+
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
   profile_summary: z.string().optional(),
-  profile_image: z
-  .any()
-  .refine((files) => !files || files.length === 0 || files[0]?.size <= 5_000_000, {
-    message: "File size must be less than 5MB",
-  })
-  .optional()
 
+  profile_image: z
+    .any()
+    .refine((files) => !files || files.length === 0 || files[0]?.size <= 5_000_000, {
+      message: "File size must be less than 5MB",
+    })
+    .optional(),
 });
+
 
 export const careerObjectiveSchema = z.object({
   career_objective: z.string().min(1, "Career Objective is required"),
@@ -42,7 +56,7 @@ export const workExperiencesSchema = z.object({
       job_title: z.string().min(1, "Job title is required"),
       company: z.string().min(1, "Company name is required"),
       location: z.string().optional(),
-      start_date: z.string().optional(),
+      start_date: z.string().min(1, "Start date is required"),
       end_date: z.string().optional(),
       responsibilities: z
         .array(z.object({ value: z.string().min(1, "Responsibility is required") }))
@@ -59,14 +73,14 @@ export const skillsSchema = z.object({
         value: z.string().min(1, "Technical skill cannot be empty"),
       })
     )
-    .nonempty("At least one technical skill is required"),
+    .nonempty("At least one technical skill is required").optional(),
   softSkills: z
     .array(
       z.object({
         value: z.string().min(1, "Soft skill cannot be empty"),
       })
     )
-    .nonempty("At least one soft skill is required"),
+    .nonempty("At least one soft skill is required").optional(),
 });
 
 export const languagesSchema = z.object({

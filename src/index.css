@@ -24,6 +24,8 @@ html.light {
   --subheading-gray: #374151;
 }
 
+
+
 /* Dark Theme */
 html.dark {
   --bg: #1F2937; /* deep dark gray */

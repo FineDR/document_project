@@ -66,7 +66,8 @@ const InputField: React.FC<InputFieldProps> = ({
         `}
       >
         {label || placeholder}
-        {required && <span className="text-redMain">*</span>}
+        {required ? <span className="text-redMain">*</span> : null}
+
       </label>
 
       {error && <p className="mt-1 text-sm text-redMain">{error}</p>}

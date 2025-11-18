@@ -12,7 +12,7 @@ interface Experience {
   job_title: string;
   company: string;
   location?: string;
-  start_date?: string;
+  start_date: string;
   end_date?: string;
   responsibilities: Responsibility[];
 }
@@ -63,6 +63,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         register={register(`experiences.${expIndex}.job_title`)}
         error={experienceErrors?.job_title?.message}
         disabled={disabled}
+        required={true}
       />
       <p className="text-gray-400 text-xs italic mt-1">
         Enter your role, e.g., Frontend Developer or Project Manager
@@ -76,6 +77,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         register={register(`experiences.${expIndex}.company`)}
         error={experienceErrors?.company?.message}
         disabled={disabled}
+        required={true}
       />
       <p className="text-gray-400 text-xs italic mt-1">
         The name of the organization you worked for
@@ -89,6 +91,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         register={register(`experiences.${expIndex}.location`)}
         error={experienceErrors?.location?.message}
         disabled={disabled}
+        required={false}
       />
       <p className="text-gray-400 text-xs italic mt-1">
         City, state, or “Remote”
@@ -101,6 +104,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         register={register(`experiences.${expIndex}.start_date`)}
         error={experienceErrors?.start_date?.message}
         disabled={disabled}
+        required={true}
       />
       <p className="text-gray-400 text-xs italic mt-1">
         Select the month and year you started
@@ -113,6 +117,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         register={register(`experiences.${expIndex}.end_date`)}
         error={experienceErrors?.end_date?.message}
         disabled={disabled}
+        required={false}
       />
       <p className="text-gray-400 text-xs italic mt-1">
         Select the month and year you ended or leave empty if current
@@ -129,6 +134,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
               register={register(`experiences.${expIndex}.responsibilities.${respIndex}.value`)}
               error={experienceErrors?.responsibilities?.[respIndex]?.value?.message}
               disabled={disabled}
+              required={true}
             />
             <p className="text-gray-400 text-xs italic mt-1">
               Add a key responsibility for this position

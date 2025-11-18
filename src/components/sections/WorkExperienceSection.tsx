@@ -63,73 +63,91 @@ const WorkExperienceSection = ({ cv }: Props) => {
 
   return (
     <>
-      <CVCard title="Work Experience">
-        {workExperiences.length > 0 ? (
-          <div className="space-y-6 font-sans text-subHeadingGray">
-            {workExperiences.map((exp) => (
-              <div
-                key={exp.id}
-                className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
-              >
-                {/* Top-right buttons: Edit & Delete */}
-                <div className="absolute top-4 right-4 flex gap-2 text-sm">
-                  <button
-                    className="text-redMain hover:underline"
-                    onClick={() => {
-                      setEditingExperience(exp);
-                      setShowModal(true);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-gray-400 hover:text-redMain"
-                    onClick={() => handleDelete(exp.id!)}
-                    disabled={loadingDelete === exp.id}
-                  >
-                    {loadingDelete === exp.id ? "⏳" : <FaTrash size={14} />}
-                  </button>
-                </div>
-
-                {/* Job title, company, location */}
-                <h4 className="font-semibold text-base mb-1 text-subHeadingGray">
-                  {exp.job_title}
-                </h4>
-                <p className="text-sm text-subHeadingGray mb-2">
-                  {exp.company} – {exp.location}
-                </p>
-
-                {/* Dates */}
-                <div className="flex flex-wrap gap-2 mb-3 text-xs">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    Start: {exp.start_date}
-                  </span>
-                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    End: {exp.end_date || "Present"}
-                  </span>
-                </div>
-
-                {/* Responsibilities */}
-                {exp.responsibilities && exp.responsibilities.length > 0 && (
-                  <ul className="list-none pl-0 space-y-2 sm:space-y-3 text-sm sm:text-base">
-                    {exp.responsibilities.map((res) => (
-                      <li key={res.id} className="flex items-start gap-2 sm:gap-3">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full mt-1 sm:mt-1.5 flex-shrink-0"></div>
-                        <span>{res.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                )}
-              </div>
-            ))}
+     <CVCard title="Work Experience">
+  {workExperiences.length > 0 ? (
+    <div className="space-y-6 font-sans text-subHeadingGray">
+      {workExperiences.map((exp) => (
+        <div
+          key={exp.id}
+          className="relative rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg hover:bg-redBg transition-all duration-200"
+        >
+          {/* Top-right buttons: Edit & Delete */}
+          <div className="absolute top-4 right-4 flex gap-2 text-sm">
+            <button
+              className="text-redMain hover:underline"
+              onClick={() => {
+                setEditingExperience(exp);
+                setShowModal(true);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              className="text-gray-400 hover:text-redMain"
+              onClick={() => handleDelete(exp.id!)}
+              disabled={loadingDelete === exp.id}
+            >
+              {loadingDelete === exp.id ? "⏳" : <FaTrash size={14} />}
+            </button>
           </div>
-        ) : (
-          <p className="text-gray-400 italic font-sans">
-            No work experience added yet
-          </p>
-        )}
-      </CVCard>
+
+          {/* Job title */}
+          {exp.job_title && (
+            <h4 className="font-semibold text-base mb-1 text-subHeadingGray">
+              {exp.job_title}
+            </h4>
+          )}
+
+          {/* Company and location */}
+          {(exp.company || exp.location) && (
+            <p className="text-sm text-subHeadingGray mb-2">
+              {exp.company}
+              {exp.company && exp.location ? " – " : ""}
+              {exp.location}
+            </p>
+          )}
+
+          {/* Dates */}
+          {(exp.start_date || exp.end_date) && (
+            <div className="flex flex-wrap gap-2 mb-3 text-xs">
+              {exp.start_date && (
+                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  Start: {exp.start_date}
+                </span>
+              )}
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                End: {exp.end_date || "Present"}
+              </span>
+            </div>
+          )}
+
+          {/* Responsibilities */}
+          {exp.responsibilities && exp.responsibilities.length > 0 && (
+            <ul className="list-none pl-0 space-y-2 sm:space-y-3 text-sm sm:text-base">
+              {exp.responsibilities.map(
+                (res) =>
+                  res.value && (
+                    <li
+                      key={res.id}
+                      className="flex items-start gap-2 sm:gap-3"
+                    >
+                      <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full mt-1 sm:mt-1.5 flex-shrink-0"></div>
+                      <span>{res.value}</span>
+                    </li>
+                  )
+              )}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-400 italic font-sans">
+      No work experience added yet
+    </p>
+  )}
+</CVCard>
+
 
       {/* Modal for editing work experience */}
       {showModal && (
