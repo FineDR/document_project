@@ -184,8 +184,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* LinkedIn */}
           <InputField
             type="text"
-            label="LinkedIn"
-            placeholder="linkedin.com/in/username"
+            label="LinkedIn (Optional)"
+             placeholder="https://www.linkedin.com/in/username"
             name="linkedin"
             register={register("linkedin")}
             error={errors.linkedin?.message}
@@ -196,8 +196,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* GitHub */}
           <InputField
             type="text"
-            label="GitHub"
-            placeholder="github.com/username"
+            label="GitHub (Optional)"
+            placeholder="https://github.com/username"
             name="github"
             register={register("github")}
             error={errors.github?.message}
@@ -208,8 +208,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Website */}
           <InputField
             type="text"
-            label="Website"
-            placeholder="www.example.com"
+            label="Website (Optional)"
+            placeholder="https://www.example.com"
             name="website"
             register={register("website")}
             error={errors.website?.message}
@@ -220,7 +220,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Date of Birth */}
           <InputField
             type="date"
-            label="Date of Birth"
+            label="Date of Birth (Optional)"
             name="date_of_birth"
             register={register("date_of_birth")}
             error={errors.date_of_birth?.message}
@@ -231,7 +231,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Nationality */}
           <InputField
             type="text"
-            label="Nationality"
+            label="Nationality (Optional)"
             placeholder="Tanzanian"
             name="nationality"
             register={register("nationality")}
@@ -243,7 +243,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Profile Summary */}
           <InputField
             type="text"
-            label="Profile Summary"
+            label="Profile Summary (Optional)"
             placeholder="Brief description of yourself"
             name="profile_summary"
             register={register("profile_summary")}
@@ -255,7 +255,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           {/* Profile Image */}
           <InputField
             type="file"
-            label="Profile Image"
+            label="Profile Image (Optional)"
             name="profile_image"
             register={register("profile_image")}
             error={errors.profile_image?.message as string | undefined}

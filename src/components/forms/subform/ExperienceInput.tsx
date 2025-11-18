@@ -94,7 +94,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         required={false}
       />
       <p className="text-gray-400 text-xs italic mt-1">
-        City, state, or “Remote”
+        City, state, or “Remote” (Optional)
       </p>
 
       {/* Start Date */}
@@ -120,7 +120,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
         required={false}
       />
       <p className="text-gray-400 text-xs italic mt-1">
-        Select the month and year you ended or leave empty if current
+        Select the month and year you ended or leave empty if current (Optional)
       </p>
 
       {/* Responsibilities */}

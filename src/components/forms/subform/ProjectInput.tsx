@@ -79,7 +79,7 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
             name={`projects.${projectIndex}.link`}
             type="url"
             register={register(`projects.${projectIndex}.link`)}
-            placeholder="e.g., https://github.com/username/project"
+            placeholder="e.g., https://github.com/username/project (Optional)"
             disabled={disabled}
             error={projectErrors?.[projectIndex]?.link?.message}
           />
@@ -137,7 +137,7 @@ const ProjectInput: React.FC<ProjectInputProps> = ({
           )}
           {showHelperText && (
             <p className="text-gray-400 text-xs italic mt-1">
-              Add the key technologies used in this project.
+              Add the key technologies used in this project.(Optional)
             </p>
           )}
         </div>

@@ -181,7 +181,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
     <section className="w-full mx-auto p-6 bg-whiteBg border rounded-md shadow-md">
       <h2 className="text-2xl font-semibold text-center mb-4">Skills</h2>
       <p className="text-gray-600 text-sm mb-6 text-center">
-        Enter your skills clearly. Separate technical skills (tools, frameworks) and soft skills (communication, teamwork, leadership). Required fields are marked with *.
+        Enter your skills clearly. Separate technical skills (tools, frameworks) and soft skills (communication, teamwork, leadership). Required fields are marked with * ,this section is (Optional you can opt it).
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -194,7 +194,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
                 name={`technicalSkills.${index}.value`}
                 type="text"
                 register={register(`technicalSkills.${index}.value`)}
-                placeholder="e.g., React, Node.js"
+                placeholder="e.g., React, Node.js (Optional)"
                 disabled={loading}
               />
               {technicalFieldsArray.fields.length > 1 && (
@@ -232,7 +232,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ skillSet, onClose, onUpdate }) 
                 name={`softSkills.${index}.value`}
                 type="text"
                 register={register(`softSkills.${index}.value`)}
-                placeholder="e.g., Communication"
+                placeholder="e.g., Communication (Optional)"
                 disabled={loading}
               />
               {softFieldsArray.fields.length > 1 && (

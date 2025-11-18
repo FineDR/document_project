@@ -105,18 +105,29 @@ export const certificationsSchema = z.object({
 export const projectSchema = z.object({
   projects: z.array(
     z.object({
-      id: z.number().optional(), 
+      id: z.number().optional(),
+
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
-      link: z.string().url("Must be a valid URL"),
-      technologies: z.array(
-        z.object({
-          value: z.string().min(1, "Technology is required"),
-        })
-      ).min(1, "At least one technology is required"),
+
+      link: z
+        .string()
+        .url("Invalid link")
+        .or(z.literal(""))
+        .optional(),
+
+      technologies: z
+        .array(
+          z.object({ value: z.string().optional() })
+        )
+        .min(1, "At least one technology required")
+
     })
-  ).min(1, "At least one project is required"),
+  ),
 });
+
+
+
 export const achievementsSchema = z.object({
   achievement: z
     .array(
