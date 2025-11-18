@@ -186,7 +186,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                                 {project?.technologies.map((tech) => (
                                                     <span
                                                         key={tech?.id}
-                                                        className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"
+                                                        className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs"
                                                     >
                                                         {tech?.value}
                                                     </span>
@@ -217,7 +217,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                                 {skills.technical_skills.map((tech) => (
                                                     <span
                                                         key={tech?.id}
-                                                        className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"
+                                                        className="bg-blue-100 border border-blue-300 text-blue-700 px-2 py-1 rounded-full text-xs"
                                                     >
                                                         {tech?.value}
                                                     </span>
@@ -234,7 +234,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                                 {skills?.soft_skills?.map((soft) => (
                                                     <span
                                                         key={soft?.id}
-                                                        className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs"
+                                                        className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs"
                                                     >
                                                         {soft?.value}
                                                     </span>
@@ -258,7 +258,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                                 {user?.profile?.certificates.map((cert) => (
                                     <div
                                         key={cert?.id}
-                                        className="flex flex-col gap-1 p-3 border border-gray-200 rounded shadow-sm hover:shadow-md transition-shadow"
+                                        className="flex flex-col gap-1 p-3 "
                                     >
                                         <div className="font-medium text-gray-800">{cert?.name}</div>
                                         <div className="text-sm text-gray-500">{cert?.issuer}</div>

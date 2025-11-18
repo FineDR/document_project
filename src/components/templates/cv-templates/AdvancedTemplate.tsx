@@ -203,7 +203,7 @@ const AdvancedTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                       )}
                       <div className="flex flex-wrap gap-1 text-xs text-blue-700">
                         {proj?.technologies?.map((tech) => (
-                          <span key={tech?.id} className="bg-blue-100 px-2 py-1 rounded-full">{tech?.value}</span>
+                          <span key={tech?.id} className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs">{tech?.value}</span>
                         ))}
                       </div>
                     </div>

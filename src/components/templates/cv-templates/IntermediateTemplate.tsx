@@ -150,7 +150,7 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2 text-xs text-blue-700">
                       {proj?.technologies?.map((tech) => (
-                        <span key={tech?.id} className="bg-blue-100 px-2 py-1 rounded-full">{tech?.value}</span>
+                        <span key={tech?.id} className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs">{tech?.value}</span>
                       ))}
                     </div>
                   </div>
@@ -171,7 +171,12 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Technical Skills</h3>
                         <div className="flex flex-wrap gap-2">
                           {skills?.technical_skills?.map((tech) => (
-                            <span key={tech?.id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">{tech?.value}</span>
+                            <span
+                              key={tech?.id}
+                              className="bg-blue-100 border border-blue-300 text-blue-700 px-2 py-1 rounded-full text-xs"
+                            >
+                              {tech?.value}
+                            </span>
                           ))}
                         </div>
                       </div>
@@ -181,7 +186,12 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Soft Skills</h3>
                         <div className="flex flex-wrap gap-2">
                           {skills?.soft_skills?.map((soft) => (
-                            <span key={soft?.id} className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">{soft?.value}</span>
+                            <span
+                              key={soft?.id}
+                              className="bg-green-100 border border-green-300 text-green-700 px-2 py-1 rounded-full text-xs"
+                            >
+                              {soft?.value}
+                            </span>
                           ))}
                         </div>
                       </div>
