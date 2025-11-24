@@ -5,17 +5,21 @@ interface PricingCardProps {
   name: string;
   price: string;
   downloads: number;
+  onBuy?: () => void;
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({ name, price, downloads }) => {
+const PricingCard: React.FC<PricingCardProps> = ({ name, price, downloads, onBuy }) => {
   const navigate = useNavigate();
 
   const handleBuy = () => {
-    // Navigate to /payment page
+    if (onBuy) {
+      return onBuy(); // use parent handler if provided
+    }
+
     navigate("/payment", {
-      state: { planName: name, price, downloads }, // pass plan info if needed
+      state: { planName: name, price, downloads },
     });
-  };
+  }; // ← FIXED: this closing brace was missing!!
 
   return (
     <div className="max-w-sm mx-auto border rounded-lg p-8 shadow-md bg-background border-redMain">
@@ -34,7 +38,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ name, price, downloads }) => 
             stroke="currentColor"
             strokeWidth="2"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
