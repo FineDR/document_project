@@ -4,21 +4,30 @@ import { CVCard } from "../../utils/CVCard";
 import { FaTrash } from "react-icons/fa";
 import type { User, Certificate } from "../../types/cv/cv";
 import CertificateFormDetails from "../forms/CertificateFormDetails";
-
+import { deleteCertificat } from "../../features/certificates/certificatesSlice";
+import { useDispatch } from "react-redux";
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>;
 }
 
-const CertificationsSection = ({ cv }: Props) => {
+const CertificationsSection = ({ cv,refetchCV }: Props) => {
+   const dispatch = useDispatch();
   // Pull certificates directly from cv data
   const certificates: Certificate[] = cv.profile?.certificates || [];
 
   const [editingCert, setEditingCert] = useState<Certificate | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleDelete = (id?: number) => {
+  const handleDelete =async (id?: number) => {
     if (!id) return;
-    console.log("Delete certificate with id:", id);
+    try {
+    await dispatch(deleteCertificat(id) as any).unwrap();
+    await refetchCV();
+    }catch(err:any){
+      console.error("Failed to delete certificate:", err);
+      return;
+    }
   };
 
   const handleDone = (updatedCert?: Certificate) => {
@@ -62,7 +71,7 @@ const CertificationsSection = ({ cv }: Props) => {
                 <p className="mt-4 text-sm text-subheading">
                   <span className="font-semibold">{cert.name}</span> - {cert.issuer}
                   {cert.date && (
-                    <span className="ml-2 text-xs bg-blue-100 px-2 py-1 dark:text-gray-800 rounded">
+                    <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 dark:text-white px-2 py-1 dark:text-gray-800 rounded">
                       {cert.date}
                     </span>
                   )}

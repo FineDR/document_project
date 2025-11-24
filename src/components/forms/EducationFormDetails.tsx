@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "../formElements/InputField";
@@ -11,9 +11,14 @@ import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "../../store/store";
-import { addEducation, editEducation, removeEducation } from "../../features/educations/educationsSlice";
+import { addEducation, editEducation } from "../../features/educations/educationsSlice";
 import type { Education } from "../../types/cv/cv";
 
+import { AIInputModal } from "../modals/AIInputModal";
+import { AIPreviewModal } from "../modals/AIPreviewModal";
+import { buildAIPromptDynamic } from "../../utils/aiPromptBuilderDynamic";
+import { generateCV } from "../../features/auth/authSlice";
+import { aiTemplates } from "../../utils/aiTemplates";
 type FormFields = {
   education: z.infer<typeof educationSchema>[];
 };
@@ -30,6 +35,13 @@ const EducationFormDetails: React.FC<Props> = ({ editingEducation, onDone }) => 
   const [elapsedTime, setElapsedTime] = useState(0);
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
+
+  // --- AI States ---
+  const [isAIModalOpen, setAIModalOpen] = useState(false);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [aiData, setAIData] = useState<Record<string, any> | null>(null);
+  const [isAILoading, setAILoading] = useState(false);
+  const [currentSection, setCurrentSection] = useState<keyof typeof aiTemplates>("education");
 
   const { register, control, reset, handleSubmit, formState: { errors } } = useForm<FormFields>({
     resolver: zodResolver(z.object({ education: educationSchema.array() })),
@@ -55,6 +67,54 @@ const EducationFormDetails: React.FC<Props> = ({ editingEducation, onDone }) => 
 
   const handleOnClick = () => setActive(!active);
 
+  /* ---------------------- AI Handlers ---------------------- */
+  const handleGenerateEducationFromAI = async (instructionText: string) => {
+    if (!instructionText) return;
+    setAILoading(true);
+
+    try {
+      // Build dynamic AI prompt for the education section
+      const prompt = buildAIPromptDynamic("education", { instruction_text: instructionText });
+
+      // Dispatch the thunk with correct key: instruction_text
+      const resultAction = await dispatch(
+        generateCV({ section: "education", userData: { instruction_text: prompt } })
+      );
+
+      if (generateCV.fulfilled.match(resultAction)) {
+        const payload = resultAction.payload;
+
+        // Extract array using backend's section format
+        const educationArray =
+          payload.educations && Array.isArray(payload.educations)
+            ? payload.educations
+            : [];
+
+        setAIData(educationArray); // for preview modal
+        setAIModalOpen(false);
+        setPreviewOpen(true);
+      } else {
+        console.error("AI generation failed:", resultAction.payload);
+      }
+    } catch (err) {
+      console.error("AI generation error:", err);
+    } finally {
+      setAILoading(false);
+    }
+  };
+
+  const handleAcceptEducationAI = () => {
+    if (!aiData || !Array.isArray(aiData)) return;
+
+    reset({ education: aiData });
+    setSuccessMessage(
+      "✅ Form populated with AI-generated education details. You can review before submission."
+    );
+    setPreviewOpen(false);
+    setAIData(null);
+  };
+
+  /* ---------------------- Form Submit ---------------------- */
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     await withLoader(async () => {
       setElapsedTime(0);
@@ -93,6 +153,18 @@ const EducationFormDetails: React.FC<Props> = ({ editingEducation, onDone }) => 
       <p className="text-gray-600 text-sm mb-4 text-center">
         Fill in your education details carefully. Required fields are marked with *.
       </p>
+
+      {/* AI Button */}
+      {!editingEducation && (
+        <div className="flex justify-center mb-4">
+          <Button
+            type="button"
+            label="✨ Autofill with AI"
+            onClick={() => setAIModalOpen(true)}
+            className="bg-primary text-white hover:bg-primary/90"
+          />
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {fields.map((field, index) => (
@@ -216,6 +288,31 @@ const EducationFormDetails: React.FC<Props> = ({ editingEducation, onDone }) => 
           {successMessage}
         </div>
       )}
+
+      {/* --- AI Modals --- */}
+      <AIInputModal
+        isOpen={isAIModalOpen}
+        onClose={() => setAIModalOpen(false)}
+        onSubmit={handleGenerateEducationFromAI}
+        loading={isAILoading}
+        defaultText={aiTemplates[currentSection]} // <-- template for that section
+        title={`Edit ${currentSection.replace("_", " ")}`}
+        description="You can edit this text. AI will extract the info and fill the form."
+        placeholder="Example: I graduated with BSc in Computer Science from University of Dodoma in 2022."
+        generateLabel="Generate Education"
+        cancelLabel="Cancel"
+      />
+
+      <AIPreviewModal
+        isOpen={isPreviewOpen}
+        data={aiData}
+        onClose={() => setPreviewOpen(false)}
+        onAccept={handleAcceptEducationAI}
+        title="Review AI-Generated Education"
+        description="Confirm the AI-generated education details before populating the form."
+        acceptLabel="Accept & Autofill"
+        discardLabel="Discard"
+      />
     </section>
   );
 };

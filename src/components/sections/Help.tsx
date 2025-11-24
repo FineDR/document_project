@@ -4,29 +4,40 @@ const faqs = [
   {
     question: "How do I create a new document?",
     answer:
-      "Navigate to the 'Create Document' section from the home page or the top navigation and select the type of document you want to create, such as CV or Cover Letter.",
+      "Navigate to the 'Create' section from the top navigation. You can select a document type like CV or Cover Letter, then fill in the details manually or use AI-assisted extraction.",
   },
   {
     question: "Can I save my documents and edit them later?",
     answer:
-      "Yes! All your documents are saved in your account under the 'Documents' section where you can edit or export them anytime.",
+      "Yes! All your documents are saved under the 'Documents' section. You can open, edit, or export them anytime.",
   },
   {
-    question: "What file formats can I export to?",
+    question: "Can AI help me fill in my CV?",
     answer:
-      "You can export your documents as PDF and Word (.docx) files for easy sharing and printing.",
+      "Absolutely! Use the AI Extraction feature to automatically extract your work experience, skills, education, and projects from text or uploaded resumes.",
   },
   {
-    question: "Is there a free plan?",
+    question: "What file formats can I export my documents to?",
     answer:
-      "Yes, our free plan allows you to create up to 3 documents with access to basic templates.",
+      "You can export your documents as PDF files for professional sharing and printing.",
+  },
+  {
+    question: "Do I need an account to use the platform?",
+    answer:
+      "Yes, signing up allows you to save documents, access AI features, and manage your profile. You can start with a free account or upgrade for premium features.",
   },
   {
     question: "How do I upgrade my subscription?",
     answer:
-      "Go to the 'Pricing' page and select the plan that fits your needs. Follow the instructions to upgrade securely.",
+      "Go to the 'Pricing' page, select a plan that fits your needs, and follow the secure upgrade instructions. Premium unlocks unlimited documents, AI enhancements, and advanced templates.",
+  },
+  {
+    question: "Is my data safe?",
+    answer:
+      "Yes, all documents and personal data are stored securely. We use industry-standard encryption and never share your data without consent.",
   },
 ];
+
 
 const Help = () => {
   return (

@@ -4,7 +4,7 @@ import type { UseFormRegisterReturn } from "react-hook-form";
 export interface InputFieldProps {
   name: string;
   type: string;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn; // <-- now optional
   placeholder?: string;
   required?: boolean;
   error?: string;
@@ -43,15 +43,16 @@ const InputField: React.FC<InputFieldProps> = ({
         required={required}
         disabled={disabled}
         autoFocus={autoFocus}
-        {...register}
+        {...(register || {})} // <-- spread only if register exists
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)} // controlled input
         className={`peer block w-full appearance-none rounded-md border px-3 pt-5 pb-2 text-base placeholder-transparent
-    ${error ? "border-redMain focus:ring-redMain" : "border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400"}
-    ${disabled ? "bg-gray-100 cursor-not-allowed dark:bg-gray-700" : "bg-background dark:bg-background"}
-    text-text dark:text-text
-    focus:outline-none focus:ring-2 transition-colors duration-200
-  `}
+          ${error ? "border-redMain focus:ring-redMain" : "border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400"}
+          ${disabled ? "bg-gray-100 cursor-not-allowed dark:bg-gray-700" : "bg-background dark:bg-background"}
+          text-text dark:text-text
+          focus:outline-none focus:ring-2 transition-colors duration-200
+        `}
       />
-
 
       <label
         htmlFor={name}
@@ -67,11 +68,9 @@ const InputField: React.FC<InputFieldProps> = ({
       >
         {label || placeholder}
         {required ? <span className="text-redMain">*</span> : null}
-
       </label>
 
       {error && <p className="mt-1 text-sm text-redMain">{error}</p>}
-
       {!error && helperText && (
         <p className="mt-1 text-sm text-text text-center dark:text-text">{helperText}</p>
       )}

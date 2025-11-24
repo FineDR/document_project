@@ -12,27 +12,27 @@ const Documents = () => {
       icon: <FaFileAlt className="text-3xl text-redMain" />,
       buttonText: 'Create CV',
     },
-    {
-      id: 'official-letter',
-      title: 'Official Letter',
-      description: 'Formal letter template for official communications and correspondence',
-      icon: <FaEnvelope className="text-3xl text-redMain" />,
-      buttonText: 'Create Official Letter',
-    },
-    {
-      id: 'portfolio',
-      title: 'Portfolio',
-      description: 'Showcase your work and projects in a professional portfolio',
-      icon: <FaFileImage className="text-3xl text-redMain" />,
-      buttonText: 'Create Portfolio',
-    },
-    {
-      id: 'certificate',
-      title: 'Certificate',
-      description: 'Create professional certificates for achievements and qualifications',
-      icon: <FaFileSignature className="text-3xl text-redMain" />,
-      buttonText: 'Create Certificate',
-    },
+    // {
+    //   id: 'official-letter',
+    //   title: 'Official Letter',
+    //   description: 'Formal letter template for official communications and correspondence',
+    //   icon: <FaEnvelope className="text-3xl text-redMain" />,
+    //   buttonText: 'Create Official Letter',
+    // },
+    // {
+    //   id: 'portfolio',
+    //   title: 'Portfolio',
+    //   description: 'Showcase your work and projects in a professional portfolio',
+    //   icon: <FaFileImage className="text-3xl text-redMain" />,
+    //   buttonText: 'Create Portfolio',
+    // },
+    // {
+    //   id: 'certificate',
+    //   title: 'Certificate',
+    //   description: 'Create professional certificates for achievements and qualifications',
+    //   icon: <FaFileSignature className="text-3xl text-redMain" />,
+    //   buttonText: 'Create Certificate',
+    // },
   ];
 
   const handleCreateDocument = (docId: string) => {

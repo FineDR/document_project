@@ -9,6 +9,9 @@ import { personalInformationSchema } from "../forms/cvValidationSchema";
 import Loader from "../common/Loader";
 import { useTimedLoader } from "../../hooks/useTimedLoader";
 
+import { aiTemplates } from "../../utils/aiTemplates";
+import { AIInputModal } from "../modals/AIInputModal";
+import { AIPreviewModal } from "../modals/AIPreviewModal";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "../../store/store";
 import {
@@ -16,6 +19,9 @@ import {
   updatePersonalInfo,
   deletePersonalInfo,
 } from "../../features/personalDetails/personalDetailsSlice";
+
+import { generateCV } from "../../features/auth/authSlice";
+import { buildAIPromptDynamic } from "../../utils/aiPromptBuilderDynamic";
 
 type FormFields = z.infer<typeof personalInformationSchema> & {
   profile_image?: FileList;
@@ -31,13 +37,19 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
   const { loading, withLoader } = useTimedLoader(3000);
   const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isAIModalOpen, setAIModalOpen] = useState(false);
+  const [currentSection, setCurrentSection] = useState<keyof typeof aiTemplates>("personal_information");
+  // --- AI Workflow State ---
+  const [isPreviewModalOpen, setPreviewModalOpen] = useState(false);
+  const [aiPreviewData, setAiPreviewData] = useState<any>(null);
+  const [isAILoading, setIsAILoading] = useState(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
   const { selectedPersonalDetail } = useSelector(
     (state: RootState) => state.personalDetails
   );
 
-  const { register, reset, handleSubmit, formState: { errors } } = useForm<FormFields>({
+  const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm<FormFields>({
     resolver: zodResolver(personalInformationSchema),
     defaultValues: existingDetails || {
       phone: "",
@@ -64,12 +76,99 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
     }
   }, [successMessage]);
 
+  // --- AI Handlers ---
+  const handleOpenAI = () => {
+    setAIModalOpen(true);
+  };
+
+  const handleGenerateFromAI = async (instructionText: string) => {
+    if (!instructionText) return;
+
+    setIsAILoading(true);
+    try {
+      // Build dynamic prompt using utility
+      const prompt = buildAIPromptDynamic("personal_information", { instruction_text: instructionText });
+
+      const payload = { section: "personal_information", userData: { prompt } };
+      console.log("Dispatching AI Generation with payload:", payload);
+      const resultAction = await dispatch(generateCV(payload));
+
+      if (generateCV.fulfilled.match(resultAction)) {
+        const generatedData = resultAction.payload;
+        const parsedData = typeof generatedData === 'string' ? JSON.parse(generatedData) : generatedData;
+
+        setAiPreviewData(parsedData);
+        setAIModalOpen(false);
+        setPreviewModalOpen(true);
+      } else {
+        console.error("AI Generation Failed:", resultAction.error);
+      }
+    } catch (error) {
+      console.error("Error dispatching AI generation:", error);
+    } finally {
+      setIsAILoading(false);
+    }
+  };
+
+
+  function convertToISODate(dateString: string): string {
+    if (!dateString) return "";
+
+    const parts = dateString.split(/[\/\-]/); // accept 11/08/2000 or 11-08-2000
+    if (parts.length !== 3) return "";
+
+    let [d, m, y] = parts;
+
+    // If the AI returns MM/DD/YYYY, fix by swapping
+    if (parseInt(d) <= 12 && parseInt(m) > 12) {
+      [d, m] = [m, d];
+    }
+
+    return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  }
+
+  const handleAcceptAI = (rawData: any) => {
+    if (!rawData) return;
+
+    const aiData = rawData.personal_information ?? rawData;
+
+    const flattenedData: Partial<FormFields> = {
+      phone: aiData.phone ?? "",
+      address: aiData.address ?? "",
+      linkedin: aiData.linkedin ?? aiData.social_links?.linkedin ?? "",
+      github: aiData.github ?? aiData.social_links?.github ?? "",
+      website: aiData.website ?? aiData.social_links?.website ?? "",
+
+      // ✅ FIXED: Convert AI DOB to YYYY-MM-DD format
+      date_of_birth: convertToISODate(aiData.date_of_birth),
+
+      nationality: aiData.nationality ?? "",
+      profile_summary: aiData.profile_summary ?? "",
+      profile_image: undefined,
+    };
+
+    console.log("Flattened Data:", flattenedData);
+
+    // Reset form
+    reset(flattenedData, { keepErrors: true, keepDirty: true });
+
+    // Force-set each field to update the UI
+    Object.entries(flattenedData).forEach(([key, value]) => {
+      setValue(key as keyof FormFields, value);
+    });
+
+    setSuccessMessage("✅ Form populated with AI data. Please review and save.");
+    setPreviewModalOpen(false);
+    setAiPreviewData(null);
+  };
+
+
+
+
   if (!user)
     return <p className="text-red-500 text-center mt-4">Not logged in</p>;
 
-  const full_name = [user.first_name, user.middle_name, user.last_name]
-    .filter(Boolean)
-    .join(" ");
+  const full_name = [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" ");
 
   const createFormData = (data: FormFields) => {
     const formData = new FormData();
@@ -143,10 +242,20 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
   };
 
   return (
-    <section className="relative mx-auto mt-6 p-6 border bg-background rounded-lg w-full max-w-3xl shadow-lg">
-      <h2 className="text-center text-2xl font-semibold mb-4">
-        {selectedPersonalDetail ? "Edit Personal Details" : "Fill Personal Details"}
-      </h2>
+    <section className="relative mx-auto mt-6 p-6 border bg-background rounded-lg w-full shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold flex-1 text-center pl-10">
+          {selectedPersonalDetail ? "Edit Personal Details" : "Fill Personal Details"}
+        </h2>
+        <Button
+          type="button"
+          label="✨ Autofill with AI"
+          onClick={handleOpenAI}
+          disabled={loading}
+          className="text-white text-sm px-3 py-2"
+        />
+      </div>
+
       <p className="text-gray-600 text-sm mb-6 text-center">
         Fill in your personal information. This will be displayed in your CV/profile.
       </p>
@@ -157,7 +266,6 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
         encType="multipart/form-data"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Phone */}
           <InputField
             type="text"
             label="Phone Number"
@@ -166,10 +274,9 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("phone")}
             error={errors.phone?.message}
             disabled={loading}
-            required={true}
+            required
           />
 
-          {/* Address */}
           <InputField
             type="text"
             label="Address"
@@ -178,22 +285,19 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("address")}
             error={errors.address?.message}
             disabled={loading}
-            required={true} 
+            required
           />
 
-          {/* LinkedIn */}
           <InputField
             type="text"
             label="LinkedIn (Optional)"
-             placeholder="https://www.linkedin.com/in/username"
+            placeholder="https://www.linkedin.com/in/username"
             name="linkedin"
             register={register("linkedin")}
             error={errors.linkedin?.message}
             disabled={loading}
-            required={false}
           />
 
-          {/* GitHub */}
           <InputField
             type="text"
             label="GitHub (Optional)"
@@ -202,10 +306,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("github")}
             error={errors.github?.message}
             disabled={loading}
-            required={false}
           />
 
-          {/* Website */}
           <InputField
             type="text"
             label="Website (Optional)"
@@ -214,10 +316,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("website")}
             error={errors.website?.message}
             disabled={loading}
-            required={false}
           />
 
-          {/* Date of Birth */}
           <InputField
             type="date"
             label="Date of Birth (Optional)"
@@ -225,10 +325,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("date_of_birth")}
             error={errors.date_of_birth?.message}
             disabled={loading}
-            required={false}
           />
 
-          {/* Nationality */}
           <InputField
             type="text"
             label="Nationality (Optional)"
@@ -237,64 +335,67 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
             register={register("nationality")}
             error={errors.nationality?.message}
             disabled={loading}
-            required={false}
           />
 
-          {/* Profile Summary */}
-          <InputField
-            type="text"
-            label="Profile Summary (Optional)"
-            placeholder="Brief description of yourself"
-            name="profile_summary"
-            register={register("profile_summary")}
-            error={errors.profile_summary?.message}
-            disabled={loading}
-            required={false}
-          />
-
-          {/* Profile Image */}
-          <InputField
-            type="file"
-            label="Profile Image (Optional)"
-            name="profile_image"
-            register={register("profile_image")}
-            error={errors.profile_image?.message as string | undefined}
-            disabled={loading}
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="flex gap-4 flex-wrap mt-4 justify-center">
-          {selectedPersonalDetail && (
-            <Button
-              type="button"
-              label="Delete"
-              onClick={handleDelete}
+          <div className="md:col-span-2">
+            <InputField
+              type="text"
+              label="Profile Summary (Optional)"
+              placeholder="Brief description of yourself"
+              name="profile_summary"
+              register={register("profile_summary")}
+              error={errors.profile_summary?.message}
               disabled={loading}
-              className="bg-red-500 hover:bg-red-600"
             />
-          )}
-          <Button
-            type="submit"
-            onClick={()=>{}}
-            label={selectedPersonalDetail ? "Update" : "Submit"}
-            disabled={loading}
-          />
+          </div>
+
+          <div className="md:col-span-2">
+            <InputField
+              type="file"
+              label="Profile Image (Optional)"
+              name="profile_image"
+              register={register("profile_image")}
+              onChange={(val) => setValue("profile_image", val)}
+              error={errors.profile_image?.message as string | undefined}
+              disabled={loading}
+            />
+          </div>
         </div>
 
-        {/* Loader */}
-        <Loader
-          loading={loading}
-          message={loading ? `Processing... (${elapsedTime}s elapsed)` : ""}
-        />
+
+        <div className="flex gap-4 flex-wrap mt-4 justify-center">
+          {selectedPersonalDetail && <Button type="button" label="Delete" onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600" />}
+          <Button type="submit" onClick={() => { }} label={selectedPersonalDetail ? "Update" : "Save Details"} disabled={loading} />
+        </div>
+
+        <Loader loading={loading} message={loading ? `Processing... (${elapsedTime}s elapsed)` : ""} />
       </form>
 
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
-          {successMessage}
-        </div>
-      )}
+      {successMessage && <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">{successMessage}</div>}
+
+      <AIInputModal
+        isOpen={isAIModalOpen}
+        onClose={() => setAIModalOpen(false)}
+        onSubmit={handleGenerateFromAI}
+        loading={isAILoading}
+        defaultText={aiTemplates[currentSection]}
+        title={`Edit ${currentSection.replace("_", " ")}`}
+        description="You can edit this text. AI will extract the info and fill the form."
+        placeholder="Hi, my name is Sarah. I live in Arusha, Tanzania. Contact: 0655-999-888. Born on June 10, 1998. GitHub: github.com/sarah-codes."
+        generateLabel="Generate Info"
+        cancelLabel="Cancel"
+      />
+
+      <AIPreviewModal
+        isOpen={isPreviewModalOpen}
+        data={aiPreviewData}
+        onClose={() => setPreviewModalOpen(false)}
+        onAccept={handleAcceptAI}
+        title="Review Extracted Personal Info"
+        description="Confirm that the AI-extracted information is correct before filling the form."
+        acceptLabel="Accept & Autofill"
+        discardLabel="Discard"
+      />
     </section>
   );
 };

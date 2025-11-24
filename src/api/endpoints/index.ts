@@ -12,6 +12,7 @@ export const AUTH_ENDPOINTS = {
   users: "auth/user-details/",
   admin: "auth/users/",
   googleAuth: "/auth/google-auth/",
+  ai: "/api/cv/cv-ai/",
 };
 export const PERSONAL_DETAILS_ENDPOINTS = {
   list: "api/personal-details/", // GET, POST
@@ -74,13 +75,13 @@ export const ORDERS_ENDPOINTS = {
   status: (order_id: string) => `api/orders/${order_id}/status/`,
   check: (cv_id: string) => `api/orders/${cv_id}/check/`,
 };
-
 export const PAYMENTS_ENDPOINTS = {
   initiate: "api/payments/initiate/",
   checkout: "api/payments/checkout/",
   azampayCallback: "api/payments/azampay/callback/",
   webhook: "api/payments/webhook/",
 };
+
 
 export const JOBS_ENDPOINTS = {
   list: "api/jobs/",
@@ -104,4 +105,5 @@ export const TEMPLATE_DOWNLOAD: Record<string, string> = {
   Basic: "api/cv/download/basic/",
   Intermediate: "api/cv/download/intermediate/",
   Advanced: "api/cv/download/advanced/",
+
 };

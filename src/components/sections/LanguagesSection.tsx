@@ -14,9 +14,10 @@ import type { RootState } from "../../store/store";
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>; 
 }
 
-const LanguagesSection = ({ cv }: Props) => {
+const LanguagesSection = ({ cv,refetchCV }: Props) => {
   const dispatch = useDispatch();
   const { languages: reduxLanguages, loading } = useSelector(
     (state: RootState) => state.languages
@@ -31,16 +32,25 @@ const LanguagesSection = ({ cv }: Props) => {
     reduxLanguages.length ? reduxLanguages : cv.languages || []
   );
 
-  const handleDelete = (id?: number) => {
-    if (!id) return;
-    setLoadingDelete(id);
-    dispatch(deleteLanguageById(id) as any)
-      .unwrap()
-      .catch((err: any) => console.error("Failed to delete language:", err))
-      .finally(() => setLoadingDelete(null));
-  };
+const handleDelete = async (id?: number) => {
+  if (!id) return;
 
-  const handleDone = (updatedLanguage?: Language) => {
+  setLoadingDelete(id);
+
+  try {
+    // Await the delete action
+    await dispatch(deleteLanguageById(id) as any).unwrap();
+
+    // Refresh CV after deletion
+    await refetchCV();
+  } catch (err: any) {
+    console.error("Failed to delete language:", err);
+  } finally {
+    setLoadingDelete(null);
+  }
+};
+
+  const handleDone = async(updatedLanguage?: Language) => {
     if (!updatedLanguage) {
       setEditingLanguage(null);
       setShowModal(false);
@@ -49,14 +59,16 @@ const LanguagesSection = ({ cv }: Props) => {
 
     if (updatedLanguage.id) {
       // Update existing language
-      dispatch(updateLanguageById({ id: updatedLanguage.id, data: updatedLanguage }) as any)
+      await dispatch(updateLanguageById({ id: updatedLanguage.id, data: updatedLanguage }) as any)
         .unwrap()
         .catch((err: any) => console.error("Failed to update language:", err));
+      await refetchCV()
     } else {
       // Add new language
-      dispatch(addLanguage(updatedLanguage) as any)
+      await dispatch(addLanguage(updatedLanguage) as any)
         .unwrap()
         .catch((err: any) => console.error("Failed to add language:", err));
+      await refetchCV()
     }
 
     setEditingLanguage(null);

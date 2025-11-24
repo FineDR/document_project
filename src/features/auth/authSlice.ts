@@ -6,7 +6,9 @@ import {
     logout,
     getProfile,
     signUpOrSignInWithGoogle,
-    updateProfile
+    updateProfile,
+    getCVFromAI,
+    generateCVWithAI
 } from '../../api/services/authApi';
 
 import { type User } from '../../types/cv/cv';
@@ -85,6 +87,18 @@ export const googleAuthUser = createAsyncThunk<
     }
 );
 
+export const fetchCVWithAI = createAsyncThunk(
+  "cv/fetchAI",
+  async (params: Record<string, any>, { rejectWithValue }) => {
+    try {
+      const response = await getCVFromAI(params);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "AI fetch failed");
+    }
+  }
+);
+
 export const registerUser = createAsyncThunk<User, { name: string; email: string; password: string }>(
     "auth/register",
     async (userData, { rejectWithValue }) => {
@@ -139,7 +153,17 @@ export const logoutUser = createAsyncThunk<void>(
   }
 );
 
-
+export const generateCV = createAsyncThunk(
+  "cv/generate",
+  async (payload: { section: string; userData: any }, { rejectWithValue }) => {
+    try {
+      const response = await generateCVWithAI(payload);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "AI generation failed");
+    }
+  }
+);
 
 
 export const authSlice = createSlice({
@@ -267,6 +291,36 @@ export const authSlice = createSlice({
 
                 localStorage.setItem("token", state.access!);
                 localStorage.setItem("refreshToken", state.refresh!);
+            })
+            .addCase(fetchCVWithAI.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.status = "loading";
+            })
+            .addCase(fetchCVWithAI.fulfilled, (state, action) => {
+                state.loading = false;
+                state.status = "succeeded";
+                // Handle AI CV data as needed
+            })
+            .addCase(fetchCVWithAI.rejected, (state, action) => {
+                state.loading = false;
+                state.status = "failed";
+                state.error = action.payload as string;
+            })
+            .addCase(generateCV.pending,(state)=>{
+                state.loading = true;
+                state.error = null;
+                state.status = "loading";
+            })
+            .addCase(generateCV.fulfilled,(state,action)=>{
+                state.loading = false;
+                state.status = "succeeded";
+                // Handle generated CV data as needed
+            })
+            .addCase(generateCV.rejected,(state,action)=>{
+                state.loading = false;
+                state.status="failed";
+                state.error=action.payload as string;
             })
 
             .addCase(googleAuthUser.rejected, (state, action) => {

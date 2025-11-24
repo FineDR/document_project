@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
+import { useForm, useFieldArray, type SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { certificationsSchema } from "../forms/cvValidationSchema";
 import type { z } from "zod";
@@ -12,25 +12,30 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { useAppDispatch as useDispatch } from "../../hooks/reduxHooks";
 import { addCertificate, updateCertificat } from "../../features/certificates/certificatesSlice";
-import type { Certificate } from "../../types/cv/cv";
 
+import { AIInputModal } from "../modals/AIInputModal";
+import { AIPreviewModal } from "../modals/AIPreviewModal";
+import { buildAIPromptDynamic } from "../../utils/aiPromptBuilderDynamic";
+import { generateCV } from "../../features/auth/authSlice";
+import { aiTemplates } from "../../utils/aiTemplates";
 type FormFields = z.infer<typeof certificationsSchema>;
 
 interface Props {
-  editingCert?: Certificate | null;
+  editingCert?: any | null;
   onClose?: () => void;
-  onUpdate?: (updatedCert: Certificate) => void;
+  onUpdate?: (updatedCert: any) => void;
 }
 
 const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdate }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<FormFields>({
+  const methods = useForm<FormFields>({
     resolver: zodResolver(certificationsSchema),
     defaultValues: { certificates: [{ name: "", issuer: "", date: "" }] },
   });
 
+  const { register, handleSubmit, control, reset, formState: { errors } } = methods;
   const { fields, append, remove, replace } = useFieldArray({ control, name: "certificates" });
 
   const { withLoader } = useTimedLoader(3000);
@@ -38,6 +43,12 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
   const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  // --- AI States ---
+  const [isAIModalOpen, setAIModalOpen] = useState(false);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [aiData, setAIData] = useState<any>(null);
+  const [isAILoading, setAILoading] = useState(false);
+  const [currentSection, setCurrentSection] = useState<keyof typeof aiTemplates>("certifications");
   // Prefill form if editing
   useEffect(() => {
     if (editingCert) {
@@ -47,6 +58,9 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
     }
   }, [editingCert, replace, reset]);
 
+  /* --------------------------------------------------------
+      FORM SUBMIT HANDLER
+  -------------------------------------------------------- */
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     if (!user) return;
 
@@ -56,10 +70,14 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
       certificates: data.certificates.map(cert => ({
         name: cert.name,
         issuer: cert.issuer,
-        date: cert.date        // must be YYYY-MM-DD
+        date: cert.date
       }))
     };
-
+    const certPayload = {
+      name: data.certificates[0].name,
+      issuer: data.certificates[0].issuer,
+      date: data.certificates[0].date,
+    };
     await withLoader(async () => {
       setLoading(true);
       const startTime = Date.now();
@@ -70,7 +88,10 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
         let message = "";
 
         if (editingCert?.id) {
-          resultAction = await dispatch(updateCertificat({ id: editingCert.id, data: payload }));
+          resultAction = await dispatch(updateCertificat({
+            id: editingCert.id,
+            data: certPayload
+          }));
           if (updateCertificat.fulfilled.match(resultAction)) {
             const updatedCert = resultAction.payload;
             message = "Certificate updated successfully ✅";
@@ -102,108 +123,195 @@ const CertificateFormDetails: React.FC<Props> = ({ editingCert, onClose, onUpdat
     });
   };
 
+  /* --------------------------------------------------------
+      AI HANDLERS
+  -------------------------------------------------------- */
+  // --- AI Handler for Certificates ---
+  // --- Generate AI Certificates ---
+  const handleGenerateCertificatesFromAI = async (instructionText: string) => {
+    if (!instructionText) return;
+    setAILoading(true);
+
+    try {
+      // Build dynamic prompt for 'certifications' section
+      const prompt = buildAIPromptDynamic("certifications", { instruction_text: instructionText });
+
+      // Dispatch thunk to request AI-generated CV data
+      const resultAction = await dispatch(
+        generateCV({
+          section: "certifications",
+          userData: { instruction_text: prompt }, // ✅ key must be 'instruction_text'
+        })
+      ).unwrap();
+
+      // Parse the AI response; backend returns { certificates: [...] }
+      const parsedData = typeof resultAction === "string" ? JSON.parse(resultAction) : resultAction;
+
+      const certificates = Array.isArray(parsedData.certificates) ? parsedData.certificates : [];
+
+      setAIData({ certificates }); // Keep object for preview modal
+      setAIModalOpen(false);
+      setPreviewOpen(true);
+    } catch (err) {
+      console.error("Error generating AI certificates:", err);
+    } finally {
+      setAILoading(false);
+    }
+  };
+
+  // --- Accept AI-generated Certificates ---
+  const handleAcceptCertificatesAI = () => {
+    if (!aiData || !aiData.certificates) return;
+
+    // Populate form with AI-generated certificates
+    reset({ certificates: aiData.certificates });
+    setSuccessMessage("✅ AI-generated certificates populated. Review before submission.");
+    setPreviewOpen(false);
+    setAIData(null);
+  };
+
+  /* --------------------------------------------------------
+      RENDER
+  -------------------------------------------------------- */
   return (
-    <section className="w-full mx-auto p-6 bg-whiteBg border rounded-md shadow-md">
-      <h2 className="text-h2 font-semibold text-center mb-4">
-        {editingCert ? "Edit Certificate" : "Add Certificate"}
-      </h2>
+    <FormProvider {...methods}>
+      <section className="w-full mx-auto p-6 bg-whiteBg border rounded-md shadow-md">
+        <h2 className="text-h2 font-semibold text-center mb-4">
+          {editingCert ? "Edit Certificate" : "Add Certificate"}
+        </h2>
 
-      <p className="text-subHeadingGray text-sm mb-6 text-center">
-        Fill in your certificate details. Required fields are marked with *.
-      </p>
+        <p className="text-subHeadingGray text-sm mb-6 text-center">
+          Fill in your certificate details. Required fields are marked with *.
+        </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {fields.map((field, index) => (
-          <div key={field.id} className="p-4 space-y-4 relative">
-            <InputField
-              type="text"
-              label={`Certificate Name *`}
-              placeholder="e.g., AWS Certified Cloud Practitioner"
-              name={`certificates.${index}.name`}
-              register={register(`certificates.${index}.name`)}
-              error={errors.certificates?.[index]?.name?.message}
-              disabled={loading}
-            />
-            <p className="text-gray-500 text-xs">
-              Enter the full name of the certificate or course completed.
-            </p>
-
-            <InputField
-              type="text"
-              label="Issuer *"
-              placeholder="e.g., Amazon Web Services"
-              name={`certificates.${index}.issuer`}
-              register={register(`certificates.${index}.issuer`)}
-              error={errors.certificates?.[index]?.issuer?.message}
-              disabled={loading}
-            />
-            <p className="text-gray-500 text-xs">
-              Name of the organization or platform that issued this certificate.
-            </p>
-
-            <InputField
-              type="date"
-              label="Issued Date *"
-              name={`certificates.${index}.date`}
-              register={register(`certificates.${index}.date`)}
-              error={errors.certificates?.[index]?.date?.message}
-              disabled={loading}
-            />
-            <p className="text-gray-500 text-xs">
-              The date the certificate was awarded.
-            </p>
-
-            {fields.length > 1 && (
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                disabled={loading}
-                className="text-red-500 underline text-sm mt-1"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        ))}
-
-        <div className="flex flex-wrap gap-3 justify-start">
+        {/* AI Button */}
+        <div className="flex justify-center mb-4">
           <Button
             type="button"
-            label="+ Add Certificate"
-            onClick={() => append({ name: "", issuer: "", date: "" })}
-            disabled={loading}
-            className="text-white mx-4"
+            label="✨ Autofill with AI"
+            onClick={() => setAIModalOpen(true)}
+            className="bg-primary text-white hover:bg-primary/90"
           />
-          <Button
-            type="submit"
-            onClick={() => { }}
-            label={editingCert ? "Update" : "Submit"}
-            disabled={loading}
-            className="text-white"
-          />
-          {onClose && (
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {fields.map((field, index) => (
+            <div key={field.id} className="p-4 space-y-4 relative">
+              <InputField
+                type="text"
+                label={`Certificate Name *`}
+                placeholder="e.g., AWS Certified Cloud Practitioner"
+                name={`certificates.${index}.name`}
+                register={register(`certificates.${index}.name`)}
+                error={errors.certificates?.[index]?.name?.message}
+                disabled={loading}
+              />
+              <p className="text-gray-400 text-xs italic mt-1">
+                Enter the official name of the certificate or course you completed.
+              </p>
+
+              <InputField
+                type="text"
+                label="Issuer *"
+                placeholder="e.g., Amazon Web Services"
+                name={`certificates.${index}.issuer`}
+                register={register(`certificates.${index}.issuer`)}
+                error={errors.certificates?.[index]?.issuer?.message}
+                disabled={loading}
+              />
+              <p className="text-gray-400 text-xs italic mt-1">
+                The organization or institution that issued the certificate.
+              </p>
+
+              <InputField
+                type="date"
+                label="Issued Date *"
+                name={`certificates.${index}.date`}
+                register={register(`certificates.${index}.date`)}
+                error={errors.certificates?.[index]?.date?.message}
+                disabled={loading}
+              />
+              <p className="text-gray-400 text-xs italic mt-1">
+                Select the date when the certificate was awarded.
+              </p>
+
+              {fields.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => remove(index)}
+                  disabled={loading}
+                  className="text-red-500 underline text-sm mt-1"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+
+          <div className="flex flex-wrap gap-3 justify-start">
             <Button
               type="button"
-              label="Cancel"
-              onClick={onClose}
-              className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+              label="+ Add Certificate"
+              onClick={() => append({ name: "", issuer: "", date: "" })}
               disabled={loading}
+              className="text-white mx-4"
             />
-          )}
-        </div>
+            <Button
+              type="submit"
+              onClick={() => { }}
+              label={editingCert ? "Update" : "Submit"}
+              disabled={loading}
+              className="text-white"
+            />
+            {onClose && (
+              <Button
+                type="button"
+                label="Cancel"
+                onClick={onClose}
+                className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+                disabled={loading}
+              />
+            )}
+          </div>
 
-        <Loader
-          loading={loading}
-          message={loading ? `Saving certificates... (${elapsedTime}s)` : ""}
+          <Loader
+            loading={loading}
+            message={loading ? `Saving certificates... (${elapsedTime}s)` : ""}
+          />
+        </form>
+
+        {successMessage && (
+          <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
+            {successMessage}
+          </div>
+        )}
+
+        {/* --- AI Modals --- */}
+        <AIInputModal
+          isOpen={isAIModalOpen}
+          onClose={() => setAIModalOpen(false)}
+          onSubmit={handleGenerateCertificatesFromAI}
+          loading={isAILoading}
+          defaultText={aiTemplates[currentSection]} // <-- template for that section
+          title={`Edit ${currentSection.replace("_", " ")}`}
+          description="You can edit this text. AI will extract the info and fill the form."
+          placeholder="I have completed AWS Certified Cloud Practitioner and React Developer courses."
+          generateLabel="Generate Certificates"
+          cancelLabel="Cancel"
         />
-      </form>
 
-      {successMessage && (
-        <div className="mt-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-700 text-center">
-          {successMessage}
-        </div>
-      )}
-    </section>
+        <AIPreviewModal
+          isOpen={isPreviewOpen}
+          data={aiData}
+          onClose={() => setPreviewOpen(false)}
+          onAccept={handleAcceptCertificatesAI}
+          title="Review Extracted Certificates"
+          description="Confirm the AI-generated certificates before populating the form."
+          acceptLabel="Accept & Autofill"
+          discardLabel="Discard"
+        />
+      </section>
+    </FormProvider>
   );
 };
 

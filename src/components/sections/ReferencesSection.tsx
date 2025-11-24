@@ -10,7 +10,8 @@ import {
   editReference,
   deleteReferenceById,
 } from "../../features/references/referencesSlice";
-
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 interface Props {
   cv: User;
   refetchCV: () => Promise<void>; // add this prop to refresh CV data after changes
@@ -97,7 +98,7 @@ const ReferencesSection = ({ cv, refetchCV }: Props) => {
                 {/* Reference Details */}
                 <h4 className="font-semibold text-gray-800 dark:text-white">{reference.name}</h4>
                 {reference.position && (
-                  <span className="inline-block mt-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  <span className="inline-block mt-1 bg-blue-100 dark:bg-blue-900 dark:text-white text-blue-800 text-xs px-2 py-1 rounded-full">
                     {reference.position}
                   </span>
                 )}

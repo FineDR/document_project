@@ -17,6 +17,7 @@ import CVEditor from "../pages/CVEditor";
 import PDFReports from "../pages/PDFReports";
 import SignUpPage from "../components/auth/SignUp";
 import { SignInPage } from "../components/auth/SignIn";
+import PaymentComponent from "../components/sections/PaymentComponent";
 
 export interface pageRouteConfig<P = {}> {
   forNav?: boolean;
@@ -69,6 +70,16 @@ export const routes: pageRouteConfig[] = [
     seo: {
       title: "Smart Docs - Help",
       description: "Get help and support for using Smart Docs features and tools."
+    },},
+     {
+    forNav: false,
+    path: "/payment",
+    element: PaymentComponent,
+    name: "Payment",
+    layout: true,
+    seo: {
+      title: "Smart Docs - Payment",
+      description: "Get payment and support for using Smart Docs features and tools."
     }
   },
 
@@ -139,8 +150,8 @@ export const routes: pageRouteConfig[] = [
     signedIn:true,
     dropdown: [
       { name: "CV", path: "/create/cv", active: true },
-      { name: "Official Letter", path: "/create/official-letter", active: true },
-      { name: "PDF Reports", path: "/create/pdf-reports", active: true },
+      { name: "Official Letter", path: "/create/official-letter", active: false },
+      { name: "PDF Reports", path: "/create/pdf-reports", active: false },
       { name: "New Portfolio", path: "/create/portfolio", active: false },
       { name: "New Certificate", path: "/create/certificate", active: false },
     ],

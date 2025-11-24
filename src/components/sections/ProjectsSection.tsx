@@ -13,9 +13,10 @@ import {
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>;
 }
 
-const ProjectsSection = ({ cv }: Props) => {
+const ProjectsSection = ({ cv,refetchCV }: Props) => {
   const dispatch = useDispatch();
   const [projects, setProjects] = useState<Project[]>(cv.projects || []);
   const [showModal, setShowModal] = useState(false);
@@ -27,6 +28,7 @@ const ProjectsSection = ({ cv }: Props) => {
     try {
       setLoadingDelete(projectId);
       await dispatch(deleteProjectById(projectId) as any).unwrap();
+      await refetchCV();
       setProjects((prev) => prev.filter((proj) => proj.id !== projectId));
     } catch (error) {
       console.error("Failed to delete project:", error as any);
@@ -101,7 +103,7 @@ const handleDone = (updatedProject: Project) => {
                       {project.technologies.map((tech: any, i: number) => (
                         <span
                           key={i}
-                          className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                          className="bg-blue-100 dark:bg-blue-900 dark:text-white text-blue-800 text-xs px-2 py-1 rounded-full"
                         >
                           {tech.value}
                         </span>

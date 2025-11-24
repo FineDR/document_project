@@ -14,9 +14,10 @@ import type { AppDispatch } from "../../store/store";
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>;
 }
 
-const WorkExperienceSection = ({ cv }: Props) => {
+const WorkExperienceSection = ({ cv,refetchCV }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
   const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>(
     cv.work_experiences || []
@@ -30,6 +31,7 @@ const WorkExperienceSection = ({ cv }: Props) => {
     try {
       setLoadingDelete(id);
       await dispatch(deleteWorkExperienceById(id) as any).unwrap();
+      await refetchCV();
       setWorkExperiences((prev) => prev.filter((exp) => exp.id !== id));
     } catch (error) {
       console.error("Failed to delete work experience:", error);
@@ -38,28 +40,29 @@ const WorkExperienceSection = ({ cv }: Props) => {
     }
   };
 
-  const handleDone = async (updatedExperience: WorkExperience) => {
-    try {
-      if (updatedExperience.id) {
-        // Existing experience → update
-        const updated = await dispatch(
-          updateWorkExperienceById({ id: updatedExperience.id, data: updatedExperience })
-        ).unwrap();
-        setWorkExperiences((prev) =>
-          prev.map((exp) => (exp.id === updated.id ? updated : exp))
-        );
-      } else {
-        // New experience → add
-        const created = await dispatch(addWorkExperience(updatedExperience) as any).unwrap();
-        setWorkExperiences((prev) => [...prev, created]);
-      }
-    } catch (error) {
-      console.error("Failed to save work experience:", error);
-    } finally {
-      setShowModal(false);
-      setEditingExperience(null);
+const handleDone = async (updatedExperience: WorkExperience) => {
+  try {
+    if (updatedExperience.id) {
+      // Existing experience → update
+      await dispatch(
+        updateWorkExperienceById({ id: updatedExperience.id, data: updatedExperience }) as any
+      ).unwrap();
+    } else {
+      // New experience → add
+      await dispatch(addWorkExperience(updatedExperience) as any).unwrap();
     }
-  };
+
+    // Refresh CV to reflect latest changes
+    await refetchCV();
+  } catch (error) {
+    console.error("Failed to save work experience:", error);
+  } finally {
+    // Close modal and reset editing state
+    setShowModal(false);
+    setEditingExperience(null);
+  }
+};
+
 
   return (
     <>
@@ -111,11 +114,11 @@ const WorkExperienceSection = ({ cv }: Props) => {
           {(exp.start_date || exp.end_date) && (
             <div className="flex flex-wrap gap-2 mb-3 text-xs">
               {exp.start_date && (
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                <span className="bg-blue-100 dark:bg-blue-900 dark:text-white text-blue-800 px-2 py-1 rounded-full">
                   Start: {exp.start_date}
                 </span>
               )}
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+              <span className="bg-green-100 dark:bg-green-900 dark:text-white text-green-800 px-2 py-1 rounded-full">
                 End: {exp.end_date || "Present"}
               </span>
             </div>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { payments, checkout, azampayCallback, webhook } from "../../api/services/paymentsApi";
+import { initiatePayment as initiatePaymentApi, checkout, azampayCallback, webhook } from "../../api/services/paymentsApi";
 
 // --------------------
 // Types for API responses
@@ -61,53 +61,53 @@ const initialState: PaymentState = {
 // --------------------
 export const initiatePayment = createAsyncThunk<
     PaymentResponse,
-    void,
+    Record<string, any>,
     { rejectValue: string }
->("payments/initiate", async (_, { rejectWithValue }) => {
+>("payments/initiate", async (payload, { rejectWithValue }) => {
     try {
-        const response = await payments();
+        const response = await initiatePaymentApi(payload);
         return response.data as PaymentResponse;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data || "An error occurred");
+        return rejectWithValue(error.response?.data?.message || "Payment initiation failed");
     }
 });
 
 export const processCheckout = createAsyncThunk<
     CheckoutResponse,
-    any,
+    Record<string, any>,
     { rejectValue: string }
->("payments/checkout", async (data, { rejectWithValue }) => {
+>("payments/checkout", async (payload, { rejectWithValue }) => {
     try {
-        const response = await checkout(data);
+        const response = await checkout(payload);
         return response.data as CheckoutResponse;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data || "An error occurred");
+        return rejectWithValue(error.response?.data?.message || "Checkout failed");
     }
 });
 
 export const handleAzampayCallback = createAsyncThunk<
     CallbackResponse,
-    any,
+    Record<string, any>,
     { rejectValue: string }
->("payments/azampayCallback", async (data, { rejectWithValue }) => {
+>("payments/azampayCallback", async (callbackData, { rejectWithValue }) => {
     try {
-        const response = await azampayCallback(data);
+        const response = await azampayCallback(callbackData);
         return response.data as CallbackResponse;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data || "An error occurred");
+        return rejectWithValue(error.response?.data?.message || "Callback processing failed");
     }
 });
 
 export const handleWebhook = createAsyncThunk<
     WebhookResponse,
-    any,
+    Record<string, any>,
     { rejectValue: string }
->("payments/webhook", async (data, { rejectWithValue }) => {
+>("payments/webhook", async (webhookData, { rejectWithValue }) => {
     try {
-        const response = await webhook(data);
+        const response = await webhook(webhookData);
         return response.data as WebhookResponse;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data || "An error occurred");
+        return rejectWithValue(error.response?.data?.message || "Webhook handling failed");
     }
 });
 
@@ -139,7 +139,7 @@ const paymentSlice = createSlice({
         });
         builder.addCase(initiatePayment.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload as string;
+            state.error = action.payload || "Payment initiation failed";
         });
 
         // processCheckout
@@ -153,7 +153,7 @@ const paymentSlice = createSlice({
         });
         builder.addCase(processCheckout.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload as string;
+            state.error = action.payload || "Checkout failed";
         });
 
         // handleAzampayCallback
@@ -167,7 +167,7 @@ const paymentSlice = createSlice({
         });
         builder.addCase(handleAzampayCallback.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload as string;
+            state.error = action.payload || "Callback failed";
         });
 
         // handleWebhook
@@ -181,7 +181,7 @@ const paymentSlice = createSlice({
         });
         builder.addCase(handleWebhook.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload as string;
+            state.error = action.payload || "Webhook failed";
         });
     },
 });

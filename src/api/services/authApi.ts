@@ -28,5 +28,11 @@ export const userDetails=()=>axiosClient.get(AUTH_ENDPOINTS.admin);
 export const signUpOrSignInWithGoogle = (data: any) =>
   axiosClient.post(AUTH_ENDPOINTS.googleAuth, data);
 
+export const generateCVWithAI = (data: any) =>
+  axiosClient.post(AUTH_ENDPOINTS.ai, data);
+
+export const getCVFromAI = (params: Record<string, any>) =>
+  axiosClient.get(AUTH_ENDPOINTS.ai, { params });
+
 
 

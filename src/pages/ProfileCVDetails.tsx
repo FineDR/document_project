@@ -26,7 +26,8 @@ const CVPage = () => {
   const [signInIsOpen, setSignInIsOpen] = useState(!user);
 
   // ✅ Updated: remove user?.id
-  const { data: cvData, loading, error } = useCurrentUserCV();
+ const { data: cvData, loading, error, refresh } = useCurrentUserCV();
+
 
   const closeSignIn = () => setSignInIsOpen(false);
   // console.log("cvdata", cvData);
@@ -142,19 +143,15 @@ const CVPage = () => {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <PersonalInfoSection cv={cvData!} />
-        <ProjectsSection cv={cvData!} />
-        <WorkExperienceSection cv={cvData!} />
-        <EducationSection cv={cvData!} />
-        <SkillsSection cv={cvData!} />
-        <CertificationsSection cv={cvData!} />
-        <AchievementsSection cv={cvData!} />
-        <LanguagesSection cv={cvData!} />
-        <ReferencesSection cv={cvData!} refetchCV={function (): Promise<void> {
-          throw new Error("Function not implemented.");
-        }} />
-        <CareerObjectiveSection cv={cvData!} refetchCV={function (): Promise<void> {
-          throw new Error("Function not implemented.");
-        }} />
+        <ProjectsSection cv={cvData!} refetchCV={refresh}/>
+        <WorkExperienceSection cv={cvData!} refetchCV={refresh} />
+        <EducationSection cv={cvData!} refetchCV={refresh} />
+        <SkillsSection cv={cvData!} refetchCV={refresh} />
+        <CertificationsSection cv={cvData!} refetchCV={refresh} />
+        <AchievementsSection cv={cvData!} refetchCV={refresh} />
+        <LanguagesSection cv={cvData!} refetchCV={refresh}/>
+        <ReferencesSection cv={cvData!} refetchCV={refresh} />
+        <CareerObjectiveSection cv={cvData!} refetchCV={refresh} />
       </div>
     </main>
   );

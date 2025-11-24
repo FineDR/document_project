@@ -14,9 +14,10 @@ import {
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>;
 }
 
-const SkillsSection = ({ cv }: Props) => {
+const SkillsSection = ({ cv,refetchCV }: Props) => {
   const dispatch = useDispatch();
   const skillSet = cv.skill_sets?.[0];
   const [skillsData, setSkillsData] = useState<SkillSet | null>(skillSet || null);
@@ -41,6 +42,7 @@ const SkillsSection = ({ cv }: Props) => {
       setLoadingDelete(skillId);
       await dispatch(deleteTechnicalSkillById(skillId) as any).unwrap();
       await dispatch(deleteSoftSkillById(skillId) as any).unwrap();
+      await refetchCV();
 
       setSkillsData((prev) => {
         if (!prev) return prev;
@@ -79,6 +81,7 @@ const SkillsSection = ({ cv }: Props) => {
         const newSkill = await dispatch(addSkill(skill) as any).unwrap();
         skill.id = newSkill.id; // Assign new id
       }
+      await refetchCV();
     }
 
     // Update soft skills
@@ -89,6 +92,7 @@ const SkillsSection = ({ cv }: Props) => {
         const newSkill = await dispatch(addSkill(skill) as any).unwrap();
         skill.id = newSkill.id;
       }
+      await refetchCV()
     }
 
     setSkillsData(updatedSkillSet);
@@ -122,7 +126,7 @@ const SkillsSection = ({ cv }: Props) => {
                   technicalSkills.map((skill: Skill) => (
                     <span
                       key={skill.id}
-                      className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
+                      className="bg-blue-100 text-blue-800 px-3 py-1.5 dark:bg-blue-900 dark:text-white rounded-full flex items-center gap-2 text-sm"
                     >
                       {skill.value}
                       {skill.id && (
@@ -162,7 +166,7 @@ const SkillsSection = ({ cv }: Props) => {
                   softSkills.map((skill: Skill) => (
                     <span
                       key={skill.id}
-                      className="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-sm"
+                      className="bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full dark:bg-green-900 dark:text-white flex items-center gap-2 text-sm"
                     >
                       {skill.value}
                       {skill.id && (

@@ -16,13 +16,17 @@ import { useTimedLoader } from "../../hooks/useTimedLoader";
 
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "../../store/store";
-import type { Project } from "../../types/cv/cv";
-
+import { aiTemplates } from "../../utils/aiTemplates";
 import {
   addProject,
   updateProjectById,
   deleteProjectById,
 } from "../../features/projects/projectsSlice";
+
+import { AIInputModal } from "../modals/AIInputModal";
+import { AIPreviewModal } from "../modals/AIPreviewModal";
+import { buildAIPromptDynamic } from "../../utils/aiPromptBuilderDynamic";
+import { generateCV } from "../../features/auth/authSlice";
 
 type FormFields = z.infer<typeof projectSchema>;
 
@@ -40,6 +44,12 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
   const [active, setActive] = useState(false);
   const hoverStyle = "hover:bg-red-500/60";
 
+  // --- AI States ---
+  const [isAIModalOpen, setAIModalOpen] = useState(false);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [aiData, setAIData] = useState<any>(null);
+  const [isAILoading, setAILoading] = useState(false);
+const [currentSection, setCurrentSection] = useState<keyof typeof aiTemplates>("projects");
   const methods = useForm<FormFields>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -67,101 +77,96 @@ const ProjectFormDetails: React.FC<Props> = ({ existingProjects, onDone }) => {
     }
   }, [successMessage]);
 
-  if (!user) return <p className="text-red-500">Not logged in</p>;
+  if (!user) return <p className="text-red-500 text-center mt-4">Not logged in</p>;
 
-const onSubmit: SubmitHandler<FormFields> = async (data) => {
-  // console.log("Submitting projects payload:", JSON.stringify(data, null, 2));
-
-  await withLoader(async () => {
-    const startTime = Date.now();
-    setElapsedTime(0);
-    const interval = setInterval(
-      () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
-      100
-    );
-
-    try {
-      let message = "";
-
-      // 1️⃣ Filter valid projects (title required)
-      const validProjects = data.projects.filter(p => p.title.trim() !== "");
-
-      // 2️⃣ Split into updates vs new
-      type ProjectWithId = { id: number; title: string; description: string; link: string; technologies: { value: string }[] };
-      type ProjectWithoutId = Omit<ProjectWithId, "id">;
-
-      const projectsToUpdate = validProjects.filter(
-        (p): p is ProjectWithId => typeof (p as any).id === "number"
+  /* --------------------------------------------------------
+      FORM SUBMIT HANDLER
+  -------------------------------------------------------- */
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    await withLoader(async () => {
+      const startTime = Date.now();
+      setElapsedTime(0);
+      const interval = setInterval(
+        () => setElapsedTime(Math.floor((Date.now() - startTime) / 1000)),
+        100
       );
 
-      const projectsToAdd = validProjects.filter(
-        (p): p is ProjectWithoutId => !(p as any).id
-      );
+      try {
+        let message = "";
 
-      const finalProjects: ProjectWithId[] = [];
+        // 1️⃣ Filter valid projects (title required)
+        const validProjects = data.projects.filter((p) => p.title.trim() !== "");
 
-      // 3️⃣ Update existing projects
-      for (const proj of projectsToUpdate) {
-        const payload = {
-          title: proj.title,
-          description: proj.description,
-          link: proj.link,
-          technologies: proj.technologies.filter(t => t.value.trim() !== ""),
-        };
+        type ProjectWithId = { id: number; title: string; description: string; link: string; technologies: { value: string }[] };
+        type ProjectWithoutId = Omit<ProjectWithId, "id">;
 
-        // Assert id exists
-        const updatedProject = await dispatch(
-          updateProjectById({ id: proj.id!, data: payload })
-        ).unwrap();
+        const projectsToUpdate = validProjects.filter(
+          (p): p is ProjectWithId => typeof (p as any).id === "number"
+        );
 
-        finalProjects.push({
-          ...updatedProject,
-          technologies: updatedProject.technologies || [],
-        });
+        const projectsToAdd = validProjects.filter(
+          (p): p is ProjectWithoutId => !(p as any).id
+        );
+
+        const finalProjects: ProjectWithId[] = [];
+
+        // 2️⃣ Update existing projects
+        for (const proj of projectsToUpdate) {
+          const payload = {
+            title: proj.title,
+            description: proj.description,
+            link: proj.link,
+            technologies: proj.technologies.filter((t) => t.value.trim() !== ""),
+          };
+
+          const updatedProject = await dispatch(
+            updateProjectById({ id: proj.id!, data: payload })
+          ).unwrap();
+
+          finalProjects.push({
+            ...updatedProject,
+            technologies: updatedProject.technologies || [],
+          });
+        }
+
+        // 3️⃣ Add new projects
+        for (const proj of projectsToAdd) {
+          const payload = {
+            title: proj.title,
+            description: proj.description,
+            link: proj.link,
+            technologies: proj.technologies.filter((t) => t.value.trim() !== ""),
+          };
+
+          const newProject = await dispatch(addProject(payload)).unwrap();
+
+          finalProjects.push({
+            ...newProject,
+            technologies: newProject.technologies || [],
+          });
+        }
+
+        // 4️⃣ Reset form with backend IDs preserved
+        reset({ projects: finalProjects });
+        finalProjects.forEach((proj) => onDone?.(proj));
+
+        message =
+          finalProjects.length === validProjects.length
+            ? "✅ Projects submitted successfully."
+            : "✅ Projects updated/added successfully.";
+
+        setSuccessMessage(message);
+      } catch (error) {
+        console.error("Error submitting projects:", error);
+      } finally {
+        clearInterval(interval);
       }
+    });
+  };
 
-      // 4️⃣ Add new projects
-      for (const proj of projectsToAdd) {
-        const payload = {
-          title: proj.title,
-          description: proj.description,
-          link: proj.link,
-          technologies: proj.technologies.filter(t => t.value.trim() !== ""),
-        };
-
-        const newProject = await dispatch(addProject(payload)).unwrap();
-
-        finalProjects.push({
-          ...newProject,
-          technologies: newProject.technologies || [],
-        });
-      }
-
-      // 5️⃣ Reset form with backend IDs preserved
-      reset({ projects: finalProjects });
-
-      finalProjects.forEach(proj => onDone?.(proj));
-
-      message =
-        finalProjects.length === validProjects.length
-          ? "✅ Projects submitted successfully."
-          : "✅ Projects updated/added successfully.";
-
-      setSuccessMessage(message);
-    } catch (error) {
-      console.error("Error submitting projects:", error);
-    } finally {
-      clearInterval(interval);
-    }
-  });
-};
-
-
-
-
-
-
-
+  /* --------------------------------------------------------
+      DELETE HANDLER
+  -------------------------------------------------------- */
   const handleDelete = async (projectId?: number) => {
     if (!projectId) return;
     await withLoader(async () => {
@@ -178,6 +183,55 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
     });
   };
 
+  /* --------------------------------------------------------
+      AI HANDLERS
+  -------------------------------------------------------- */
+  // --- Generate AI Projects ---
+  const handleGenerateProjectsFromAI = async (instructionText: string) => {
+    if (!instructionText) return;
+    setAILoading(true);
+
+    try {
+      // Build dynamic prompt for 'projects' section
+      const prompt = buildAIPromptDynamic("projects", { instruction_text: instructionText });
+
+      // Dispatch thunk to request AI-generated CV data
+      const resultAction = await dispatch(
+        generateCV({
+          section: "projects",
+          userData: { instruction_text: prompt }, // ✅ key must be 'instruction_text'
+        })
+      ).unwrap();
+
+      // Parse AI response; backend returns { projects: [...] }
+      const parsedData = typeof resultAction === "string" ? JSON.parse(resultAction) : resultAction;
+
+      const projects = Array.isArray(parsedData.projects) ? parsedData.projects : [];
+
+      setAIData({ projects }); // Keep object for preview modal
+      setAIModalOpen(false);
+      setPreviewOpen(true);
+    } catch (err) {
+      console.error("Error generating AI projects:", err);
+    } finally {
+      setAILoading(false);
+    }
+  };
+
+  // --- Accept AI-generated Projects ---
+  const handleAcceptProjectsAI = () => {
+    if (!aiData || !aiData.projects) return;
+
+    // Populate form with AI-generated projects
+    reset({ projects: aiData.projects });
+    setSuccessMessage("✅ AI-generated projects populated. Review before submission.");
+    setPreviewOpen(false);
+    setAIData(null);
+  };
+
+  /* --------------------------------------------------------
+      RENDER
+  -------------------------------------------------------- */
   return (
     <FormProvider {...methods}>
       <section className="w-full mx-auto p-6 bg-whiteBg border rounded-lg shadow-md">
@@ -189,6 +243,18 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
           Add your projects clearly — include title, description, technologies used,
           and links if any. Required fields are marked with *.
         </p>
+
+        {/* AI Button */}
+        {!existingProjects && (
+          <div className="flex justify-center mb-4">
+            <Button
+              type="button"
+              label="✨ Autofill with AI"
+              onClick={() => setAIModalOpen(true)}
+              className="bg-primary text-white hover:bg-primary/90"
+            />
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {projectFields.map((project, index) => (
@@ -255,6 +321,31 @@ const onSubmit: SubmitHandler<FormFields> = async (data) => {
             {successMessage}
           </div>
         )}
+
+        {/* --- AI Modals --- */}
+        <AIInputModal
+          isOpen={isAIModalOpen}
+          onClose={() => setAIModalOpen(false)}
+          onSubmit={handleGenerateProjectsFromAI}
+          loading={isAILoading}
+          defaultText={aiTemplates[currentSection]} // <-- template for that section
+          title={`Edit ${currentSection.replace("_", " ")}`}
+          description="You can edit this text. AI will extract the info and fill the form."
+          placeholder="Example: I built a portfolio website with React and TailwindCSS."
+          generateLabel="Generate Projects"
+          cancelLabel="Cancel"
+        />
+
+        <AIPreviewModal
+          isOpen={isPreviewOpen}
+          data={aiData}
+          onClose={() => setPreviewOpen(false)}
+          onAccept={handleAcceptProjectsAI}
+          title="Review Extracted Projects"
+          description="Confirm the AI-generated projects before populating the form."
+          acceptLabel="Accept & Autofill"
+          discardLabel="Discard"
+        />
       </section>
     </FormProvider>
   );

@@ -16,7 +16,10 @@ export const useCurrentUserCV = () => {
     dispatch(fetchCv());
   }, [dispatch]);
 
-  const refresh = () => dispatch(fetchCv());
+  // ✅ Updated refresh function
+  const refresh = async (): Promise<void> => {
+    await dispatch(fetchCv());
+  };
 
   return { data: cv as User | null, loading, error, refresh };
 };

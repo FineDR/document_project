@@ -10,9 +10,10 @@ import { type AppDispatch } from "../../store/store";
 
 interface Props {
   cv: User;
+  refetchCV: () => Promise<void>;
 }
 
-const AchievementsSection = ({ cv }: Props) => {
+const AchievementsSection = ({ cv,refetchCV }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
   // Use achievements directly from cv data
   const achievements: Achievement[] = cv.achievement_profile?.achievements || [];
@@ -27,14 +28,10 @@ const handleDelete = async (id?: number) => {
     const confirmed = window.confirm("Are you sure you want to delete this achievement?");
     if (!confirmed) return;
 
-    const resultAction = await dispatch(deleteAchievementById(id));
+     await dispatch(deleteAchievementById(id));
+     await refetchCV();
 
-    if (deleteAchievementById.fulfilled.match(resultAction)) {
-      console.log("Achievement deleted successfully:", id);
-      // Optionally, show toast or update local state
-    } else {
-      console.error("Failed to delete achievement:", resultAction.payload);
-    }
+   
   } catch (error) {
     console.error("Error deleting achievement:", error);
   }
