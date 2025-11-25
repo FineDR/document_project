@@ -9,7 +9,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
     const user = useSelector((state: RootState) => state.auth.user);
 
     const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
-
+    console.log("the path", user?.personal_details?.profile_image);
     if (!user && isPreview) {
         return (
             <div className="space-y-2 p-2">
