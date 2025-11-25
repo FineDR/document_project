@@ -10,6 +10,7 @@ const TraditionalTemplate = ({ isPreview }: AdvancedTemplateProps) => {
 
     const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
     console.log("the path", user?.personal_details?.profile_image);
+    console.log("backend base", import.meta.env.VITE_APP_API_BASE_URL);
     if (!user && isPreview) {
         return (
             <div className="space-y-2 p-2">
