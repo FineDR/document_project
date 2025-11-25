@@ -52,6 +52,9 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
   const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm<FormFields>({
     resolver: zodResolver(personalInformationSchema),
     defaultValues: existingDetails || {
+      first_name:"",
+      middle_name: "",
+      last_name: "",
       phone: "",
       address: "",
       linkedin: "",
@@ -64,6 +67,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
     },
   });
 
+
   useEffect(() => {
     if (existingDetails) reset(existingDetails);
     else if (selectedPersonalDetail) reset(selectedPersonalDetail);
@@ -75,6 +79,9 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+
+  // Apply AI form data when it changes
+
 
   // --- AI Handlers ---
   const handleOpenAI = () => {
@@ -110,7 +117,6 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
     }
   };
 
-
   function convertToISODate(dateString: string): string {
     if (!dateString) return "";
 
@@ -130,39 +136,31 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
   const handleAcceptAI = (rawData: any) => {
     if (!rawData) return;
 
-    const aiData = rawData.personal_information ?? rawData;
+    // Extract array from backend response
+    const aiArray = rawData.personal_information ?? [];
+    if (!Array.isArray(aiArray) || aiArray.length === 0) return;
 
-    const flattenedData: Partial<FormFields> = {
+    const aiData = aiArray[0]; // ✅ Take the first item
+
+    const formData: Partial<FormFields> = {
+      first_name: aiData.first_name ?? "",
+      middle_name: aiData.middle_name ?? "",
+      last_name: aiData.last_name ?? "",
       phone: aiData.phone ?? "",
       address: aiData.address ?? "",
       linkedin: aiData.linkedin ?? aiData.social_links?.linkedin ?? "",
       github: aiData.github ?? aiData.social_links?.github ?? "",
       website: aiData.website ?? aiData.social_links?.website ?? "",
-
-      // ✅ FIXED: Convert AI DOB to YYYY-MM-DD format
       date_of_birth: convertToISODate(aiData.date_of_birth),
-
       nationality: aiData.nationality ?? "",
       profile_summary: aiData.profile_summary ?? "",
-      profile_image: undefined,
     };
 
-    console.log("Flattened Data:", flattenedData);
-
-    // Reset form
-    reset(flattenedData, { keepErrors: true, keepDirty: true });
-
-    // Force-set each field to update the UI
-    Object.entries(flattenedData).forEach(([key, value]) => {
-      setValue(key as keyof FormFields, value);
-    });
-
+    reset(formData, { keepErrors: true, keepDirty: false });
     setSuccessMessage("✅ Form populated with AI data. Please review and save.");
     setPreviewModalOpen(false);
     setAiPreviewData(null);
   };
-
-
 
 
   if (!user)
@@ -172,6 +170,9 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
 
   const createFormData = (data: FormFields) => {
     const formData = new FormData();
+    formData.append("first_name", data.first_name);
+    formData.append("middle_name", data.middle_name || "");
+    formData.append("last_name", data.last_name);
     formData.append("full_name", full_name);
     formData.append("email", user.email);
     formData.append("phone", data.phone);
@@ -268,6 +269,38 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputField
             type="text"
+            label="First Name"
+            placeholder="John"
+            name="first_name"
+            register={register("first_name")}
+            error={errors.first_name?.message}
+            disabled={loading}
+            required
+          />
+
+          <InputField
+            type="text"
+            label="Middle Name (Optional)"
+            placeholder="Michael"
+            name="middle_name"
+            register={register("middle_name")}
+            error={errors.middle_name?.message}
+            disabled={loading}
+          />
+
+          <InputField
+            type="text"
+            label="Last Name"
+            placeholder="Doe"
+            name="last_name"
+            register={register("last_name")}
+            error={errors.last_name?.message}
+            disabled={loading}
+            required
+          />
+
+          <InputField
+            type="text"
             label="Phone Number"
             placeholder="+255 123 456 789"
             name="phone"
@@ -355,7 +388,6 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
               label="Profile Image (Optional)"
               name="profile_image"
               register={register("profile_image")}
-              onChange={(val) => setValue("profile_image", val)}
               error={errors.profile_image?.message as string | undefined}
               disabled={loading}
             />

@@ -7,6 +7,7 @@ interface AdvancedTemplateProps {
 
 const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
   const user = useSelector((state: RootState) => state.auth.user);
+   const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
 
   if (!user && isPreview) {
     return (
@@ -58,7 +59,7 @@ const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
                   className="text-3xl font-bold uppercase text-blue-800 mb-1"
                   style={{ fontFamily: "'Times New Roman', Times, serif" }}
                 >
-                  {user?.profile?.full_name || "Full Name"}
+                  {full_name}
                 </h1>
 
                 {/* Contact Info */}

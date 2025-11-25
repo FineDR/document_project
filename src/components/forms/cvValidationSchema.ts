@@ -4,25 +4,32 @@
 // src/components/forms/cvValidationSchema.ts
 import { z } from "zod";
 
+const urlOptional = z
+  .string()
+  .optional()
+  .refine(
+    (val) =>
+      !val ||
+      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(
+        val
+      ),
+    { message: "Invalid URL" }
+  );
+
 export const personalInformationSchema = z.object({
+  // Name fields
+  first_name: z.string().min(1, "First name is required"),
+  middle_name: z.string().optional(),
+  last_name: z.string().min(1, "Last name is required"),
+
+  // Contact info
   phone: z.string().min(1, "Phone is required"),
   address: z.string().min(1, "Address is required"),
 
-  // LinkedIn, GitHub, Website optional na validate URL tu ikiwa imeingizwa
-  linkedin: z.string().optional().refine(
-    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
-    { message: "Invalid URL" }
-  ),
-
-  github: z.string().optional().refine(
-    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
-    { message: "Invalid URL" }
-  ),
-
-  website: z.string().optional().refine(
-    (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(val),
-    { message: "Invalid URL" }
-  ),
+  // URLs optional and validated if provided
+  linkedin: urlOptional,
+  github: urlOptional,
+  website: urlOptional,
 
   date_of_birth: z.string().optional(),
   nationality: z.string().optional(),
@@ -30,9 +37,10 @@ export const personalInformationSchema = z.object({
 
   profile_image: z
     .any()
-    .refine((files) => !files || files.length === 0 || files[0]?.size <= 5_000_000, {
-      message: "File size must be less than 5MB",
-    })
+    .refine(
+      (files) => !files || files.length === 0 || files[0]?.size <= 5_000_000,
+      { message: "File size must be less than 5MB" }
+    )
     .optional(),
 });
 

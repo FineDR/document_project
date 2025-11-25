@@ -15,10 +15,13 @@ const PersonalInfoSection = ({ cv }: Props) => {
 
   const formatLinkText = (url: string, platform: string) =>
     url ? `Visit ${platform}` : "-";
-
+  const full_name = `${info?.first_name || ""} ${info?.middle_name || ""} ${info?.last_name || ""}`.trim();
   const hasData =
     profile?.full_name ||
     profile?.email ||
+    info?.first_name ||
+    info?.middle_name ||
+    info?.last_name ||
     info?.phone ||
     info?.address ||
     info?.date_of_birth ||
@@ -44,7 +47,7 @@ const PersonalInfoSection = ({ cv }: Props) => {
             Edit
           </button>
 
-          {profile?.full_name && <p><strong>Name:</strong> {profile.full_name}</p>}
+          {info?.first_name && <p><strong>Name:</strong> {full_name}</p>}
           {profile?.email && <p><strong>Email:</strong> {profile.email}</p>}
           {info?.phone && <p><strong>Phone:</strong> {info.phone}</p>}
           {info?.address && <p><strong>Address:</strong> {info.address}</p>}
