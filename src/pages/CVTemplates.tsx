@@ -112,7 +112,7 @@ const CVTemplates = () => {
       <div className="container mx-auto px-4 sm:px-6">
         
         {/* Header Section */}
-        <div className="prose prose-lg mx-auto text-center mb-8 md:mb-12 max-w-3xl">
+        <div className="prose prose-lg mx-auto text-center mb-8 md:mb-12 mt-16 max-w-3xl">
           <h1 className="text-3xl md:text-h1 font-bold text-redMain mb-4">
             CV Template Options
           </h1>
