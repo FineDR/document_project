@@ -15,15 +15,15 @@ const Services = () => {
       buttonText: "Create CV",
       path: "/create/cv",
     },
-    {
-      id: "official-letter",
-      title: "Official Letter Creation",
-      icon: <FaEnvelope className="text-2xl text-redMain" />,
-      description:
-        "Generate professional, well-formatted letters for job applications, business communication, and more.",
-      buttonText: "Create Letter",
-      path: "/create/official-letter",
-    },
+    // {
+    //   id: "official-letter",
+    //   title: "Official Letter Creation",
+    //   icon: <FaEnvelope className="text-2xl text-redMain" />,
+    //   description:
+    //     "Generate professional, well-formatted letters for job applications, business communication, and more.",
+    //   buttonText: "Create Letter",
+    //   path: "/create/official-letter",
+    // },
   ];
 
   const stages = [
