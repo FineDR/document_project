@@ -38,7 +38,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isAIModalOpen, setAIModalOpen] = useState(false);
-  const [currentSection, setCurrentSection] = useState<keyof typeof aiTemplates>("personal_information");
+  const [currentSection] = useState<keyof typeof aiTemplates>("personal_information");
   // --- AI Workflow State ---
   const [isPreviewModalOpen, setPreviewModalOpen] = useState(false);
   const [aiPreviewData, setAiPreviewData] = useState<any>(null);
@@ -49,7 +49,7 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
     (state: RootState) => state.personalDetails
   );
 
-  const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm<FormFields>({
+  const { register, reset, handleSubmit, formState: { errors } } = useForm<FormFields>({
     resolver: zodResolver(personalInformationSchema),
     defaultValues: existingDetails || {
       first_name:"",
@@ -244,8 +244,15 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
 
   return (
     <section className="relative mx-auto mt-6 p-6 border bg-background rounded-lg w-full shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold flex-1 text-center pl-10">
+      
+      {/* 
+        UPDATED HEADER: 
+        1. Used 'flex-col' for mobile and 'md:flex-row' for larger screens.
+        2. Added 'gap-4' for spacing between title and button.
+        3. Made button 'w-full' on mobile and 'w-auto' on desktop.
+      */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-xl md:text-2xl font-semibold text-center md:text-left w-full md:w-auto">
           {selectedPersonalDetail ? "Edit Personal Details" : "Fill Personal Details"}
         </h2>
         <Button
@@ -253,11 +260,11 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
           label="✨ Autofill with AI"
           onClick={handleOpenAI}
           disabled={loading}
-          className="text-white text-sm px-3 py-2"
+          className="w-full md:w-auto text-white text-sm px-4 py-2"
         />
       </div>
 
-      <p className="text-gray-600 text-sm mb-6 text-center">
+      <p className="text-gray-600 text-sm mb-6 text-center md:text-left">
         Fill in your personal information. This will be displayed in your CV/profile.
       </p>
 
@@ -396,8 +403,8 @@ const PersonDetailForm: React.FC<Props> = ({ existingDetails, onDone }) => {
 
 
         <div className="flex gap-4 flex-wrap mt-4 justify-center">
-          {selectedPersonalDetail && <Button type="button" label="Delete" onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600" />}
-          <Button type="submit" onClick={() => { }} label={selectedPersonalDetail ? "Update" : "Save Details"} disabled={loading} />
+          {selectedPersonalDetail && <Button type="button" label="Delete" onClick={handleDelete} disabled={loading} className="bg-red-500 hover:bg-red-600 w-full md:w-auto" />}
+          <Button type="submit" onClick={() => { }} label={selectedPersonalDetail ? "Update" : "Save Details"} disabled={loading} className="w-full md:w-auto" />
         </div>
 
         <Loader loading={loading} message={loading ? `Processing... (${elapsedTime}s elapsed)` : ""} />
