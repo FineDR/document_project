@@ -1,5 +1,13 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+  Image,
+} from "@react-pdf/renderer";
 import type { User } from "../../../../types/cv/cv";
 
 interface CVAdvancedPDFProps {
@@ -13,7 +21,11 @@ Font.register({
     { src: "/fonts/Times_New_Roman.ttf" },
     { src: "/fonts/Times_New_Roman_Italic.ttf", fontStyle: "italic" },
     { src: "/fonts/Times_New_Roman_Bold.ttf", fontWeight: "bold" },
-    { src: "/fonts/Times_New_Roman_Bold_Italic.ttf", fontWeight: "bold", fontStyle: "italic" },
+    {
+      src: "/fonts/Times_New_Roman_Bold_Italic.ttf",
+      fontWeight: "bold",
+      fontStyle: "italic",
+    },
   ],
 });
 
@@ -27,10 +39,12 @@ const styles = StyleSheet.create({
     minHeight: "297mm",
     flexDirection: "column",
   },
+
+  /* ---------- HEADER (FIXED) ---------- */
   header: {
     flexDirection: "row",
     marginBottom: 15,
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   photo: {
     width: 90,
@@ -39,10 +53,36 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#1E40AF",
   },
-  headerText: { flexGrow: 1 },
-  name: { fontSize: 22, fontWeight: "bold", textTransform: "uppercase", color: "#1E40AF", marginBottom: 6 },
-  contact: { fontSize: 10, color: "#1D4ED8" },
-  section: { marginBottom: 12 },
+  headerText: {
+    flexGrow: 1,
+    flexShrink: 1,
+    maxWidth: "100%",
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#1E40AF",
+    marginBottom: 6,
+  },
+  contactRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    maxWidth: "100%",
+  },
+  contactItem: {
+    fontSize: 10,
+    color: "#1D4ED8",
+    marginRight: 6,
+    marginBottom: 2,
+    wordBreak: "break-word",
+    maxWidth: "100%",
+  },
+
+  /* ---------- SECTIONS ---------- */
+  section: {
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "bold",
@@ -53,9 +93,22 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     color: "#1E40AF",
   },
-  card: { padding: 6, backgroundColor: "#F8FAFC", borderLeftWidth: 4, borderLeftColor: "#2563EB", marginBottom: 6 },
-  rowBetween: { flexDirection: "row", justifyContent: "space-between" },
-  paragraph: { marginBottom: 4, textAlign: "justify" },
+  card: {
+    padding: 6,
+    backgroundColor: "#F8FAFC",
+    borderLeftWidth: 4,
+    borderLeftColor: "#2563EB",
+    marginBottom: 6,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
+  paragraph: {
+    marginBottom: 4,
+    textAlign: "justify",
+  },
   badge: {
     fontSize: 9,
     paddingHorizontal: 6,
@@ -66,18 +119,26 @@ const styles = StyleSheet.create({
     marginRight: 4,
     marginBottom: 4,
   },
-  footer: { marginTop: 12, textAlign: "center", fontSize: 9, color: "#555", fontStyle: "italic" },
+  footer: {
+    marginTop: 12,
+    textAlign: "center",
+    fontSize: 9,
+    color: "#555",
+    fontStyle: "italic",
+  },
 });
 
 const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
   if (!user) return null;
 
-  const fullName = `${user.personal_details?.first_name || ""} ${user.personal_details?.middle_name || ""} ${user.personal_details?.last_name || ""}`.trim();
+  const fullName = `${user.personal_details?.first_name || ""} ${
+    user.personal_details?.middle_name || ""
+  } ${user.personal_details?.last_name || ""}`.trim();
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* HEADER */}
+        {/* ================= HEADER ================= */}
         <View style={styles.header}>
           {user.personal_details?.profile_image && (
             <Image
@@ -88,13 +149,32 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
 
           <View style={styles.headerText}>
             <Text style={styles.name}>{fullName}</Text>
-            <Text style={styles.contact}>
-              {user.personal_details?.phone}
-              {user.email && ` | ${user.email}`}
-              {user.personal_details?.address && ` | ${user.personal_details.address}`}
-              {user.personal_details?.github && ` | ${user.personal_details.github}`}
-              {user.personal_details?.linkedin && ` | ${user.personal_details.linkedin}`}
-            </Text>
+
+            <View style={styles.contactRow}>
+              {user.personal_details?.phone && (
+                <Text style={styles.contactItem}>
+                  {user.personal_details.phone}
+                </Text>
+              )}
+              {user.email && (
+                <Text style={styles.contactItem}>| {user.email}</Text>
+              )}
+              {user.personal_details?.address && (
+                <Text style={styles.contactItem}>
+                  | {user.personal_details.address}
+                </Text>
+              )}
+              {user.personal_details?.github && (
+                <Text style={styles.contactItem}>
+                  | {user.personal_details.github}
+                </Text>
+              )}
+              {user.personal_details?.linkedin && (
+                <Text style={styles.contactItem}>
+                  | {user.personal_details.linkedin}
+                </Text>
+              )}
+            </View>
           </View>
         </View>
 
@@ -103,7 +183,9 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Summary</Text>
             <View style={styles.card}>
-              <Text style={styles.paragraph}>{user.personal_details.profile_summary}</Text>
+              <Text style={styles.paragraph}>
+                {user.personal_details.profile_summary}
+              </Text>
             </View>
           </View>
         )}
@@ -116,7 +198,9 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
               <View key={edu.id} style={styles.card}>
                 <View style={styles.rowBetween}>
                   <Text style={{ fontWeight: "bold" }}>{edu.degree}</Text>
-                  <Text>{edu.start_date} – {edu.end_date}</Text>
+                  <Text>
+                    {edu.start_date} – {edu.end_date}
+                  </Text>
                 </View>
                 <Text>{edu.institution}</Text>
                 <Text>{edu.location}</Text>
@@ -134,7 +218,9 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
               <View key={work.id} style={styles.card}>
                 <View style={styles.rowBetween}>
                   <Text style={{ fontWeight: "bold" }}>{work.job_title}</Text>
-                  <Text>{work.start_date} – {work.end_date || "Present"}</Text>
+                  <Text>
+                    {work.start_date} – {work.end_date || "Present"}
+                  </Text>
                 </View>
                 <Text style={{ fontStyle: "italic" }}>{work.company}</Text>
                 <Text>{work.location}</Text>
@@ -161,7 +247,9 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
                 {proj.technologies?.length > 0 && (
                   <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                     {proj.technologies.map((t) => (
-                      <Text key={t.id} style={styles.badge}>{t.value}</Text>
+                      <Text key={t.id} style={styles.badge}>
+                        {t.value}
+                      </Text>
                     ))}
                   </View>
                 )}
@@ -177,16 +265,26 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
             {user.skill_sets.map((set) => (
               <View key={set.id} style={{ marginBottom: 6 }}>
                 {set.technical_skills?.length > 0 && (
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 2 }}>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                     {set.technical_skills.map((t) => (
-                      <Text key={t.id} style={styles.badge}>{t.value}</Text>
+                      <Text key={t.id} style={styles.badge}>
+                        {t.value}
+                      </Text>
                     ))}
                   </View>
                 )}
                 {set.soft_skills?.length > 0 && (
                   <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                     {set.soft_skills.map((s) => (
-                      <Text key={s.id} style={[styles.badge, { backgroundColor: "#DCFCE7", color: "#166534" }]}>{s.value}</Text>
+                      <Text
+                        key={s.id}
+                        style={[
+                          styles.badge,
+                          { backgroundColor: "#DCFCE7", color: "#166534" },
+                        ]}
+                      >
+                        {s.value}
+                      </Text>
                     ))}
                   </View>
                 )}
@@ -248,7 +346,6 @@ const CVAdvancedPDF: React.FC<CVAdvancedPDFProps> = ({ user }) => {
           </View>
         )}
 
-        {/* FOOTER */}
         <Text style={styles.footer}>Generated CV • Advanced Template</Text>
       </Page>
     </Document>

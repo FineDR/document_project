@@ -10,10 +10,6 @@ import {
 } from "@react-pdf/renderer";
 import type { User } from "../../../../types/cv/cv";
 
-interface CVTraditionalPDFProps {
-    user?: User;
-}
-
 /* Font */
 Font.register({
   family: "Times New Roman",
@@ -21,57 +17,80 @@ Font.register({
     { src: "/fonts/Times_New_Roman.ttf" },
     { src: "/fonts/Times_New_Roman_Italic.ttf", fontStyle: "italic" },
     { src: "/fonts/Times_New_Roman_Bold.ttf", fontWeight: "bold" },
-    { src: "/fonts/Times_New_Roman_Bold_Italic.ttf", fontWeight: "bold", fontStyle: "italic" },
+    {
+      src: "/fonts/Times_New_Roman_Bold_Italic.ttf",
+      fontWeight: "bold",
+      fontStyle: "italic",
+    },
   ],
 });
 
+interface CVTraditionalPDFProps {
+  user?: User;
+}
 
 const styles = StyleSheet.create({
+  /* PAGE */
   page: {
-    padding: 32,
+    paddingTop: 36,
+    paddingBottom: 36,
+    paddingHorizontal: 36, // standard A4 margin
     fontFamily: "Times New Roman",
     fontSize: 11,
     lineHeight: 1.6,
-    width: "210mm",
-    minHeight: "297mm",
   },
 
   /* HEADER */
   header: {
-    alignItems: "center",
     marginBottom: 24,
   },
+
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    maxWidth: 520,
+    width: "100%",
   },
+
   photo: {
-    width: 90,
-    height: 90,
+    width: 96,
+    height: 96,
     marginRight: 16,
     borderWidth: 2,
     borderColor: "#1E40AF",
   },
+
+  headerContent: {
+    flex: 1,
+  },
+
   name: {
     fontSize: 22,
     fontWeight: "bold",
     textTransform: "uppercase",
     color: "#1E40AF",
-    marginBottom: 4,
-  },
-  contact: {
-    fontSize: 10,
-    color: "#1D4ED8",
-    flexWrap: "wrap",
+    marginBottom: 6,
   },
 
+  contactRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    maxWidth: "100%",
+  },
+
+  contactItem: {
+    fontSize: 10,
+    color: "#1D4ED8",
+    marginRight: 6,
+    marginBottom: 2,
+  },
+
+  /* SECTIONS */
   section: {
     marginBottom: 18,
   },
 
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
     textTransform: "uppercase",
     borderBottomWidth: 1,
@@ -80,48 +99,63 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  paragraph: {
+    textAlign: "justify",
+  },
+
   card: {
-    padding: 10,
+    padding: 8,
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderColor: "#E5E7EB",
     marginBottom: 8,
   },
 
-  row: {
+  rowBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
 
-  paragraph: {
-    textAlign: "justify",
-    marginBottom: 4,
+  listItem: {
+    marginLeft: 10,
+    marginBottom: 2,
   },
 
   tagBlue: {
     fontSize: 9,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 10,
     backgroundColor: "#DBEAFE",
     color: "#1E40AF",
     marginRight: 4,
     marginBottom: 4,
+    borderRadius: 10,
   },
 
   tagGreen: {
     fontSize: 9,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 10,
     backgroundColor: "#DCFCE7",
     color: "#166534",
     marginRight: 4,
     marginBottom: 4,
+    borderRadius: 10,
+  },
+
+  grid3: {
+    flexDirection: "row",
+    gap: 12,
+  },
+
+  col: {
+    flex: 1,
   },
 });
 
-const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
+const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({
+  user,
+}) => {
   if (!user) return null;
 
   const pd = user.personal_details;
@@ -139,15 +173,25 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
                 style={styles.photo}
               />
             )}
-            <View>
+
+            <View style={styles.headerContent}>
               <Text style={styles.name}>{fullName}</Text>
-              <Text style={styles.contact}>
-                {pd?.phone}
-                {user.email && ` | ${user.email}`}
-                {pd?.address && ` | ${pd.address}`}
-                {pd?.github && ` | ${pd.github}`}
-                {pd?.linkedin && ` | ${pd.linkedin}`}
-              </Text>
+
+              <View style={styles.contactRow}>
+                {pd?.phone && <Text style={styles.contactItem}>{pd.phone}</Text>}
+                {user.email && (
+                  <Text style={styles.contactItem}>| {user.email}</Text>
+                )}
+                {pd?.address && (
+                  <Text style={styles.contactItem}>| {pd.address}</Text>
+                )}
+                {pd?.github && (
+                  <Text style={styles.contactItem}>| {pd.github}</Text>
+                )}
+                {pd?.linkedin && (
+                  <Text style={styles.contactItem}>| {pd.linkedin}</Text>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -156,9 +200,7 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
         {pd?.profile_summary && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Summary</Text>
-            <View style={styles.card}>
-              <Text style={styles.paragraph}>{pd.profile_summary}</Text>
-            </View>
+            <Text style={styles.paragraph}>{pd.profile_summary}</Text>
           </View>
         )}
 
@@ -168,16 +210,21 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
             <Text style={styles.sectionTitle}>Education</Text>
             {user.educations.map((edu) => (
               <View key={edu.id} style={styles.card}>
-                <Text style={{ fontWeight: "bold" }}>{edu.degree}</Text>
-                <Text>{edu.institution}</Text>
-                <Text style={{ fontSize: 10, color: "#555" }}>
-                  {edu.location} • {edu.start_date} – {edu.end_date}
-                </Text>
-                {edu.grade && (
-                  <Text style={{ fontSize: 10, color: "#1E40AF" }}>
-                    Grade: {edu.grade}
-                  </Text>
-                )}
+                <View style={styles.rowBetween}>
+                  <View>
+                    <Text style={{ fontWeight: "bold" }}>{edu.degree}</Text>
+                    <Text>{edu.institution}</Text>
+                  </View>
+                  <View>
+                    <Text style={{ fontSize: 10 }}>{edu.location}</Text>
+                    <Text style={{ fontSize: 10 }}>
+                      {edu.start_date} – {edu.end_date}
+                    </Text>
+                    {edu.grade && (
+                      <Text style={{ fontSize: 10 }}>Grade: {edu.grade}</Text>
+                    )}
+                  </View>
+                </View>
               </View>
             ))}
           </View>
@@ -188,20 +235,24 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Work Experience</Text>
             {user.work_experiences.map((work) => (
-              <View key={work.id} style={styles.card} wrap={false}>
-                <View style={styles.row}>
+              <View key={work.id} wrap={false}>
+                <View style={styles.rowBetween}>
                   <Text style={{ fontWeight: "bold" }}>{work.job_title}</Text>
+                  <Text style={{ fontStyle: "italic" }}>{work.company}</Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text>{work.location}</Text>
                   <Text>
                     {work.start_date} – {work.end_date || "Present"}
                   </Text>
                 </View>
-                <Text style={{ fontStyle: "italic" }}>{work.company}</Text>
-                <Text>{work.location}</Text>
 
                 {work.responsibilities?.length > 0 && (
                   <View style={{ marginTop: 4 }}>
                     {work.responsibilities.map((r, i) => (
-                      <Text key={i}>• {r.value}</Text>
+                      <Text key={i} style={styles.listItem}>
+                        • {r.value}
+                      </Text>
                     ))}
                   </View>
                 )}
@@ -217,7 +268,8 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
             {user.projects.map((proj) => (
               <View key={proj.id} style={styles.card}>
                 <Text style={{ fontWeight: "bold" }}>{proj.title}</Text>
-                <Text style={styles.paragraph}>{proj.description}</Text>
+                <Text>{proj.description}</Text>
+
                 {proj.technologies?.length > 0 && (
                   <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                     {proj.technologies.map((t) => (
@@ -237,67 +289,59 @@ const CVTraditionalPDF: React.FC<CVTraditionalPDFProps> = ({ user }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Skills</Text>
             {user.skill_sets.map((set) => (
-              <View key={set.id} style={{ marginBottom: 6 }}>
-                {set.technical_skills?.length > 0 && (
-                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                    {set.technical_skills.map((s) => (
-                      <Text key={s.id} style={styles.tagBlue}>
-                        {s.value}
-                      </Text>
-                    ))}
-                  </View>
-                )}
-                {set.soft_skills?.length > 0 && (
-                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                    {set.soft_skills.map((s) => (
-                      <Text key={s.id} style={styles.tagGreen}>
-                        {s.value}
-                      </Text>
-                    ))}
-                  </View>
-                )}
+              <View key={set.id}>
+                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                  {set.technical_skills?.map((s) => (
+                    <Text key={s.id} style={styles.tagBlue}>
+                      {s.value}
+                    </Text>
+                  ))}
+                </View>
+                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                  {set.soft_skills?.map((s) => (
+                    <Text key={s.id} style={styles.tagGreen}>
+                      {s.value}
+                    </Text>
+                  ))}
+                </View>
               </View>
             ))}
           </View>
         )}
 
-        {/* LANGUAGES */}
-        {user.languages?.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Languages</Text>
-            {user.languages.map((l) => (
-              <View key={l.id} style={styles.card}>
-                <Text>
+        {/* CERTIFICATIONS / LANGUAGES / ACHIEVEMENTS */}
+        <View style={[styles.section, styles.grid3]}>
+          {user.profile?.certificates?.length > 0 && (
+            <View style={styles.col}>
+              <Text style={styles.sectionTitle}>Certifications</Text>
+              {user.profile.certificates.map((c) => (
+                <Text key={c.id}>
+                  {c.name} — {c.issuer} ({c.date})
+                </Text>
+              ))}
+            </View>
+          )}
+
+          {user.languages?.length > 0 && (
+            <View style={styles.col}>
+              <Text style={styles.sectionTitle}>Languages</Text>
+              {user.languages.map((l) => (
+                <Text key={l.id}>
                   {l.language} — {l.proficiency}
                 </Text>
-              </View>
-            ))}
-          </View>
-        )}
+              ))}
+            </View>
+          )}
 
-        {/* CERTIFICATIONS */}
-        {user.profile?.certificates?.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Certifications</Text>
-            {user.profile.certificates.map((c) => (
-              <View key={c.id} style={styles.card}>
-                <Text style={{ fontWeight: "bold" }}>{c.name}</Text>
-                <Text>{c.issuer}</Text>
-                <Text style={{ fontSize: 10 }}>{c.date}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* ACHIEVEMENTS */}
-        {user.achievement_profile?.achievements?.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Achievements</Text>
-            {user.achievement_profile.achievements.map((a) => (
-              <Text key={a.id}>• {a.value}</Text>
-            ))}
-          </View>
-        )}
+          {user.achievement_profile?.achievements?.length > 0 && (
+            <View style={styles.col}>
+              <Text style={styles.sectionTitle}>Achievements</Text>
+              {user.achievement_profile.achievements.map((a) => (
+                <Text key={a.id}>• {a.value}</Text>
+              ))}
+            </View>
+          )}
+        </View>
 
         {/* REFERENCES */}
         {user.references?.length > 0 && (

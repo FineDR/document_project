@@ -11,7 +11,7 @@ import {
 import type { User } from "../../../../types/cv/cv";
 
 interface CVIntermediatePDFProps {
-    user?: User;
+  user?: User;
 }
 
 /* Font */
@@ -21,31 +21,36 @@ Font.register({
     { src: "/fonts/Times_New_Roman.ttf" },
     { src: "/fonts/Times_New_Roman_Italic.ttf", fontStyle: "italic" },
     { src: "/fonts/Times_New_Roman_Bold.ttf", fontWeight: "bold" },
-    { src: "/fonts/Times_New_Roman_Bold_Italic.ttf", fontWeight: "bold", fontStyle: "italic" },
+    {
+      src: "/fonts/Times_New_Roman_Bold_Italic.ttf",
+      fontWeight: "bold",
+      fontStyle: "italic",
+    },
   ],
 });
 
-
 const styles = StyleSheet.create({
+  /* PAGE */
   page: {
-    padding: 32,
+    paddingTop: 32,
+    paddingBottom: 32,
+    paddingHorizontal: 32, // standard document margin
     fontFamily: "Times New Roman",
     fontSize: 11,
     lineHeight: 1.6,
-    width: "210mm",
-    minHeight: "297mm",
   },
 
   /* HEADER */
   header: {
-    alignItems: "center",
     marginBottom: 24,
   },
+
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    maxWidth: 520,
+    width: "100%",
   },
+
   photo: {
     width: 90,
     height: 90,
@@ -53,19 +58,33 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#1E40AF",
   },
+
+  headerContent: {
+    flex: 1, // IMPORTANT: prevents overflow
+  },
+
   name: {
     fontSize: 22,
     fontWeight: "bold",
     textTransform: "uppercase",
     color: "#1E40AF",
-    marginBottom: 4,
-  },
-  contact: {
-    fontSize: 10,
-    color: "#1D4ED8",
-    flexWrap: "wrap",
+    marginBottom: 6,
   },
 
+  contactRow: {
+    flexDirection: "row",
+    flexWrap: "wrap", // CRITICAL
+    maxWidth: "100%",
+  },
+
+  contactItem: {
+    fontSize: 10,
+    color: "#1D4ED8",
+    marginRight: 6,
+    marginBottom: 2,
+  },
+
+  /* SECTIONS */
   section: {
     marginBottom: 18,
   },
@@ -139,15 +158,27 @@ const CVIntermediatePDF: React.FC<CVIntermediatePDFProps> = ({ user }) => {
                 style={styles.photo}
               />
             )}
-            <View>
+
+            <View style={styles.headerContent}>
               <Text style={styles.name}>{fullName}</Text>
-              <Text style={styles.contact}>
-                {pd?.phone}
-                {user.email && ` | ${user.email}`}
-                {pd?.address && ` | ${pd.address}`}
-                {pd?.github && ` | ${pd.github}`}
-                {pd?.linkedin && ` | ${pd.linkedin}`}
-              </Text>
+
+              <View style={styles.contactRow}>
+                {pd?.phone && (
+                  <Text style={styles.contactItem}>{pd.phone}</Text>
+                )}
+                {user.email && (
+                  <Text style={styles.contactItem}>| {user.email}</Text>
+                )}
+                {pd?.address && (
+                  <Text style={styles.contactItem}>| {pd.address}</Text>
+                )}
+                {pd?.github && (
+                  <Text style={styles.contactItem}>| {pd.github}</Text>
+                )}
+                {pd?.linkedin && (
+                  <Text style={styles.contactItem}>| {pd.linkedin}</Text>
+                )}
+              </View>
             </View>
           </View>
         </View>
