@@ -107,3 +107,11 @@ export const TEMPLATE_DOWNLOAD: Record<string, string> = {
   Advanced: "api/cv/download/advanced/",
 
 };
+// endpoints.ts
+export const RISALA_ENDPOINTS = {
+  list: "/api/risala/",             // list all risalas for admin or current user
+  create: "/api/risala/",           // create new risala
+  detail: "/api/risala/",           // fetch/update the risala for current user (no ID)
+  aiGenerate: "/api/risala/ai/generate/", // AI generation
+};
+

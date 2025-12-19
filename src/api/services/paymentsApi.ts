@@ -2,25 +2,13 @@ import { PAYMENTS_ENDPOINTS } from "../endpoints";
 import axiosClient from "../axiosClient";
 
 export const initiatePayment = (data: any) =>
-  axiosClient(PAYMENTS_ENDPOINTS.initiate, {
-    method: "POST",
-    data,
-  });
+  axiosClient.post(PAYMENTS_ENDPOINTS.initiate, data);
 
 export const checkout = (data: any) =>
-  axiosClient(PAYMENTS_ENDPOINTS.checkout, {
-    method: "POST",
-    data,
-  });
+  axiosClient.post(PAYMENTS_ENDPOINTS.checkout, data);
 
 export const azampayCallback = (data: any) =>
-  axiosClient(PAYMENTS_ENDPOINTS.azampayCallback, {
-    method: "POST",
-    data,
-  });
+  axiosClient.post(PAYMENTS_ENDPOINTS.azampayCallback, data);
 
 export const webhook = (data: any) =>
-  axiosClient(PAYMENTS_ENDPOINTS.webhook, {
-    method: "POST",
-    data,
-  });
+  axiosClient.post(PAYMENTS_ENDPOINTS.webhook, data);

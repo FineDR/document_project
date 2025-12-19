@@ -171,3 +171,45 @@ export const cvValidationSchema: Record<string, any> = {
   references: z.array(referencesSchema).nonempty("At least one reference is required"),
 };
 export type CVValidationSchema = typeof cvValidationSchema;
+
+export const risalaSchema = z.object({
+  // STEP 1
+ event_type: z.enum(["harusi", "msiba", "uzinduzi", "mgeni_rasmi"])
+    .refine(val => !!val, { message: "Chagua aina ya tukio" }),
+  event_title: z.string().min(1, "Jina la tukio ni lazima"),
+  event_date: z.string().min(1, "Chagua tarehe ya tukio"),
+  event_location: z.string().min(1, "Andika mahali pa tukio"),
+
+  // STEP 2
+  guest_of_honor: z.string().optional(),
+  guest_title: z.string().optional(),
+  organization_name: z.string().optional(),
+  organization_representative: z.string().optional(),
+
+  // STEP 3
+  purpose_statement: z.string().min(1, "Andika lengo kuu la risala"),
+  background_info: z.string().optional(),
+  main_message: z.string().min(1, "Andika ujumbe mkuu"),
+
+  // STEP 4 (conditional)
+  bride_name: z.string().optional(),
+  groom_name: z.string().optional(),
+  wedding_theme: z.string().optional(),
+
+  deceased_name: z.string().optional(),
+  relationship: z.string().optional(),
+  tribute_summary: z.string().optional(),
+
+  project_name: z.string().optional(),
+  project_goal: z.string().optional(),
+  project_beneficiaries: z.string().optional(),
+
+  program_name: z.string().optional(),
+  program_theme: z.string().optional(),
+
+  // STEP 5
+  requests: z.string().optional(),
+  closing_statement: z.string().optional(),
+  presenter_name: z.string().min(1, "Andika jina la msomaji"),
+  presenter_title: z.string().optional(),
+});

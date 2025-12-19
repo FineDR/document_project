@@ -7,6 +7,7 @@ import { initiatePayment as initiatePaymentApi, checkout, azampayCallback, webho
 interface CheckoutData {
     checkoutId?: string;
     paymentUrl?: string;
+    downloads_added?: number; // <-- New
     [key: string]: any;
 }
 
@@ -18,6 +19,7 @@ interface CheckoutResponse {
 
 interface CallbackResponse {
     status: "received" | "failed";
+    downloads_added?: number; // <-- New
 }
 
 interface PaymentResponse {
@@ -42,6 +44,7 @@ interface PaymentState {
     checkoutData: CheckoutResponse | null;
     callbackData: CallbackResponse | null;
     webhookData: WebhookResponse | null;
+    downloadCredits: number; // <-- New
 }
 
 // --------------------
@@ -54,6 +57,7 @@ const initialState: PaymentState = {
     checkoutData: null,
     callbackData: null,
     webhookData: null,
+    downloadCredits: 0, // <-- New
 };
 
 // --------------------
@@ -126,6 +130,12 @@ const paymentSlice = createSlice({
             state.callbackData = null;
             state.webhookData = null;
         },
+        decrementDownloadCredit(state) {
+            if (state.downloadCredits > 0) state.downloadCredits -= 1;
+        },
+        setDownloadCredits(state, action: PayloadAction<number>) {
+            state.downloadCredits = action.payload;
+        },
     },
     extraReducers: (builder) => {
         // initiatePayment
@@ -150,6 +160,11 @@ const paymentSlice = createSlice({
         builder.addCase(processCheckout.fulfilled, (state, action: PayloadAction<CheckoutResponse>) => {
             state.loading = false;
             state.checkoutData = action.payload;
+
+            // Update download credits from backend response
+            if (action.payload.data?.downloads_added) {
+                state.downloadCredits += action.payload.data.downloads_added;
+            }
         });
         builder.addCase(processCheckout.rejected, (state, action) => {
             state.loading = false;
@@ -164,6 +179,10 @@ const paymentSlice = createSlice({
         builder.addCase(handleAzampayCallback.fulfilled, (state, action: PayloadAction<CallbackResponse>) => {
             state.loading = false;
             state.callbackData = action.payload;
+
+            if (action.payload.downloads_added) {
+                state.downloadCredits += action.payload.downloads_added;
+            }
         });
         builder.addCase(handleAzampayCallback.rejected, (state, action) => {
             state.loading = false;
@@ -178,6 +197,10 @@ const paymentSlice = createSlice({
         builder.addCase(handleWebhook.fulfilled, (state, action: PayloadAction<WebhookResponse>) => {
             state.loading = false;
             state.webhookData = action.payload;
+
+            if (action.payload.data?.downloads_added) {
+                state.downloadCredits += action.payload.data.downloads_added;
+            }
         });
         builder.addCase(handleWebhook.rejected, (state, action) => {
             state.loading = false;
@@ -186,5 +209,5 @@ const paymentSlice = createSlice({
     },
 });
 
-export const { resetPaymentState } = paymentSlice.actions;
+export const { resetPaymentState, decrementDownloadCredit, setDownloadCredits } = paymentSlice.actions;
 export default paymentSlice.reducer;

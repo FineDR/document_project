@@ -18,8 +18,9 @@ import PDFReports from "../pages/PDFReports";
 import SignUpPage from "../components/auth/SignUp";
 import { SignInPage } from "../components/auth/SignIn";
 import PaymentComponent from "../components/sections/PaymentComponent";
-
-export interface pageRouteConfig<P = {}> {
+import RisalaForm from "../components/forms/RisalaForm";
+import  RisalaTemplate  from "../pages/RisalaTemplate";
+export interface pageRouteConfig<P = any> {
   forNav?: boolean;
   path: string;
   element: React.ComponentType<P>;
@@ -121,6 +122,7 @@ export const routes: pageRouteConfig[] = [
     layout: true,
     dropdown: [
       { name: "CV Templates", path: "/documents/templates/cv", active: true },
+      { name: "Risala Templates", path: "/documents/templates/risala", active: true },
       { name: "Cover Letter Templates", path: "/documents/templates/cover-letter", active: false },
       { name: "Portfolio Templates", path: "/documents/templates/portfolio", active: false },
       { name: "Certificate Templates", path: "/documents/templates/certificate", active: false },
@@ -154,6 +156,7 @@ export const routes: pageRouteConfig[] = [
       { name: "PDF Reports", path: "/create/pdf-reports", active: false },
       { name: "New Portfolio", path: "/create/portfolio", active: false },
       { name: "New Certificate", path: "/create/certificate", active: false },
+      { name: "Risala", path: "/create/risala", active: true },
     ],
     seo: {
       title: "Smart Docs - Create Documents",
@@ -180,6 +183,28 @@ export const routes: pageRouteConfig[] = [
     seo: {
       title: "Smart Docs - Create Official Letter",
       description: "Create professional official letters for work or personal use."
+    }
+  },
+    {
+    forNav: false,
+    path: "/create/risala",
+    element: RisalaForm,
+    name: "Create Risala",
+    layout: true,
+    seo: {
+      title: "Smart Docs - Create Risala",
+      description: "Create professional Risala for work or personal use."
+    }
+  },
+      {
+    forNav: false,
+    path: "/documents/templates/risala",
+    element: RisalaTemplate,
+    name: "Risala Template",
+    layout: true,
+    seo: {
+      title: "Smart Docs - Template Risala",
+      description: "Create professional Risala for work or personal use."
     }
   },
   {

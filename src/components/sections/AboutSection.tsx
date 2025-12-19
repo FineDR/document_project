@@ -57,7 +57,7 @@ const AboutSection = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className=" p-8"
+            className="p-8"
           >
             <div className="mb-6">
               <h3 className="text-h2 font-bold text-redMain mb-2 flex items-center">
@@ -82,19 +82,22 @@ const AboutSection = () => {
         <div>
           <h3 className="text-h2 font-bold text-redMain mb-8 text-center">Why Choose GenDocs</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {features.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="text-redMain mb-4 text-3xl">{feature.icon}</div>
-                <h4 className="text-lg font-semibold text-redMain mb-2">{feature.title}</h4>
-                <p className="text-subHeadingGray text-sm">{feature.description}</p>
-              </motion.div>
-            ))}
+            {features.map((feature, idx) => {
+              const isSpecial = idx === 1; // second card special animation
+              return (
+                <motion.div
+                  key={idx}
+                  initial={isSpecial ? { opacity: 0, y: 50, scale: 0.95 } : { opacity: 0, y: 20 }}
+                  animate={isSpecial ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1, duration: 0.6, ease: 'easeOut' }}
+                  className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
+                >
+                  <div className="text-redMain mb-4 text-3xl">{feature.icon}</div>
+                  <h4 className="text-lg font-semibold text-redMain mb-2">{feature.title}</h4>
+                  <p className="text-subHeadingGray text-sm">{feature.description}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>

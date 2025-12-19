@@ -24,4 +24,19 @@ export const CV_TEMPLATE_CATEGORIES: CVTemplateCategory[] = [
     name: "Advanced",
     description: "Creative, visually appealing CV with colors, icons, or infographics, ideal for designers or creative roles.",
   },
+    {
+    id: 4,
+    name: "Modern", // This name MUST match the key in templateMap below
+    description: "Sleek split-layout with a dark sidebar. Ideal for tech and creative roles.",
+  },
+  {
+  id: 5,
+  name: "Minimalist", // Matches key below
+  description: "A clean, top-heavy layout with a dedicated side column for skills.",
+},
+ {
+    id: 6,
+    name: "Creative", // This name MUST match the key in step 2
+    description: "A bold, high-contrast design with a layered header for a strong first impression.",
+  },
 ];

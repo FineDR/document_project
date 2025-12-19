@@ -20,6 +20,7 @@ import paymentReducer from "../features/payments/paymentsSlice";
 import referenceReducer from "../features/references/referencesSlice";
 import downloadsReducer from "../features/downloads/downloadsSlice"
 import uiReducer from "../store/uiSlice"
+import risalaReducer from "../features/risala/risalaSlice";
 // import profileReducer from "../features/certificates/profileSlice";
 
 
@@ -62,6 +63,7 @@ export const store = configureStore({
     educations: educationReducer, 
     language: languagesReducer,
     cv: civReducer,
+    risala: risalaReducer,
     payments: paymentReducer,
      downloads: downloadsReducer,
      ui: uiReducer,

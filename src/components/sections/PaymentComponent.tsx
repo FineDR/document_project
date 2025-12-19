@@ -53,12 +53,13 @@ const PaymentComponent: React.FC<PaymentComponentProps> = ({ onSuccess }) => {
     setSuccess(false);
   };
 
-  const providerOptions = [
-    { label: "Mpesa", value: "MPESA" },
-    { label: "Airtel", value: "AIRTEL" },
-    { label: "Tigo Pesa", value: "TIGO PESA" },
-    { label: "Halo Pesa", value: "HALO PESA" },
-  ];
+const providerOptions = [
+  { label: "Mpesa", value: "M-PESA" },
+  { label: "Airtel", value: "AIRTEL" },
+  { label: "Tigo Pesa", value: "TIGO" },
+  { label: "Halo Pesa", value: "HALO" },
+];
+
 
 
   return (

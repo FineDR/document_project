@@ -38,11 +38,10 @@ const faqs = [
   },
 ];
 
-
 const Help = () => {
   return (
     <main className="py-16 text-paragraphGray transition-colors duration-300">
-      <div className="container mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="container mx-auto">
         {/* Header */}
         <header className="text-center mb-16">
           <h1 className="text-h1 font-bold text-redMain mb-4">Help & FAQ</h1>
@@ -53,31 +52,24 @@ const Help = () => {
 
         {/* FAQ Grid */}
         <div className="grid gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-3">
-          {faqs.map((faq, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1, duration: 0.5 }}
-              className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
-            >
-              <h2 className="text-h2 text-redMain mb-2">{faq.question}</h2>
-              <p className="text-base text-subHeadingGray">{faq.answer}</p>
-            </motion.div>
-          ))}
-        </div>
+          {faqs.map((faq, idx) => {
+            // Special animation for the second card (idx === 1)
+            const specialAnimation = idx === 1;
 
-        {/* Footer CTA */}
-        {/* <p className="text-center text-sm text-subHeadingGray mt-12">
-          Still have questions?{" "}
-          <a
-            href="/contact"
-            className="text-redMain hover:underline font-medium"
-          >
-            Contact Support
-          </a>
-          .
-        </p> */}
+            return (
+              <motion.div
+                key={idx}
+                initial={specialAnimation ? { opacity: 0, y: 50, scale: 0.95 } : { opacity: 0, y: 20 }}
+                animate={specialAnimation ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1, duration: 0.6, ease: "easeOut" }}
+                className="bg-whiteBg dark:bg-grayBg p-6 rounded-xl shadow-md border-t-4 border-redMain dark:border-red-400 hover:shadow-lg transition-shadow duration-300"
+              >
+                <h2 className="text-h2 text-redMain mb-2">{faq.question}</h2>
+                <p className="text-base text-subHeadingGray">{faq.answer}</p>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </main>
   );
