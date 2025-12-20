@@ -7,7 +7,7 @@ import {
   AiOutlineCheckCircle,
   AiOutlineFilePdf
 } from "react-icons/ai";
-
+import { useCurrentUserCV } from "../hooks/useCurrentUserCV";
 // Templates
 import TraditionalTemplate from "../components/templates/cv-templates/TraditionalTemplate";
 import AdvancedTemplate from "../components/templates/cv-templates/AdvancedTemplate";
@@ -29,7 +29,6 @@ import PaymentComponent from "../components/sections/PaymentComponent";
 // Redux
 // Note: You might need to create a 'getModernPDF' action in your slice if the backend endpoint differs
 // import { getBasicPDF, getIntermediatePDF, getAdvancedPDF } from "../features/downloads/downloadsSlice";
-import type { AppDispatch } from "../store/store";
 import { PDFDownloadLink, pdf,type DocumentProps } from "@react-pdf/renderer";
 import type { RootState } from "../store/store";
 import { useSelector } from "react-redux";
@@ -57,7 +56,6 @@ const pdfTemplateMap: Record<string, React.ComponentType<CVPDFProps & DocumentPr
 
 
 const CVTemplates = () => {
-  const dispatch = useDispatch<AppDispatch>();
 
   // --- State ---
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -69,7 +67,8 @@ const CVTemplates = () => {
 
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const [isDownloading, setDownloading] = useState(false);
+  const [, setDownloading] = useState(false);
+   const { data: cvData } = useCurrentUserCV();
 
   // MAPPING: Keys here must match 'name' in CV_TEMPLATE_CATEGORIES
   const templateMap: Record<string, React.ComponentType<TemplateProps>> = {
@@ -283,7 +282,7 @@ const CVTemplates = () => {
 
                     {selectedTemplateName && (
                       <PDFDownloadLink
-                        document={React.createElement(pdfTemplateMap[selectedTemplateName], { user })}
+                        document={React.createElement(pdfTemplateMap[selectedTemplateName], {   user: cvData })}
                         fileName={`My_CV_${selectedTemplateName}.pdf`}
                       >
                         {({ loading }) => (

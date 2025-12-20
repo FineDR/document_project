@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { users, userDetails } from "../../api/services/authApi";
 import { type User } from "../../types/cv/cv";
+import { cvData } from "../../data/cvData"; // Import the static data
 
 // -------------------- State --------------------
 export interface CvState {
@@ -21,6 +22,59 @@ const initialState: CvState = {
   status: 'idle',
 };
 
+// Helper function to check if CV is empty or incomplete
+const isCvEmpty = (cv: User): boolean => {
+  return (
+    !cv.personal_details?.profile_summary &&
+    cv.career_objectives.length === 0 &&
+    cv.educations.length === 0 &&
+    cv.projects.length === 0 &&
+    cv.work_experiences.length === 0
+  );
+};
+
+// Helper function to merge user data with static template
+const mergeWithStaticTemplate = (user: User): User => {
+  // Create a deep copy of the static template
+  const mergedCv = JSON.parse(JSON.stringify(cvData));
+  
+  // Preserve user's basic information
+  mergedCv.id = user.id;
+  mergedCv.email = user.email;
+  mergedCv.first_name = user.first_name;
+  mergedCv.middle_name = user.middle_name;
+  mergedCv.last_name = user.last_name;
+  
+  // Update personal details if they exist
+  if (user.personal_details) {
+    mergedCv.personal_details = {
+      ...mergedCv.personal_details,
+      ...user.personal_details,
+      id: user.personal_details.id || mergedCv.personal_details.id,
+      user: user.id
+    };
+  }
+  
+  // Update other sections if they have data
+  if (user.career_objectives.length > 0) {
+    mergedCv.career_objectives = user.career_objectives.map(obj => ({
+      ...obj,
+      user: user.id
+    }));
+  }
+  
+  if (user.educations.length > 0) {
+    mergedCv.educations = user.educations.map(edu => ({
+      ...edu,
+      user: user.id
+    }));
+  }
+  
+  // Repeat for other sections (projects, work_experiences, etc.)
+  
+  return mergedCv;
+};
+
 // -------------------- Async Thunks --------------------
 
 // Fetch current user's CV
@@ -28,9 +82,15 @@ export const fetchCv = createAsyncThunk<User>(
   'cv/fetchCv',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await users(); // ✅ await the Axios call
-      // console.log("Fetched CV data:", response.data);
-      return response.data.enhanced_data || response.data; // use flattened CV
+      const response = await users();
+      let userData = response.data.enhanced_data || response.data;
+      
+      // If CV is empty or incomplete, use static template
+      if (isCvEmpty(userData)) {
+        userData = mergeWithStaticTemplate(userData);
+      }
+      
+      return userData;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -42,8 +102,14 @@ export const fetchAllUsers = createAsyncThunk<User[]>(
   'cv/fetchAllUsers',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await userDetails(); // ✅ await the Axios call
-      return response.data;
+      const response = await userDetails();
+      return response.data.map((user: User) => {
+        // If any user's CV is empty, merge with static template
+        if (isCvEmpty(user)) {
+          return mergeWithStaticTemplate(user);
+        }
+        return user;
+      });
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

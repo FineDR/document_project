@@ -1,13 +1,16 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../store/store";
+import { useCurrentUserCV } from "../../../hooks/useCurrentUserCV";
 
 interface AdvancedTemplateProps {
   isPreview?: boolean; // optional prop
 }
 
 const IntermediateTemplate = ({ isPreview }: AdvancedTemplateProps) => {
-  const user = useSelector((state: RootState) => state.auth.user);
-   const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
+  let user = useSelector((state: RootState) => state.auth.user);
+  const { data: cvData } = useCurrentUserCV();
+  user = cvData || user;
+  const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
 
   // --- Loading Skeleton ---
   if (!user && isPreview) {
