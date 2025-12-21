@@ -15,6 +15,15 @@ const Services = () => {
       buttonText: "Create CV",
       path: "/create/cv",
     },
+    {
+      id: "risala",
+      title: "Risala Creation",
+      icon: <FaFileAlt className="text-2xl text-redMain" />,
+      description:
+        "Build an ATS-friendly RISALA that highlights .",
+      buttonText: "Create Risala",
+      path: "/create/risala",
+    },
     // {
     //   id: "official-letter",
     //   title: "Official Letter Creation",
