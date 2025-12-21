@@ -12,6 +12,7 @@ const CreativeHeaderTemplate = ({ isPreview }: TemplateProps) => {
     user = cvData || user;
     const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
 
+
     // --- Skeleton Loader ---
     if (!user && isPreview) {
         return (

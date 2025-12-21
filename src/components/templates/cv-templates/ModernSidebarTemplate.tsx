@@ -13,6 +13,7 @@ const ModernSidebarTemplate = ({ isPreview }: TemplateProps) => {
 
     const full_name = `${user?.personal_details?.first_name || ""} ${user?.personal_details?.middle_name || ""} ${user?.personal_details?.last_name || ""}`.trim();
 
+
     // --- Skeleton Loader for Preview ---
     if (!user && isPreview) {
         return (
